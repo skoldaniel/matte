@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pythagoras sats</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#f7f3ea; --surface:#ffffff; --surface-2:#efe9da;
+    --ink:#23252b; --ink-soft:#6b6f76;
+    --border:#e2dbc9; --border-strong:#cfc6ae;
+    --accent:#2f5d9f; --accent-ink:#ffffff; --accent-soft:#dde7f6;
+    --cell-empty:#eae4d4;
+    --shadow: 0 1px 2px rgba(35,30,15,.04), 0 8px 24px -12px rgba(35,30,15,.18);
+    --good:#187a5e; --good-soft:#d9efe6;
+    --bad:#c8384c; --bad-soft:#f8dfe2;
+
+    --leg1:#2f5d9f; --leg1-soft:#dde7f6;
+    --leg2:#187a5e; --leg2-soft:#d9efe6;
+    --hyp:#b8860b; --hyp-soft:#f6ecd2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#181a1f; --surface:#212429; --surface-2:#282c33;
+      --ink:#ecebe5; --ink-soft:#a2a6b0;
+      --border:#383c46; --border-strong:#454a56;
+      --accent:#7aa7e6; --accent-ink:#12203a; --accent-soft:#25344d;
+      --cell-empty:#31353d;
+      --good:#5fcda3; --good-soft:#1c332c;
+      --bad:#ec8794; --bad-soft:#3a232a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+
+      --leg1:#7aa7e6; --leg1-soft:#20304a;
+      --leg2:#5fcda3; --leg2-soft:#193228;
+      --hyp:#e0b34d; --hyp-soft:#3a300f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#181a1f; --surface:#212429; --surface-2:#282c33;
+    --ink:#ecebe5; --ink-soft:#a2a6b0;
+    --border:#383c46; --border-strong:#454a56;
+    --accent:#7aa7e6; --accent-ink:#12203a; --accent-soft:#25344d;
+    --cell-empty:#31353d;
+    --good:#5fcda3; --good-soft:#1c332c;
+    --bad:#ec8794; --bad-soft:#3a232a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+
+    --leg1:#7aa7e6; --leg1-soft:#20304a;
+    --leg2:#5fcda3; --leg2-soft:#193228;
+    --hyp:#e0b34d; --hyp-soft:#3a300f;
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Public Sans', system-ui, -apple-system, sans-serif; padding:32px 16px 56px; }
+  .page{ max-width:1000px; margin:0 auto; }
+  header.hero{ text-align:center; margin-bottom:20px; }
+  .kicker{ font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  h1{ font-family:'Fraunces', Georgia, serif; font-optical-sizing:auto; font-weight:600; font-size:clamp(1.7rem, 1.3rem + 1.5vw, 2.5rem); margin:.25em 0 .2em; text-wrap:balance; }
+  .lede{ color:var(--ink-soft); font-size:1.03rem; max-width:60ch; margin:0 auto; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); }
+
+  .tabs{ display:flex; flex-wrap:wrap; gap:6px; padding:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; margin:20px 0; }
+  .tab{ flex:1 1 auto; border:none; background:transparent; color:var(--ink-soft); padding:10px 8px; border-radius:8px; font-size:.85rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .tab:hover{ color:var(--ink); }
+  .tab.active{ background:var(--surface); color:var(--accent); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .tab:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  .section{ padding:26px; }
+  .section h2{ font-family:'Fraunces', serif; font-weight:600; font-size:1.35rem; margin:0 0 6px; }
+  .section .desc{ color:var(--ink-soft); font-size:.92rem; margin:0 0 18px; max-width:70ch; line-height:1.5; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{ border:1.5px solid var(--border-strong); background:var(--surface-2); color:var(--ink); padding:9px 14px; border-radius:10px; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover{ border-color:var(--accent); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .btn[disabled]{ opacity:.4; cursor:not-allowed; }
+  .seg{ border:1.5px solid var(--border-strong); background:var(--surface-2); color:var(--ink-soft); padding:8px 13px; border-radius:999px; font-size:.82rem; font-weight:700; }
+  .seg.active{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+  .segrow{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+
+  .mode-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+
+  .sliders{ display:flex; flex-wrap:wrap; gap:22px; margin-bottom:18px; }
+  .slider-field{ flex:1 1 220px; min-width:200px; }
+  .slider-field .lbl{ display:flex; justify-content:space-between; font-size:.85rem; font-weight:700; margin-bottom:6px; }
+  .slider-field input[type=range]{ width:100%; accent-color:var(--accent); }
+  .slider-field .lbl .val{ font-variant-numeric:tabular-nums; color:var(--accent); }
+
+  .diagram-wrap{ display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start; margin-bottom:6px; }
+  .diagram-box{ flex:1 1 320px; min-width:280px; overflow-x:auto; }
+  .diagram-box svg{ display:block; margin:0 auto; }
+  .calc-box{ flex:1 1 260px; min-width:240px; }
+
+  .controls-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0; }
+  .step-indicator{ font-size:.8rem; color:var(--ink-soft); }
+
+  .caption-box{ background:var(--surface-2); border:1px dashed var(--border-strong); border-radius:12px; padding:12px 16px; font-size:.9rem; line-height:1.55; min-height:44px; margin-bottom:14px; }
+  .caption-box b{ color:var(--accent); }
+
+  .calc-lines{ font-family:'Fraunces', serif; font-size:1.15rem; font-weight:600; line-height:2; }
+  .calc-lines .fade{ opacity:.25; }
+  .calc-lines .leg1{ color:var(--leg1); }
+  .calc-lines .leg2{ color:var(--leg2); }
+  .calc-lines .hyp{ color:var(--hyp); }
+
+  .result-box{ margin-top:14px; padding:14px 18px; border-radius:12px; background:var(--good-soft); border:1.5px solid var(--good); text-align:center; display:none; }
+  .result-box.show{ display:block; }
+  .result-box .label{ font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; font-weight:700; color:var(--good); }
+  .result-box .value{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; color:var(--ink); }
+
+  /* proof tab */
+  .proof-toggle{ display:flex; gap:8px; margin-bottom:16px; }
+  .proof-note{ background:var(--surface-2); border:1px dashed var(--border-strong); border-radius:12px; padding:14px 18px; font-size:.9rem; line-height:1.6; margin-top:14px; }
+  .proof-identity{ text-align:center; font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem; margin-top:10px; }
+  .proof-identity .leg1{ color:var(--leg1); } .proof-identity .leg2{ color:var(--leg2); } .proof-identity .hyp{ color:var(--hyp); }
+
+  /* applications */
+  .app-grid{ display:flex; flex-direction:column; gap:18px; }
+  .app-card{ border:1px solid var(--border); border-radius:14px; padding:18px; background:var(--surface-2); }
+  .app-card h3{ font-family:'Fraunces', serif; font-size:1.1rem; margin:0 0 4px; }
+  .app-card .scenario{ font-size:.9rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.5; }
+  .app-body{ display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; }
+  .app-diagram{ flex:1 1 240px; min-width:220px; }
+  .app-diagram svg{ display:block; margin:0 auto; }
+  .app-solution{ flex:1 1 260px; min-width:240px; }
+  .solution-box{ display:none; font-size:.88rem; line-height:1.6; background:var(--surface); border:1px dashed var(--border-strong); border-radius:10px; padding:12px 14px; }
+  .solution-box.show{ display:block; }
+  .solution-box ol{ margin:0; padding-left:1.1em; }
+  .solution-box li{ margin-bottom:5px; }
+  .solution-answer{ margin-top:8px; font-weight:700; color:var(--good); }
+
+  /* practice */
+  .quiz-score{ font-size:.85rem; color:var(--ink-soft); margin-bottom:14px; }
+  .quiz-score b{ color:var(--accent); font-variant-numeric:tabular-nums; }
+  .quiz-card{ display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 20px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border); margin-bottom:18px; }
+  .quiz-prompt{ font-size:1rem; text-align:center; max-width:52ch; }
+  .quiz-answer-row{ display:flex; gap:10px; align-items:center; }
+  .quiz-answer-row input[type=text]{
+    width:130px; font-family:'Fraunces', serif; font-weight:700; font-size:1.2rem; text-align:center;
+    padding:9px 10px; border-radius:10px; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--ink);
+  }
+  .quiz-answer-row input:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .quiz-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .quiz-feedback{ margin-top:4px; font-size:.9rem; line-height:1.55; text-align:center; min-height:24px; }
+  .quiz-feedback.correct{ color:var(--good); font-weight:700; }
+  .quiz-feedback.wrong{ color:var(--bad); font-weight:700; }
+
+  footer.credits{ text-align:center; color:var(--ink-soft); font-size:.75rem; margin-top:22px; }
+
+  @media (max-width:640px){
+    .section{ padding:18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="hero">
+    <div class="kicker">Matteverktyg &middot; Geometri</div>
+    <h1>Pythagoras sats</h1>
+    <p class="lede">Utforska, bevisa och öva a² + b² = c² &ndash; från att räkna ut hypotenusan när du känner katetrarna, till att lösa verkliga geometriska problem.</p>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <!-- Utforska -->
+  <section class="panel card active" id="panel-utforska">
+    <div class="section">
+      <h2>Utforska triangeln</h2>
+      <p class="desc">Dra i reglagen för att ändra triangelns sidor. Tryck dig igenom stegen för att se hur den okända sidan räknas ut.</p>
+
+      <div class="mode-row" id="modeRow"></div>
+      <div class="sliders" id="sliderHost"></div>
+
+      <div class="diagram-wrap">
+        <div class="diagram-box"><div id="triHost"></div></div>
+        <div class="calc-box">
+          <div class="controls-row">
+            <button class="btn" id="uPrev" type="button">◀ Föregående</button>
+            <button class="btn primary" id="uNext" type="button">Nästa steg ▶</button>
+            <span class="step-indicator" id="uStepInd">Steg 0 av 5</span>
+          </div>
+          <div class="caption-box" id="uCaption"></div>
+          <div class="calc-lines" id="uCalc"></div>
+          <div class="result-box" id="uResult">
+            <div class="label" id="uResultLabel">Svar</div>
+            <div class="value" id="uResultValue"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bevis -->
+  <section class="panel card" id="panel-bevis">
+    <div class="section">
+      <h2>Varför funkar Pythagoras sats?</h2>
+      <p class="desc">Samma stora kvadrat, samma fyra trianglar &ndash; bara omflyttade. Det som blir kvar måste vara lika stort i båda uppställningarna. Det är hela beviset.</p>
+
+      <div class="sliders" id="proofSliders"></div>
+      <div class="proof-toggle" id="proofToggle"></div>
+
+      <div class="diagram-wrap">
+        <div class="diagram-box" style="flex:1 1 420px;"><div id="proofHost"></div></div>
+      </div>
+      <div class="proof-identity" id="proofIdentity"></div>
+      <div class="proof-note" id="proofNote"></div>
+    </div>
+  </section>
+
+  <!-- Tillämpningar -->
+  <section class="panel card" id="panel-app">
+    <div class="section">
+      <h2>Verkliga problem</h2>
+      <p class="desc">Pythagoras sats dyker upp överallt &ndash; man måste bara upptäcka den rätvinkliga triangeln i problemet först. Här är fem exempel, i stigande svårighetsgrad.</p>
+      <div class="app-grid" id="appGrid"></div>
+    </div>
+  </section>
+
+  <!-- Öva -->
+  <section class="panel card" id="panel-ova">
+    <div class="section">
+      <h2>Öva</h2>
+      <p class="desc">Räkna ut den okända sidan. Avrunda till en decimal om svaret inte blir jämnt.</p>
+      <div class="segrow" id="ovaLevelRow"></div>
+      <div class="quiz-score">Rätt: <b id="ovaScore">0 / 0</b></div>
+      <div class="quiz-card">
+        <div class="quiz-prompt" id="ovaPrompt"></div>
+        <div id="ovaTriHost"></div>
+        <div class="quiz-answer-row">
+          <input type="text" id="ovaAnswerInput" inputmode="decimal" placeholder="t.ex. 8,6" aria-label="Ditt svar">
+          <span style="color:var(--ink-soft); font-size:.85rem;">cm</span>
+        </div>
+        <div class="quiz-feedback" id="ovaFeedback"></div>
+      </div>
+      <div class="quiz-actions">
+        <button class="btn primary" id="ovaCheckBtn" type="button">Rätta</button>
+        <button class="btn" id="ovaNextBtn" type="button">Nästa tal</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="credits">Pythagoras sats &middot; Matteverktyg</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ helpers ============ */
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function se(tag, attrs){ const el = document.createElementNS(SVGNS, tag); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+  function fmtNum(v){ if(!Number.isFinite(v)) return '–'; if(Math.abs(v-Math.round(v)) < 1e-9) return String(Math.round(v)); return v.toFixed(2).replace('.', ','); }
+  function fmtNum1(v){ if(!Number.isFinite(v)) return '–'; if(Math.abs(v-Math.round(v)) < 1e-9) return String(Math.round(v)); return v.toFixed(1).replace('.', ','); }
+  function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+  function polyStr(pts){ return pts.map(p => p.x+','+p.y).join(' '); }
+  function centroid(pts){ const n=pts.length; let x=0,y=0; pts.forEach(p=>{x+=p.x;y+=p.y;}); return {x:x/n,y:y/n}; }
+
+  function squareOnSegment(P1, P2, away){
+    const dx = P2.x-P1.x, dy = P2.y-P1.y;
+    const len = Math.hypot(dx,dy) || 1;
+    let nx = -dy/len, ny = dx/len;
+    const midx = (P1.x+P2.x)/2, midy = (P1.y+P2.y)/2;
+    const toAway = { x: away.x-midx, y: away.y-midy };
+    if(nx*toAway.x + ny*toAway.y > 0){ nx=-nx; ny=-ny; }
+    const Q1 = { x:P1.x+nx*len, y:P1.y+ny*len };
+    const Q2 = { x:P2.x+nx*len, y:P2.y+ny*len };
+    return [P1,P2,Q2,Q1];
+  }
+
+  /* ============ tabs ============ */
+
+  const TABS = [
+    { id:'utforska', label:'Utforska' },
+    { id:'bevis', label:'Bevis' },
+    { id:'app', label:'Verkliga problem' },
+    { id:'ova', label:'Öva' }
+  ];
+  const tabsEl = document.getElementById('tabs');
+  const panels = {};
+  TABS.forEach(t => panels[t.id] = document.getElementById('panel-'+t.id));
+  TABS.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (t.id==='utforska' ? ' active' : '');
+    btn.type = 'button';
+    btn.dataset.id = t.id;
+    btn.textContent = t.label;
+    btn.addEventListener('click', () => {
+      TABS.forEach(x => panels[x.id].classList.toggle('active', x.id===t.id));
+      [...tabsEl.children].forEach(b => b.classList.toggle('active', b===btn));
+    });
+    tabsEl.appendChild(btn);
+  });
+
+  /* ============ triangle + squares diagram ============ */
+
+  function drawTriangleDiagram(host, { aVal, bVal, cVal, unknown, revealed, showSquares }){
+    const maxLeg = Math.max(aVal, bVal, 1);
+    let sc = 150/maxLeg;
+    sc = Math.max(7, Math.min(sc, 34));
+    const aPix = aVal*sc, bPix = bVal*sc;
+
+    const R = { x:0, y:aPix };
+    const A = { x:0, y:0 };
+    const B = { x:bPix, y:aPix };
+
+    const legASq = showSquares ? squareOnSegment(R, A, B) : null;
+    const legBSq = showSquares ? squareOnSegment(R, B, A) : null;
+    const hypSq  = showSquares ? squareOnSegment(A, B, R) : null;
+
+    const allPts = [R,A,B].concat(legASq||[], legBSq||[], hypSq||[]);
+    const xs = allPts.map(p=>p.x), ys = allPts.map(p=>p.y);
+    const pad = 34;
+    const minX = Math.min(...xs)-pad, maxX = Math.max(...xs)+pad;
+    const minY = Math.min(...ys)-pad, maxY = Math.max(...ys)+pad;
+    const w = maxX-minX, h = maxY-minY;
+
+    const svg = se('svg', { viewBox:`${minX} ${minY} ${w} ${h}`, width: Math.min(420, w), height: Math.min(420, h*(Math.min(420,w)/w)) });
+
+    function isUnknown(key){ return unknown === key && !revealed; }
+
+    if(showSquares){
+      const sqDefs = [
+        { poly:legASq, key:'a', fill:'var(--leg1-soft)', stroke:'var(--leg1)', val:aVal },
+        { poly:legBSq, key:'b', fill:'var(--leg2-soft)', stroke:'var(--leg2)', val:bVal },
+        { poly:hypSq,  key:'c', fill:'var(--hyp-soft)',  stroke:'var(--hyp)',  val:cVal }
+      ];
+      sqDefs.forEach(sd => {
+        const unk = isUnknown(sd.key);
+        svg.appendChild(se('polygon', {
+          points: polyStr(sd.poly),
+          fill: unk ? 'var(--cell-empty)' : sd.fill,
+          stroke: sd.stroke, 'stroke-width':2,
+          'stroke-dasharray': unk ? '5 4' : 'none'
+        }));
+        const c = centroid(sd.poly);
+        const t = se('text', { x:c.x, y:c.y+5, 'text-anchor':'middle', 'font-family':"'Fraunces', serif", 'font-weight':700, 'font-size':15, fill: unk?'var(--ink-soft)':sd.stroke });
+        t.textContent = unk ? '?' : fmtNum(sd.val*sd.val);
+        svg.appendChild(t);
+      });
+    }
+
+    // triangle
+    svg.appendChild(se('polygon', { points: polyStr([R,A,B]), fill:'var(--surface)', stroke:'var(--ink)', 'stroke-width':2.5 }));
+    // right angle mark
+    const markSize = Math.min(14, aPix*0.25, bPix*0.25);
+    svg.appendChild(se('path', { d:`M ${R.x} ${R.y-markSize} L ${R.x+markSize} ${R.y-markSize} L ${R.x+markSize} ${R.y}`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5 }));
+
+    // side labels
+    function sideLabel(P1,P2, key, val, color, offsetOut, inward){
+      const mid = { x:(P1.x+P2.x)/2, y:(P1.y+P2.y)/2 };
+      const dx = P2.x-P1.x, dy = P2.y-P1.y, len = Math.hypot(dx,dy)||1;
+      const nx=-dy/len, ny=dx/len;
+      const away = { x: (R.x+A.x+B.x)/3, y:(R.y+A.y+B.y)/3 };
+      const toAway = { x: away.x-mid.x, y: away.y-mid.y };
+      let sign = (nx*toAway.x+ny*toAway.y > 0) ? -1 : 1;
+      if(inward) sign = -sign;
+      const lx = mid.x + nx*sign*offsetOut, ly = mid.y + ny*sign*offsetOut;
+      const unk = isUnknown(key);
+      const t = se('text', { x:lx, y:ly+5, 'text-anchor':'middle', 'font-family':"'Fraunces', serif", 'font-weight':700, 'font-size':14, fill: unk?'var(--ink-soft)':color });
+      t.textContent = (key==='a'?'a = ':key==='b'?'b = ':'c = ') + (unk ? '?' : fmtNum(val));
+      svg.appendChild(t);
+    }
+    sideLabel(R,A,'a',aVal,'var(--leg1)', showSquares? 16 : 16, showSquares);
+    sideLabel(R,B,'b',bVal,'var(--leg2)', showSquares? 16 : 16, showSquares);
+    sideLabel(A,B,'c',cVal,'var(--hyp)', showSquares? 16 : 18, false);
+
+    host.innerHTML = '';
+    host.appendChild(svg);
+  }
+
+  /* ============ Utforska tab ============ */
+
+  const modeRow = document.getElementById('modeRow');
+  const sliderHost = document.getElementById('sliderHost');
+  const triHost = document.getElementById('triHost');
+  const uCaption = document.getElementById('uCaption');
+  const uCalc = document.getElementById('uCalc');
+  const uResult = document.getElementById('uResult');
+  const uResultLabel = document.getElementById('uResultLabel');
+  const uResultValue = document.getElementById('uResultValue');
+  const uStepInd = document.getElementById('uStepInd');
+  const uPrev = document.getElementById('uPrev');
+  const uNext = document.getElementById('uNext');
+
+  const U_MODES = [
+    { id:'hyp', label:'Hitta hypotenusan (c)' },
+    { id:'leg', label:'Hitta en katet' }
+  ];
+  let uMode = 'hyp';
+  let uA = 3, uB = 4, uC = 12, uKnownLeg = 5; // uC/uKnownLeg used in 'leg' mode
+  let uStep = 0;
+
+  U_MODES.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'seg' + (m.id===uMode ? ' active' : '');
+    btn.type = 'button';
+    btn.textContent = m.label;
+    btn.addEventListener('click', () => {
+      uMode = m.id;
+      [...modeRow.children].forEach(b => b.classList.toggle('active', b===btn));
+      buildUSliders();
+      uStep = 0;
+      renderU();
+    });
+    modeRow.appendChild(btn);
+  });
+
+  function buildUSliders(){
+    sliderHost.innerHTML = '';
+    if(uMode === 'hyp'){
+      sliderHost.appendChild(makeSlider('a (katet)', uA, 1, 20, 'var(--leg1)', v => { uA=v; uStep=0; renderU(); }));
+      sliderHost.appendChild(makeSlider('b (katet)', uB, 1, 20, 'var(--leg2)', v => { uB=v; uStep=0; renderU(); }));
+    } else {
+      if(uKnownLeg >= uC) uKnownLeg = uC-1;
+      sliderHost.appendChild(makeSlider('c (hypotenusa)', uC, 5, 25, 'var(--hyp)', v => { uC=v; if(uKnownLeg>=uC) uKnownLeg=uC-1; uStep=0; renderU(); buildUSliders(); }));
+      sliderHost.appendChild(makeSlider('a (känd katet)', uKnownLeg, 1, uC-1, 'var(--leg1)', v => { uKnownLeg=v; uStep=0; renderU(); }));
+    }
+  }
+
+  function makeSlider(label, value, min, max, color, onInput){
+    const wrap = document.createElement('div');
+    wrap.className = 'slider-field';
+    wrap.innerHTML = `<div class="lbl"><span style="color:${color}">${label}</span><span class="val">${fmtNum(value)}</span></div>`;
+    const input = document.createElement('input');
+    input.type = 'range'; input.min = min; input.max = max; input.value = value; input.step = 1;
+    input.addEventListener('input', () => {
+      const v = Number(input.value);
+      wrap.querySelector('.val').textContent = fmtNum(v);
+      onInput(v);
+    });
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  function currentUProblem(){
+    if(uMode === 'hyp'){
+      const c = Math.sqrt(uA*uA + uB*uB);
+      return { aVal:uA, bVal:uB, cVal:c, unknown:'c' };
+    } else {
+      const b = Math.sqrt(uC*uC - uKnownLeg*uKnownLeg);
+      return { aVal:uKnownLeg, bVal:b, cVal:uC, unknown:'b' };
+    }
+  }
+
+  const U_CAPTIONS_HYP = [
+    'Tryck på <b>Nästa steg</b> för att se hur hypotenusan c räknas ut.',
+    'Steg 1: Pythagoras sats säger att a² + b² = c² i en rätvinklig triangel.',
+    'Steg 2: Sätt in de kända värdena för a och b.',
+    'Steg 3: Räkna ut kvadraterna a² och b² var för sig.',
+    'Steg 4: Addera dem &ndash; det ger c².',
+    'Steg 5: Ta kvadratroten ur båda leden för att få c.'
+  ];
+  const U_CAPTIONS_LEG = [
+    'Tryck på <b>Nästa steg</b> för att se hur den okända kateten räknas ut.',
+    'Steg 1: Pythagoras sats: a² + b² = c². Lös ut den okända kateten: b² = c² &minus; a².',
+    'Steg 2: Sätt in de kända värdena för a och c.',
+    'Steg 3: Räkna ut kvadraterna a² och c² var för sig.',
+    'Steg 4: Subtrahera &ndash; det ger b².',
+    'Steg 5: Ta kvadratroten ur båda leden för att få b.'
+  ];
+
+  function renderUCalc(p){
+    const a2 = p.aVal*p.aVal, b2 = p.bVal*p.bVal, c2 = p.cVal*p.cVal;
+    let lines = [];
+    if(uMode === 'hyp'){
+      lines = [
+        `<span class="leg1">a</span>² + <span class="leg2">b</span>² = <span class="hyp">c</span>²`,
+        `<span class="leg1">${fmtNum(p.aVal)}</span>² + <span class="leg2">${fmtNum(p.bVal)}</span>² = <span class="hyp">c</span>²`,
+        `<span class="leg1">${fmtNum(a2)}</span> + <span class="leg2">${fmtNum(b2)}</span> = <span class="hyp">c</span>²`,
+        `${fmtNum(a2+b2)} = <span class="hyp">c</span>²`,
+        `<span class="hyp">c</span> = √${fmtNum(a2+b2)} ≈ ${fmtNum1(p.cVal)}`
+      ];
+    } else {
+      lines = [
+        `<span class="hyp">c</span>² &minus; <span class="leg1">a</span>² = <span class="leg2">b</span>²`,
+        `<span class="hyp">${fmtNum(p.cVal)}</span>² &minus; <span class="leg1">${fmtNum(p.aVal)}</span>² = <span class="leg2">b</span>²`,
+        `<span class="hyp">${fmtNum(c2)}</span> &minus; <span class="leg1">${fmtNum(a2)}</span> = <span class="leg2">b</span>²`,
+        `${fmtNum(c2-a2)} = <span class="leg2">b</span>²`,
+        `<span class="leg2">b</span> = √${fmtNum(c2-a2)} ≈ ${fmtNum1(p.bVal)}`
+      ];
+    }
+    const shown = lines.slice(0, Math.max(0, uStep));
+    uCalc.innerHTML = shown.map((l,i) => `<div>${i===0?'':''}${l}</div>`).join('');
+  }
+
+  function renderU(){
+    const p = currentUProblem();
+    const captions = uMode==='hyp' ? U_CAPTIONS_HYP : U_CAPTIONS_LEG;
+    uCaption.innerHTML = captions[uStep];
+    uStepInd.textContent = `Steg ${uStep} av 5`;
+    uPrev.disabled = uStep===0;
+    uNext.disabled = uStep===5;
+
+    drawTriangleDiagram(triHost, { aVal:p.aVal, bVal:p.bVal, cVal:p.cVal, unknown:p.unknown, revealed: uStep===5, showSquares:true });
+    renderUCalc(p);
+
+    if(uStep === 5){
+      uResult.classList.add('show');
+      uResultLabel.textContent = p.unknown==='c' ? 'Hypotenusan c' : 'Kateten b';
+      uResultValue.textContent = fmtNum1(p.unknown==='c'?p.cVal:p.bVal) + ' cm';
+    } else {
+      uResult.classList.remove('show');
+    }
+  }
+
+  uPrev.addEventListener('click', () => { uStep = Math.max(0, uStep-1); renderU(); });
+  uNext.addEventListener('click', () => { uStep = Math.min(5, uStep+1); renderU(); });
+
+  /* ============ Bevis tab ============ */
+
+  const proofSliders = document.getElementById('proofSliders');
+  const proofToggle = document.getElementById('proofToggle');
+  const proofHost = document.getElementById('proofHost');
+  const proofIdentity = document.getElementById('proofIdentity');
+  const proofNote = document.getElementById('proofNote');
+
+  let pfA = 3, pfB = 4, pfArrangement = 1;
+
+  proofSliders.appendChild(makeSlider('a', pfA, 2, 8, 'var(--leg1)', v => { pfA=v; renderProof(); }));
+  proofSliders.appendChild(makeSlider('b', pfB, 2, 8, 'var(--leg2)', v => { pfB=v; renderProof(); }));
+
+  const PROOF_MODES = [
+    { id:1, label:'Uppställning 1 &middot; visar c²' },
+    { id:2, label:'Uppställning 2 &middot; visar a² + b²' }
+  ];
+  PROOF_MODES.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'seg' + (m.id===pfArrangement ? ' active' : '');
+    btn.type = 'button';
+    btn.innerHTML = m.label;
+    btn.addEventListener('click', () => {
+      pfArrangement = m.id;
+      [...proofToggle.children].forEach(b => b.classList.toggle('active', b===btn));
+      renderProof();
+    });
+    proofToggle.appendChild(btn);
+  });
+
+  function drawProof(host, a, b, arrangement){
+    const sc = Math.max(10, Math.min(34, 220/(a+b)));
+    const aPix = a*sc, bPix = b*sc, sPix = aPix+bPix;
+    const pad = 30;
+    const svg = se('svg', { viewBox:`${-pad} ${-pad} ${sPix+pad*2} ${sPix+pad*2}`, width: Math.min(420, sPix+pad*2), height: Math.min(420, sPix+pad*2) });
+
+    // outer square
+    svg.appendChild(se('rect', { x:0, y:0, width:sPix, height:sPix, fill:'none', stroke:'var(--ink)', 'stroke-width':2 }));
+
+    const triFill = 'var(--cell-empty)';
+    const triStroke = 'var(--ink-soft)';
+
+    function addTri(pts){
+      svg.appendChild(se('polygon', { points: polyStr(pts), fill:triFill, stroke:triStroke, 'stroke-width':1.5 }));
+    }
+    function addLabel(x,y,text,color,size){
+      const t = se('text', { x, y, 'text-anchor':'middle', 'font-family':"'Fraunces', serif", 'font-weight':700, 'font-size':size||15, fill:color });
+      t.textContent = text;
+      svg.appendChild(t);
+    }
+
+    if(arrangement === 1){
+      // pinwheel: triangle with right angle at (0,0), legs b (x-axis), a (y-axis)
+      const base = [ {x:0,y:0}, {x:bPix,y:0}, {x:0,y:aPix} ];
+      const center = { x:sPix/2, y:sPix/2 };
+      function rot(p, deg){
+        const rad = deg*Math.PI/180;
+        const dx=p.x-center.x, dy=p.y-center.y;
+        return { x: center.x+dx*Math.cos(rad)-dy*Math.sin(rad), y: center.y+dx*Math.sin(rad)+dy*Math.cos(rad) };
+      }
+      const tris = [0,90,180,270].map(deg => base.map(p => rot(p,deg)));
+      tris.forEach(addTri);
+      // inner tilted square = hypotenuse endpoints
+      const inner = [0,90,180,270].map(deg => rot({x:bPix,y:0}, deg));
+      svg.appendChild(se('polygon', { points: polyStr(inner), fill:'var(--hyp-soft)', stroke:'var(--hyp)', 'stroke-width':2 }));
+      const c = centroid(inner);
+      addLabel(c.x, c.y+6, 'c²', 'var(--hyp)', 17);
+    } else {
+      const sqA = [ {x:0,y:0},{x:aPix,y:0},{x:aPix,y:aPix},{x:0,y:aPix} ];
+      const sqB = [ {x:aPix,y:aPix},{x:sPix,y:aPix},{x:sPix,y:sPix},{x:aPix,y:sPix} ];
+      svg.appendChild(se('polygon', { points: polyStr(sqA), fill:'var(--leg1-soft)', stroke:'var(--leg1)', 'stroke-width':2 }));
+      svg.appendChild(se('polygon', { points: polyStr(sqB), fill:'var(--leg2-soft)', stroke:'var(--leg2)', 'stroke-width':2 }));
+      const cA = centroid(sqA), cB = centroid(sqB);
+      addLabel(cA.x, cA.y+6, 'a²', 'var(--leg1)', 17);
+      addLabel(cB.x, cB.y+6, 'b²', 'var(--leg2)', 17);
+
+      const T1 = [ {x:0,y:aPix},{x:aPix,y:aPix},{x:aPix,y:sPix} ];
+      const T2 = [ {x:0,y:aPix},{x:aPix,y:sPix},{x:0,y:sPix} ];
+      const T3 = [ {x:aPix,y:0},{x:sPix,y:0},{x:sPix,y:aPix} ];
+      const T4 = [ {x:aPix,y:0},{x:sPix,y:aPix},{x:aPix,y:aPix} ];
+      [T1,T2,T3,T4].forEach(addTri);
+    }
+
+    host.innerHTML = '';
+    host.appendChild(svg);
+  }
+
+  function renderProof(){
+    drawProof(proofHost, pfA, pfB, pfArrangement);
+    const a2=pfA*pfA, b2=pfB*pfB, c2=a2+b2, c=Math.sqrt(c2);
+    proofIdentity.innerHTML = `<span class="leg1">${pfA}²</span> + <span class="leg2">${pfB}²</span> = <span class="leg1">${a2}</span> + <span class="leg2">${b2}</span> = ${c2} = <span class="hyp">c²</span>  (c ≈ ${fmtNum1(c)})`;
+    proofNote.innerHTML = arrangementNote(pfArrangement);
+  }
+
+  function arrangementNote(arr){
+    if(arr === 1){
+      return 'De fyra trianglarna är placerade i ett moln kring en stor kvadrat (sida a + b), vridna som ett vindspel. Det som blir kvar i mitten är en lutande kvadrat med sida <b>c</b> &ndash; alltså har den arean <b>c²</b>.';
+    }
+    return 'Samma fyra trianglar, samma stora kvadrat &ndash; men nu omflyttade så att det som blir kvar är två separata kvadrater: en med sida <b>a</b> och en med sida <b>b</b>. Deras sammanlagda area är <b>a² + b²</b>. Eftersom det är exakt samma yta som blir över i båda uppställningarna måste a² + b² = c².';
+  }
+
+  /* ============ Tillämpningar tab ============ */
+
+  const appGrid = document.getElementById('appGrid');
+
+  function svgWrap(vb, w, h){ return se('svg', { viewBox:vb, width:w, height:h }); }
+  function line(x1,y1,x2,y2,attrs){ return se('line', Object.assign({x1,y1,x2,y2, stroke:'var(--ink)', 'stroke-width':2}, attrs||{})); }
+  function txt(x,y,s,attrs){ const t = se('text', Object.assign({x,y,'text-anchor':'middle','font-family':"'Fraunces', serif",'font-weight':700,'font-size':13,fill:'var(--ink)'}, attrs||{})); t.textContent=s; return t; }
+
+  const APPLICATIONS = [
+    {
+      title:'1. Stegen mot väggen',
+      scenario:'En stege som är 5 meter lång lutar mot en vägg. Foten av stegen når 4 meter upp på väggen. Hur långt från väggen står stegens fot?',
+      build(svg){
+        const wallX=60, groundY=200, topY=40;
+        svg.appendChild(line(wallX,20,wallX,groundY,{'stroke-width':3}));
+        svg.appendChild(line(wallX,groundY,260,groundY,{'stroke-width':3}));
+        svg.appendChild(line(wallX,topY,220,groundY,{stroke:'var(--hyp)','stroke-width':2.5}));
+        svg.appendChild(se('path',{d:`M ${wallX} ${groundY-14} L ${wallX+14} ${groundY-14} L ${wallX+14} ${groundY}`, fill:'none', stroke:'var(--ink-soft)','stroke-width':1.5}));
+        svg.appendChild(txt(wallX-18,(topY+groundY)/2,'4 m',{fill:'var(--leg1)', 'text-anchor':'end'}));
+        svg.appendChild(txt((wallX+220)/2,(topY+groundY)/2-10,'5 m',{fill:'var(--hyp)'}));
+        svg.appendChild(txt((wallX+220)/2,groundY+22,'? m',{fill:'var(--leg2)'}));
+      },
+      solution:[
+        'Stegen, väggen och marken bildar en rätvinklig triangel: stegen är hypotenusan (5 m), höjden på väggen är en katet (4 m), avståndet till väggen är den andra kateten (okänd).',
+        'a² + b² = c²  →  4² + b² = 5²',
+        '16 + b² = 25',
+        'b² = 25 &minus; 16 = 9',
+        'b = √9 = 3'
+      ],
+      answer:'Stegens fot står 3 meter från väggen.'
+    },
+    {
+      title:'2. TV-skärmens diagonal',
+      scenario:'En TV-skärm är 80 cm bred och 45 cm hög. Hur lång är skärmens diagonal?',
+      build(svg){
+        const x0=50,y0=30,w=200,h=115;
+        svg.appendChild(se('rect',{x:x0,y:y0,width:w,height:h,fill:'none',stroke:'var(--ink)','stroke-width':2.5}));
+        svg.appendChild(line(x0,y0,x0+w,y0+h,{stroke:'var(--hyp)','stroke-width':2.5}));
+        svg.appendChild(txt(x0+w/2,y0+h+22,'80 cm',{fill:'var(--leg2)'}));
+        svg.appendChild(txt(x0-14,y0+h/2,'45 cm',{fill:'var(--leg1)','text-anchor':'end'}));
+        svg.appendChild(txt(x0+w/2+18,y0+h/2-12,'?',{fill:'var(--hyp)'}));
+      },
+      solution:[
+        'Diagonalen delar skärmen i en rätvinklig triangel med katetrarna 80 cm och 45 cm.',
+        'a² + b² = c²  →  80² + 45² = c²',
+        '6400 + 2025 = c²',
+        '8425 = c²',
+        'c = √8425 ≈ 91,8'
+      ],
+      answer:'Diagonalen är ungefär 91,8 cm lång.'
+    },
+    {
+      title:'3. Avståndet mellan två punkter',
+      scenario:'Punkt A ligger i (1, 1) och punkt B ligger i (7, 5) i ett koordinatsystem. Hur långt är avståndet mellan A och B?',
+      build(svg){
+        const ox=40, oy=190, ux=24, uy=24;
+        for(let i=0;i<=8;i++){ svg.appendChild(line(ox+i*ux,20,ox+i*ux,oy,{stroke:'var(--border-strong)','stroke-width':1})); }
+        for(let j=0;j<=7;j++){ svg.appendChild(line(ox,oy-j*uy,ox+8*ux,oy-j*uy,{stroke:'var(--border-strong)','stroke-width':1})); }
+        const A={x:ox+1*ux,y:oy-1*uy}, B={x:ox+7*ux,y:oy-5*uy};
+        svg.appendChild(line(A.x,A.y,B.x,A.y,{stroke:'var(--leg2)','stroke-width':2,'stroke-dasharray':'4 3'}));
+        svg.appendChild(line(B.x,A.y,B.x,B.y,{stroke:'var(--leg1)','stroke-width':2,'stroke-dasharray':'4 3'}));
+        svg.appendChild(line(A.x,A.y,B.x,B.y,{stroke:'var(--hyp)','stroke-width':2.5}));
+        svg.appendChild(se('circle',{cx:A.x,cy:A.y,r:4,fill:'var(--ink)'}));
+        svg.appendChild(se('circle',{cx:B.x,cy:B.y,r:4,fill:'var(--ink)'}));
+        svg.appendChild(txt(A.x-6,A.y+16,'A',{'text-anchor':'end'}));
+        svg.appendChild(txt(B.x+10,B.y-6,'B',{'text-anchor':'start'}));
+        svg.appendChild(txt((A.x+B.x)/2,A.y+18,'Δx = 6',{fill:'var(--leg2)','font-size':12}));
+        svg.appendChild(txt(B.x+22,(A.y+B.y)/2,'Δy = 4',{fill:'var(--leg1)','font-size':12}));
+      },
+      solution:[
+        'Skillnaden i x-led (Δx = 7 &minus; 1 = 6) och skillnaden i y-led (Δy = 5 &minus; 1 = 4) bildar de två katetrarna i en rätvinklig triangel. Avståndet AB är hypotenusan.',
+        'a² + b² = c²  →  6² + 4² = c²',
+        '36 + 16 = c²',
+        '52 = c²',
+        'c = √52 ≈ 7,2'
+      ],
+      answer:'Avståndet mellan A och B är ungefär 7,2 längdenheter.'
+    },
+    {
+      title:'4. Höjden i en likbent triangel',
+      scenario:'En likbent triangel har bas 10 cm och de två lika långa sidorna är 13 cm. Hur hög är triangeln?',
+      build(svg){
+        const bx0=40,bx1=240,by=170, apex={x:140,y:30};
+        svg.appendChild(se('polygon',{points:`${bx0},${by} ${bx1},${by} ${apex.x},${apex.y}`, fill:'none', stroke:'var(--ink)','stroke-width':2.5}));
+        svg.appendChild(line(apex.x,apex.y,apex.x,by,{stroke:'var(--hyp)','stroke-width':2,'stroke-dasharray':'4 3'}));
+        svg.appendChild(se('path',{d:`M ${apex.x-12} ${by-12} L ${apex.x-12} ${by} L ${apex.x} ${by}`, fill:'none', stroke:'var(--ink-soft)','stroke-width':1.5}));
+        svg.appendChild(txt((bx0+apex.x)/2-8,(by+apex.y)/2,'13 cm',{fill:'var(--leg2)'}));
+        svg.appendChild(txt(apex.x+22,(by+apex.y)/2,'?',{fill:'var(--hyp)'}));
+        svg.appendChild(txt((bx0+bx1)/2,by+20,'10 cm',{fill:'var(--leg1)'}));
+      },
+      solution:[
+        'Höjden från toppen ner till basen delar den likbenta triangeln i två lika stora rätvinkliga trianglar &ndash; och halverar basen: 10/2 = 5 cm.',
+        'Den kända sidan (13 cm) blir hypotenusa, halva basen (5 cm) blir en katet, höjden är den andra kateten.',
+        'a² + b² = c²  →  5² + b² = 13²',
+        '25 + b² = 169',
+        'b² = 144  →  b = √144 = 12'
+      ],
+      answer:'Triangelns höjd är 12 cm.'
+    },
+    {
+      title:'5. Diagonalen i ett rätblock',
+      scenario:'En låda (rätblock) är 6 cm lång, 8 cm bred och 4,5 cm hög. Hur lång är den längsta diagonalen genom lådan, från ett hörn till det motsatta?',
+      build(svg){
+        const fx=70, fy=50, w=110, h=90, ddx=45, ddy=-35;
+        const FTL={x:fx,y:fy}, FTR={x:fx+w,y:fy}, FBR={x:fx+w,y:fy+h}, FBL={x:fx,y:fy+h};
+        const BTL={x:fx+ddx,y:fy+ddy}, BTR={x:fx+w+ddx,y:fy+ddy}, BBR={x:fx+w+ddx,y:fy+h+ddy};
+        [[FTL,FTR],[FTR,FBR],[FBR,FBL],[FBL,FTL],[FTL,BTL],[FTR,BTR],[FBR,BBR],[BTL,BTR],[BTR,BBR]].forEach(([p1,p2])=>{
+          svg.appendChild(line(p1.x,p1.y,p2.x,p2.y,{stroke:'var(--ink-soft)','stroke-width':1.5}));
+        });
+        svg.appendChild(line(FBL.x,FBL.y,BTR.x,BTR.y,{stroke:'var(--hyp)','stroke-width':2.5}));
+        svg.appendChild(txt((FTL.x+FTR.x)/2,FBL.y+18,'6 cm',{fill:'var(--leg1)','font-size':12}));
+        svg.appendChild(txt(FTL.x-12,(FTL.y+FBL.y)/2,'4,5 cm',{fill:'var(--leg2)','font-size':12,'text-anchor':'end'}));
+        svg.appendChild(txt((FTL.x+BTL.x)/2-4,(FTL.y+BTL.y)/2-6,'8 cm',{fill:'var(--ink-soft)','font-size':12}));
+        svg.appendChild(txt((FBL.x+BTR.x)/2+16,(FBL.y+BTR.y)/2,'?',{fill:'var(--hyp)'}));
+      },
+      solution:[
+        'Använd Pythagoras sats två gånger. Först: hitta diagonalen i golvet (bottenrektangeln, 6 cm × 8 cm).',
+        'golvdiagonal² = 6² + 8² = 36 + 64 = 100  →  golvdiagonal = √100 = 10 cm',
+        'Sedan: kombinera golvdiagonalen med höjden (4,5 cm) i en ny rätvinklig triangel.',
+        'rumsdiagonal² = 10² + 4,5² = 100 + 20,25 = 120,25',
+        'rumsdiagonal = √120,25 ≈ 11,0'
+      ],
+      answer:'Den längsta diagonalen genom lådan är ungefär 11,0 cm.'
+    }
+  ];
+
+  APPLICATIONS.forEach((app, idx) => {
+    const card = document.createElement('div');
+    card.className = 'app-card';
+    card.innerHTML = `<h3>${app.title}</h3><p class="scenario">${app.scenario}</p>`;
+    const body = document.createElement('div');
+    body.className = 'app-body';
+    const diagramDiv = document.createElement('div');
+    diagramDiv.className = 'app-diagram';
+    const svg = svgWrap('0 0 280 210', 280, 210);
+    app.build(svg);
+    diagramDiv.appendChild(svg);
+    body.appendChild(diagramDiv);
+
+    const solDiv = document.createElement('div');
+    solDiv.className = 'app-solution';
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn primary';
+    toggleBtn.type = 'button';
+    toggleBtn.textContent = 'Visa lösning';
+    const solBox = document.createElement('div');
+    solBox.className = 'solution-box';
+    solBox.innerHTML = '<ol>' + app.solution.map(s => `<li>${s}</li>`).join('') + `</ol><div class="solution-answer">${app.answer}</div>`;
+    toggleBtn.addEventListener('click', () => {
+      const showing = solBox.classList.toggle('show');
+      toggleBtn.textContent = showing ? 'Dölj lösning' : 'Visa lösning';
+    });
+    solDiv.appendChild(toggleBtn);
+    solDiv.appendChild(solBox);
+    body.appendChild(solDiv);
+
+    card.appendChild(body);
+    appGrid.appendChild(card);
+  });
+
+  /* ============ Öva tab ============ */
+
+  const ovaLevelRow = document.getElementById('ovaLevelRow');
+  const ovaScoreEl = document.getElementById('ovaScore');
+  const ovaPrompt = document.getElementById('ovaPrompt');
+  const ovaTriHost = document.getElementById('ovaTriHost');
+  const ovaAnswerInput = document.getElementById('ovaAnswerInput');
+  const ovaFeedback = document.getElementById('ovaFeedback');
+  const ovaCheckBtn = document.getElementById('ovaCheckBtn');
+  const ovaNextBtn = document.getElementById('ovaNextBtn');
+
+  const OVA_LEVELS = [
+    { id:1, label:'Nivå 1 · Hitta hypotenusan' },
+    { id:2, label:'Nivå 2 · Hitta en katet' },
+    { id:3, label:'Nivå 3 · Blandat i vardagen' }
+  ];
+  let ovaLevel = 1;
+  let ovaProblem = null;
+  let ovaScore = { right:0, total:0 };
+  let ovaChecked = false;
+
+  OVA_LEVELS.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'seg' + (l.id===ovaLevel?' active':'');
+    btn.type = 'button';
+    btn.textContent = l.label;
+    btn.addEventListener('click', () => {
+      ovaLevel = l.id;
+      [...ovaLevelRow.children].forEach(b => b.classList.toggle('active', b===btn));
+      newOva();
+    });
+    ovaLevelRow.appendChild(btn);
+  });
+
+  function genOvaProblem(){
+    if(ovaLevel === 1){
+      const a = randInt(3,15), b = randInt(3,15);
+      const c = Math.sqrt(a*a+b*b);
+      return { aVal:a, bVal:b, cVal:c, unknown:'c', prompt:`En rätvinklig triangel har katetrarna a = ${a} cm och b = ${b} cm. Hur lång är hypotenusan c?`, answer:c };
+    } else if(ovaLevel === 2){
+      const c = randInt(10,26), a = randInt(3,c-2);
+      const b = Math.sqrt(c*c-a*a);
+      return { aVal:a, bVal:b, cVal:c, unknown:'b', prompt:`En rätvinklig triangel har hypotenusan c = ${c} cm och en katet a = ${a} cm. Hur lång är den andra kateten b?`, answer:b };
+    } else {
+      const w = randInt(4,18), h = randInt(4,18);
+      const c = Math.sqrt(w*w+h*h);
+      return { aVal:h, bVal:w, cVal:c, unknown:'c', prompt:`En rektangel är ${w} cm bred och ${h} cm hög. Hur lång är rektangelns diagonal?`, answer:c };
+    }
+  }
+
+  function newOva(){
+    ovaProblem = genOvaProblem();
+    ovaChecked = false;
+    ovaAnswerInput.value = '';
+    ovaFeedback.textContent = '';
+    ovaFeedback.className = 'quiz-feedback';
+    ovaPrompt.textContent = ovaProblem.prompt;
+    drawTriangleDiagram(ovaTriHost, { aVal:ovaProblem.aVal, bVal:ovaProblem.bVal, cVal:ovaProblem.cVal, unknown:ovaProblem.unknown, revealed:false, showSquares:false });
+  }
+
+  function checkOva(){
+    if(ovaChecked || !ovaProblem) return;
+    const raw = ovaAnswerInput.value.trim().replace(',', '.');
+    const val = parseFloat(raw);
+    if(Number.isNaN(val)){
+      ovaFeedback.textContent = 'Skriv ett tal, t.ex. 8,6';
+      ovaFeedback.className = 'quiz-feedback';
+      return;
+    }
+    ovaChecked = true;
+    const correct = Math.abs(val - ovaProblem.answer) <= 0.15;
+    ovaScore.total++;
+    if(correct) ovaScore.right++;
+    ovaScoreEl.textContent = `${ovaScore.right} / ${ovaScore.total}`;
+    ovaFeedback.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
+    ovaFeedback.textContent = correct
+      ? `Rätt! Svaret är ${fmtNum1(ovaProblem.answer)} cm.`
+      : `Inte riktigt. Rätt svar är ${fmtNum1(ovaProblem.answer)} cm.`;
+    drawTriangleDiagram(ovaTriHost, { aVal:ovaProblem.aVal, bVal:ovaProblem.bVal, cVal:ovaProblem.cVal, unknown:ovaProblem.unknown, revealed:true, showSquares:false });
+  }
+
+  ovaCheckBtn.addEventListener('click', checkOva);
+  ovaNextBtn.addEventListener('click', newOva);
+  ovaAnswerInput.addEventListener('keydown', (e) => { if(e.key==='Enter') checkOva(); });
+
+  /* ============ init ============ */
+
+  buildUSliders();
+  renderU();
+  renderProof();
+  newOva();
+
+})();
+</script>
+
+</body>
+</html>
