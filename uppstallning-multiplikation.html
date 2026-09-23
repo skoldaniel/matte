@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uppställning multiplikation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#f7f3ea; --surface:#ffffff; --surface-2:#efe9da;
+    --ink:#23252b; --ink-soft:#6b6f76;
+    --border:#e2dbc9; --border-strong:#cfc6ae;
+    --accent:#2f5d9f; --accent-ink:#ffffff; --accent-soft:#dde7f6;
+    --shadow: 0 1px 2px rgba(35,30,15,.04), 0 8px 24px -12px rgba(35,30,15,.18);
+    --good:#187a5e; --good-soft:#d9efe6;
+    --bad:#c8384c; --bad-soft:#f8dfe2;
+    --carry:#b8860b; --carry-soft:#f6ecd2;
+    --add:#8a4fb8; --add-soft:#efe3f8;
+    --dec:#c8384c; --dec-soft:#fbe6e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#181a1f; --surface:#212429; --surface-2:#282c33;
+      --ink:#ecebe5; --ink-soft:#a2a6b0;
+      --border:#383c46; --border-strong:#454a56;
+      --accent:#7aa7e6; --accent-ink:#12203a; --accent-soft:#25344d;
+      --good:#5fcda3; --good-soft:#1c332c;
+      --bad:#ec8794; --bad-soft:#3a232a;
+      --carry:#e0b34d; --carry-soft:#3a300f;
+      --add:#c49be6; --add-soft:#342842;
+      --dec:#ec8794; --dec-soft:#3d2429;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#181a1f; --surface:#212429; --surface-2:#282c33;
+    --ink:#ecebe5; --ink-soft:#a2a6b0;
+    --border:#383c46; --border-strong:#454a56;
+    --accent:#7aa7e6; --accent-ink:#12203a; --accent-soft:#25344d;
+    --good:#5fcda3; --good-soft:#1c332c;
+    --bad:#ec8794; --bad-soft:#3a232a;
+    --carry:#e0b34d; --carry-soft:#3a300f;
+    --add:#c49be6; --add-soft:#342842;
+    --dec:#ec8794; --dec-soft:#3d2429;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Public Sans', system-ui, -apple-system, sans-serif; padding:32px 16px 56px; }
+  .page{ max-width:840px; margin:0 auto; }
+  header.hero{ text-align:center; margin-bottom:20px; }
+  .kicker{ font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  h1{ font-family:'Fraunces', Georgia, serif; font-weight:600; font-size:clamp(1.7rem, 1.3rem + 1.5vw, 2.5rem); margin:.25em 0 .2em; text-wrap:balance; }
+  .lede{ color:var(--ink-soft); font-size:1.03rem; max-width:60ch; margin:0 auto; line-height:1.55; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); margin-top:20px; }
+  .section{ padding:26px; }
+  .section h2{ font-family:'Fraunces', serif; font-weight:600; font-size:1.3rem; margin:0 0 6px; }
+  .section h3{ font-family:'Fraunces', serif; font-weight:600; font-size:1rem; margin:0 0 10px; }
+  .section .desc{ color:var(--ink-soft); font-size:.92rem; margin:0 0 18px; max-width:64ch; line-height:1.55; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{ border:1.5px solid var(--border-strong); background:var(--surface-2); color:var(--ink); padding:9px 14px; border-radius:10px; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover{ border-color:var(--accent); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .btn.ghost{ background:transparent; }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .seg{ border:1.5px solid var(--border-strong); background:var(--surface-2); color:var(--ink-soft); padding:8px 13px; border-radius:999px; font-size:.82rem; font-weight:700; }
+  .seg.active{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+  .segrow{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+
+  .own{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field label{ font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); }
+  .field input{ width:120px; font-family:'Fraunces', serif; font-weight:700; font-size:1.3rem; text-align:center; padding:8px 6px; border-radius:10px; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--ink); }
+  .field input:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .field input.invalid{ border-color:var(--bad); }
+  .own .sign{ font-family:'Fraunces', serif; font-weight:700; font-size:1.5rem; color:var(--ink-soft); padding-bottom:6px; }
+  .own-hint{ flex-basis:100%; font-size:.78rem; color:var(--ink-soft); margin:0; line-height:1.5; }
+
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chip{ border:1px solid var(--border); background:var(--surface-2); color:var(--ink-soft); font-family:'Fraunces', serif; font-weight:600; font-size:.92rem; padding:6px 13px; border-radius:999px; line-height:1.2; }
+  .chip:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* ---------- the column layout ---------- */
+  .note{ text-align:center; font-size:.85rem; color:var(--carry); background:var(--carry-soft); border:1px solid var(--carry); border-radius:10px; padding:8px 14px; margin:0 auto 6px; max-width:62ch; line-height:1.5; }
+  .note[hidden]{ display:none; }
+  .us-wrap{ overflow-x:auto; padding:22px 4px 18px; display:flex; justify-content:center; }
+  .us{ display:grid; --cw:36px; align-items:end; font-family:'Fraunces', serif; font-variant-numeric:tabular-nums; }
+  .cell{ position:relative; width:var(--cw); height:44px; display:flex; align-items:center; justify-content:center; font-size:1.65rem; font-weight:700; color:var(--ink); border-radius:8px; }
+  .cell.small{ height:22px; font-size:.85rem; }
+  .cell.small.mc{ color:var(--carry); }
+  .cell.small.ac{ color:var(--add); }
+  .cell.sign{ color:var(--ink-soft); font-size:2rem; }
+  .cell.faint{ color:var(--ink-soft); opacity:.55; }
+  .cell.ph{ color:var(--ink-soft); opacity:.5; }
+  .cell.pad{ color:var(--dec); }
+  .cell .cm{ position:absolute; right:-5px; bottom:3px; font-size:1.5rem; line-height:1; color:var(--dec); z-index:3; opacity:0; transform:translateY(-8px); transition:opacity .25s, transform .25s; }
+  .cell.hasComma .cm{ opacity:1; transform:none; }
+  .cell.decd{ background:var(--dec-soft); }
+  .cell.hl{ background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent) inset; }
+  .cell.small.hlc{ background:var(--carry-soft); box-shadow:0 0 0 1.5px var(--carry) inset; }
+  .cell.small.hla{ background:var(--add-soft); box-shadow:0 0 0 1.5px var(--add) inset; }
+  .cell.hladd{ background:var(--add-soft); box-shadow:0 0 0 2px var(--add) inset; }
+  .cell.target{ box-shadow:0 0 0 2px var(--accent) inset; background:repeating-linear-gradient(135deg, transparent 0 5px, var(--accent-soft) 5px 9px); }
+  .cell .cnt{ position:absolute; bottom:-15px; left:50%; transform:translateX(-50%); font-family:'Public Sans', sans-serif; font-size:.68rem; font-weight:700; color:var(--dec); }
+  .cell.pop{ animation:pop .35s ease-out; }
+  @keyframes pop{ 0%{ transform:scale(.6); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  .rule{ height:2.5px; background:var(--ink); border-radius:2px; margin:3px 0; }
+  .lbl{ padding-left:14px; font-family:'Public Sans', sans-serif; font-size:.8rem; font-weight:600; color:var(--ink-soft); white-space:nowrap; align-self:center; }
+  .lbl b{ color:var(--accent); }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; font-size:.76rem; color:var(--ink-soft); margin-top:4px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+
+  /* ---------- prompt ---------- */
+  .prompt-box{ margin-top:10px; background:var(--surface-2); border:1px dashed var(--border-strong); border-radius:12px; padding:16px 18px; }
+  .prompt-text{ font-size:.98rem; margin-bottom:12px; line-height:1.55; }
+  .prompt-text b{ color:var(--accent); }
+  .prompt-text .c{ color:var(--carry); }
+  .prompt-text .a{ color:var(--add); }
+  .prompt-text .d{ color:var(--dec); }
+  .prompt-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .prompt-row input[type=text]{ width:88px; font-family:'Fraunces', serif; font-weight:700; font-size:1.2rem; text-align:center; padding:8px; border-radius:10px; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--ink); }
+  .prompt-row input:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .feedback{ margin-top:9px; font-size:.88rem; font-weight:700; min-height:20px; line-height:1.5; }
+  .feedback.correct{ color:var(--good); }
+  .feedback.wrong{ color:var(--bad); }
+  .hintbox{ margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+  .hintbox span{ font-family:'Fraunces', serif; font-weight:600; font-size:.82rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px 8px; color:var(--ink-soft); }
+  .hintbox[hidden]{ display:none; }
+
+  .result-box{ margin-top:14px; padding:16px 18px; border-radius:12px; background:var(--good-soft); border:1.5px solid var(--good); display:none; }
+  .result-box.show{ display:block; }
+  .result-box .label{ font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; font-weight:700; color:var(--good); }
+  .result-box .value{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; color:var(--ink); margin-top:2px; }
+  .result-box .check{ font-size:.86rem; color:var(--ink-soft); margin-top:8px; line-height:1.55; }
+  .result-box .check b{ color:var(--ink); }
+
+  .tools{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:12px; }
+
+  /* ---------- step log ---------- */
+  .log{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .log li{ display:flex; gap:10px; align-items:flex-start; font-size:.9rem; line-height:1.5; padding:9px 12px; border-radius:10px; background:var(--surface-2); }
+  .log li .n{ flex:none; width:22px; height:22px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-family:'Fraunces', serif; font-weight:700; font-size:.8rem; }
+  .log li.note .n{ background:var(--carry); }
+  .log li.addn .n{ background:var(--add); }
+  .log li.decn .n{ background:var(--dec); }
+  .log-empty{ color:var(--ink-soft); font-size:.88rem; margin:0; }
+
+  footer.credits{ text-align:center; color:var(--ink-soft); font-size:.75rem; margin-top:22px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+  @media (max-width:600px){
+    .section{ padding:18px; }
+    .us{ --cw:27px; }
+    .cell{ font-size:1.3rem; height:38px; }
+    .cell .cm{ font-size:1.2rem; right:-4px; }
+    .lbl{ font-size:.7rem; padding-left:8px; }
+    .field input{ width:100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="hero">
+    <div class="kicker">Matteverktyg &middot; Multiplikation</div>
+    <h1>Uppställning med multiplikation</h1>
+    <p class="lede">Multiplicera siffra för siffra från höger, skriv minnessiffror ovanför och addera delprodukterna. Med decimaltal räknar du först som om kommatecknen inte fanns &ndash; och sätter kommat sist.</p>
+  </header>
+
+  <!-- ======== controls ======== -->
+  <section class="card">
+    <div class="section">
+      <h2>Välj en multiplikation</h2>
+      <p class="desc">Skriv in två egna faktorer, eller slumpa en uppgift från en nivå. Decimaltal skrivs med kommatecken, t.ex. <b>3,47</b>.</p>
+
+      <div class="own">
+        <div class="field"><label for="inA">Faktor 1</label><input type="text" id="inA" value="347" inputmode="decimal" autocomplete="off"></div>
+        <span class="sign">·</span>
+        <div class="field"><label for="inB">Faktor 2</label><input type="text" id="inB" value="26" inputmode="decimal" autocomplete="off"></div>
+        <button class="btn primary" id="runBtn" type="button">Ställ upp</button>
+        <button class="btn ghost" id="swapBtn" type="button" title="Byt plats på faktorerna">⇅ Byt plats</button>
+        <p class="own-hint" id="ownHint">Faktor 1 högst 5 siffror, faktor 2 högst 3 siffror (utan inledande nollor), högst 3 decimaler var. Tips: lägg talet med <b>flest</b> siffror överst &ndash; då blir det färre rader.</p>
+      </div>
+
+      <div class="segrow" style="margin-top:16px;" id="levels"></div>
+      <div class="segrow" id="modes"></div>
+      <div class="presets" id="presets"></div>
+    </div>
+  </section>
+
+  <!-- ======== the calculation ======== -->
+  <section class="card">
+    <div class="section">
+      <p class="note" id="note" hidden></p>
+
+      <div class="us-wrap"><div class="us" id="grid"></div></div>
+
+      <div class="legend">
+        <span><i style="background:var(--carry)"></i>Minnessiffra (multiplikation)</span>
+        <span><i style="background:var(--add)"></i>Minnessiffra (addition)</span>
+        <span><i style="background:var(--ink-soft);opacity:.5"></i>Platshållarnolla</span>
+        <span><i style="background:var(--dec)"></i>Decimaler &amp; kommatecken</span>
+      </div>
+
+      <div class="prompt-box" id="promptBox">
+        <div class="prompt-text" id="promptText"></div>
+        <div class="prompt-row" id="promptRow"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="hintbox" id="hint" hidden></div>
+      </div>
+
+      <div class="result-box" id="resultBox">
+        <div class="label">Klart</div>
+        <div class="value" id="resultValue"></div>
+        <div class="check" id="resultCheck"></div>
+      </div>
+
+      <div class="tools">
+        <button class="btn ghost" type="button" id="backBtn">↶ Ett steg bakåt</button>
+        <button class="btn ghost" type="button" id="restartBtn">⟲ Börja om</button>
+        <button class="btn ghost" type="button" id="allBtn">Visa hela uträkningen</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== step log ======== -->
+  <section class="card">
+    <div class="section">
+      <h3>Så här gick uträkningen</h3>
+      <p class="log-empty" id="logEmpty">Stegen skrivs ut här efterhand, i ord, så att de går att läsa upp eller skriva av.</p>
+      <ol class="log" id="log"></ol>
+    </div>
+  </section>
+
+  <footer class="credits">Uppställning med multiplikation &middot; Matteverktyg</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =================== number helpers =================== */
+
+  // "3,470" -> { s:"3.470", dec:3, int:"3470" }. int has no leading zeros.
+  function parseFactor(str, maxInt){
+    if(typeof str !== 'string') return null;
+    let s = str.trim().replace(/\s+/g,'').replace(',', '.');
+    if(!/^\d{1,6}(\.\d{1,3})?$/.test(s)) return null;
+    const parts = s.split('.');
+    const ip = parts[0].replace(/^0+(?=\d)/, '');
+    s = parts.length > 1 ? ip + '.' + parts[1] : ip;
+    const dec = parts.length > 1 ? parts[1].length : 0;
+    const int = s.replace('.', '').replace(/^0+(?=\d)/, '');
+    if(/^0+$/.test(int)) return null;
+    if(int.length > maxInt) return null;
+    return { s:s, dec:dec, int:int };
+  }
+  function sv(s){ return String(s).replace('.', ','); }
+  function fmtNum(n){ return sv(Number(n).toFixed(6).replace(/0+$/,'').replace(/\.$/,'')); }
+  function sig1(x){ return Number(x.toPrecision(1)); }
+  function pow10(k){ return Math.pow(10, k); }
+
+  /* =================== plan: every step of the calculation =================== */
+
+  // A mark is something written in the layout. It becomes visible once the
+  // step with index `t` is done (taskIdx > t), and disappears again at `hideAt`.
+  function buildPlan(aStr, bStr){
+    const A = parseFactor(aStr, 5), B = parseFactor(bStr, 3);
+    const a = A.int.split('').reverse().map(Number);
+    const b = B.int.split('').reverse().map(Number);
+    const n = a.length, m = b.length;
+    const multi = m > 1;
+    const tasks = [], marks = [], labels = [];
+    const rows = [];                   // rows[j][col] = digit (partial products)
+    const rowName = function(j){ return multi ? 'p' + j : 'R'; };
+
+    for(let j = 0; j < m; j++){
+      rows[j] = {};
+      const rn = rowName(j);
+      if(j > 0){
+        tasks.push({ kind:'shift', j:j });
+        const t = tasks.length - 1;
+        for(let c = 0; c < j; c++){ marks.push({ row:rn, col:c, text:'0', t:t, cls:'ph' }); rows[j][c] = 0; }
+      }
+      if(b[j] === 0 && multi){
+        tasks.push({ kind:'zerorow', j:j });
+        const t = tasks.length - 1;
+        for(let i = 0; i < n; i++){ marks.push({ row:rn, col:i + j, text:'0', t:t }); rows[j][i + j] = 0; }
+      } else {
+        let carry = 0;
+        const carryMarks = [];
+        for(let i = 0; i < n; i++){
+          const prod = a[i] * b[j] + carry;
+          const last = i === n - 1;
+          tasks.push({ kind:'mul', i:i, j:j, a:a[i], b:b[j], carryIn:carry, prod:prod, last:last });
+          const t = tasks.length - 1;
+          marks.push({ row:rn, col:i + j, text:String(prod % 10), t:t });
+          rows[j][i + j] = prod % 10;
+          if(last){
+            if(prod >= 10){ marks.push({ row:rn, col:i + j + 1, text:String(Math.floor(prod / 10)), t:t }); rows[j][i + j + 1] = Math.floor(prod / 10); }
+          } else if(prod >= 10){
+            const cm = { row:'mc', col:i + 1, text:String(Math.floor(prod / 10)), t:t };
+            marks.push(cm); carryMarks.push(cm);
+          }
+          carry = Math.floor(prod / 10);
+        }
+        // when the next row (or the addition) starts, this row's carries are erased
+        if(multi) carryMarks.forEach(function(cm){ cm.hideAt = tasks.length; });
+      }
+      labels.push({ row:rn, j:j, t:tasks.length - 1, text:A.int + ' · ' + (b[j] * pow10(j)) });
+    }
+
+    let product = 0;
+    if(multi){
+      let maxCol = 0;
+      rows.forEach(function(r){ Object.keys(r).forEach(function(k){ if(+k > maxCol) maxCol = +k; }); });
+      let carry = 0;
+      for(let c = 0; c <= maxCol; c++){
+        const terms = [];
+        rows.forEach(function(r, j){ if(r[c] !== undefined) terms.push({ j:j, v:r[c] }); });
+        const sum = terms.reduce(function(s, x){ return s + x.v; }, 0) + carry;
+        const last = c === maxCol;
+        tasks.push({ kind:'add', c:c, terms:terms, carryIn:carry, sum:sum, last:last });
+        const t = tasks.length - 1;
+        marks.push({ row:'R', col:c, text:String(sum % 10), t:t });
+        if(last){
+          const hi = Math.floor(sum / 10);
+          if(hi > 0) String(hi).split('').reverse().forEach(function(ch, k){ marks.push({ row:'R', col:c + 1 + k, text:ch, t:t }); });
+        } else if(sum >= 10){
+          marks.push({ row:'ac', col:c + 1, text:String(Math.floor(sum / 10)), t:t });
+        }
+        carry = Math.floor(sum / 10);
+      }
+    }
+    product = parseInt(A.int, 10) * parseInt(B.int, 10);
+    const P = String(product);
+    const D = A.dec + B.dec;
+
+    let decIdx = -1, commaIdx = -1;
+    if(D > 0){
+      tasks.push({ kind:'dec' }); decIdx = tasks.length - 1;
+      tasks.push({ kind:'comma' }); commaIdx = tasks.length - 1;
+      for(let c = P.length; c <= D; c++) marks.push({ row:'R', col:c, text:'0', t:commaIdx, cls:'pad' });
+      marks.push({ row:'R', col:D, comma:true, t:commaIdx });
+    }
+
+    let padded = P;
+    while(padded.length <= D) padded = '0' + padded;
+    let resultStr = D > 0 ? padded.slice(0, padded.length - D) + ',' + padded.slice(padded.length - D) : padded;
+    let simplified = resultStr;
+    if(D > 0) simplified = simplified.replace(/0+$/,'').replace(/,$/,'');
+
+    // grid width: widest row + a column for the sign
+    let width = Math.max(A.s.replace('.','').length, B.s.replace('.','').length, padded.length);
+    rows.forEach(function(r){ Object.keys(r).forEach(function(k){ width = Math.max(width, +k + 1); }); });
+    width += 1;
+
+    return { A:A, B:B, a:a, b:b, n:n, m:m, multi:multi, tasks:tasks, marks:marks, labels:labels,
+             product:product, P:P, D:D, padded:padded, resultStr:resultStr, simplified:simplified,
+             decIdx:decIdx, commaIdx:commaIdx, width:width };
+  }
+
+  /* =================== state & DOM =================== */
+
+  const $ = function(id){ return document.getElementById(id); };
+  const inA = $('inA'), inB = $('inB');
+  const gridEl = $('grid'), noteEl = $('note');
+  const promptBox = $('promptBox'), promptText = $('promptText'), promptRow = $('promptRow');
+  const feedbackEl = $('feedback'), hintEl = $('hint');
+  const resultBox = $('resultBox'), resultValue = $('resultValue'), resultCheck = $('resultCheck');
+  const logEl = $('log'), logEmpty = $('logEmpty');
+
+  let plan = null, taskIdx = 0, mode = 'quiz', level = 1, busy = false;
+  let cells = {};   // "row|col" -> element
+
+  const LEVELS = [
+    { id:1, label:'Nivå 1 · gånger ental' },
+    { id:2, label:'Nivå 2 · gånger tvåsiffrigt' },
+    { id:3, label:'Nivå 3 · decimaltal · heltal' },
+    { id:4, label:'Nivå 4 · decimaltal · decimaltal' }
+  ];
+  const MODES = [
+    { id:'show', label:'Visa mig stegen' },
+    { id:'quiz', label:'Jag svarar själv' }
+  ];
+  const PRESETS = ['347/6', '58/23', '347/26', '1205/34', '4,7/3', '3,25/12', '2,4/1,5', '0,6/0,4', '12,5/0,08', '3,47/2,6'];
+
+  function mkSeg(parent, items, current, onPick){
+    items.forEach(function(it){
+      const btn = document.createElement('button');
+      btn.className = 'seg' + (it.id === current ? ' active' : '');
+      btn.type = 'button'; btn.textContent = it.label;
+      btn.addEventListener('click', function(){
+        Array.prototype.forEach.call(parent.children, function(x){ x.classList.toggle('active', x === btn); });
+        onPick(it.id);
+      });
+      parent.appendChild(btn);
+    });
+  }
+  mkSeg($('levels'), LEVELS, level, function(id){ level = id; newProblem(); });
+  mkSeg($('modes'), MODES, mode, function(id){ mode = id; renderPrompt(); });
+  PRESETS.forEach(function(p){
+    const pair = p.split('/');
+    const chip = document.createElement('button');
+    chip.className = 'chip'; chip.type = 'button';
+    chip.textContent = pair[0] + ' · ' + pair[1];
+    chip.addEventListener('click', function(){ inA.value = pair[0]; inB.value = pair[1]; runOwn(); });
+    $('presets').appendChild(chip);
+  });
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function randDec(minInt, maxInt, dec){
+    // a decimal number whose last decimal is not 0
+    let v;
+    do { v = randInt(minInt, maxInt); } while(v % 10 === 0);
+    return (v / pow10(dec)).toFixed(dec);
+  }
+  function genProblem(){
+    if(level === 1) return { a:String(randInt(12, 999)), b:String(randInt(2, 9)) };
+    if(level === 2) return { a:String(randInt(24, 999)), b:String(randInt(12, 98)) };
+    if(level === 3){
+      const d = randInt(1, 2);
+      return { a:randDec(d === 1 ? 12 : 105, 999, d), b:String(Math.random() < .5 ? randInt(2, 9) : randInt(11, 32)) };
+    }
+    const d = randInt(1, 2);
+    return { a:randDec(d === 1 ? 12 : 105, 999, d), b:randDec(2, 49, 1) };
+  }
+
+  /* =================== rendering =================== */
+
+  function addCell(row, col, cls, text){
+    const el = document.createElement('div');
+    el.className = 'cell' + (cls ? ' ' + cls : '');
+    const dg = document.createElement('span'); dg.className = 'dg'; dg.textContent = text || '';
+    const cm = document.createElement('span'); cm.className = 'cm'; cm.textContent = ',';
+    el.appendChild(dg); el.appendChild(cm);
+    el._dg = dg;
+    if(col !== null) cells[row + '|' + col] = el;
+    gridEl.appendChild(el);
+    return el;
+  }
+  function addLabel(row){
+    const el = document.createElement('div');
+    el.className = 'lbl'; el.dataset.row = row;
+    gridEl.appendChild(el);
+  }
+  function addRule(){
+    const el = document.createElement('div');
+    el.className = 'rule';
+    el.style.gridColumn = '1 / span ' + plan.width;
+    gridEl.appendChild(el);
+    gridEl.appendChild(document.createElement('div'));
+  }
+  // one row of the layout: col index counts from the right (0 = ones)
+  function addRow(row, small, sign){
+    const W = plan.width;
+    for(let k = 0; k < W; k++){
+      const col = W - 1 - k;
+      if(k === 0 && sign){ addCell(row, null, 'sign', sign); continue; }
+      addCell(row, col, small ? 'small ' + small : '');
+    }
+    addLabel(row);
+  }
+  function fillFactor(row, F){
+    const digits = F.s.replace('.', '');
+    const L = digits.length;
+    for(let c = 0; c < L; c++){
+      const el = cells[row + '|' + c];
+      el._dg.textContent = digits.charAt(L - 1 - c);
+      // leading "0" in e.g. 0,6 is written but not multiplied
+      if(c >= F.int.length) el.classList.add('faint');
+      if(F.dec > 0 && c === F.dec) el.classList.add('hasComma');
+    }
+  }
+
+  function buildGrid(){
+    gridEl.innerHTML = ''; cells = {};
+    gridEl.style.gridTemplateColumns = 'repeat(' + plan.width + ', var(--cw)) auto';
+    addRow('mc', 'mc');
+    addRow('A');
+    addRow('B', null, '·');
+    addRule();
+    if(plan.multi){
+      addRow('ac', 'ac');
+      for(let j = 0; j < plan.m; j++) addRow('p' + j, null, j === plan.m - 1 ? '+' : null);
+      addRule();
+    }
+    addRow('R');
+    fillFactor('A', plan.A);
+    fillFactor('B', plan.B);
+  }
+
+  function render(popT){
+    // clear dynamic state
+    Object.keys(cells).forEach(function(k){
+      const el = cells[k];
+      const row = k.split('|')[0];
+      el.classList.remove('hl','hlc','hla','hladd','target','decd','pop','ph','pad');
+      const cnt = el.querySelector('.cnt'); if(cnt) cnt.remove();
+      if(row !== 'A' && row !== 'B'){ el._dg.textContent = ''; el.classList.remove('hasComma'); }
+    });
+    plan.marks.forEach(function(mk){
+      const vis = taskIdx > mk.t && (mk.hideAt === undefined || taskIdx < mk.hideAt);
+      if(!vis) return;
+      const el = cells[mk.row + '|' + mk.col];
+      if(!el) return;
+      if(mk.comma){ el.classList.add('hasComma'); return; }
+      el._dg.textContent = mk.text;
+      if(mk.cls) el.classList.add(mk.cls);
+      if(popT !== undefined && mk.t === popT) el.classList.add('pop');
+    });
+    Array.prototype.forEach.call(gridEl.querySelectorAll('.lbl'), function(l){ l.innerHTML = ''; });
+    if(plan.multi){
+      plan.labels.forEach(function(lb){
+        if(taskIdx > lb.t){
+          const l = gridEl.querySelector('.lbl[data-row="' + lb.row + '"]');
+          if(l) l.innerHTML = '= <b>' + lb.text + '</b>';
+        }
+      });
+    }
+    // decimals tinted from the decimal step on
+    if(plan.D > 0 && taskIdx >= plan.decIdx){
+      for(let c = 0; c < plan.A.dec; c++) cells['A|' + c].classList.add('decd');
+      for(let c = 0; c < plan.B.dec; c++) cells['B|' + c].classList.add('decd');
+    }
+    if(plan.D > 0 && taskIdx > plan.commaIdx){
+      for(let c = 0; c < plan.D; c++) cells['R|' + c].classList.add('decd');
+    }
+    highlight();
+  }
+
+  function mark(key, cls){ const el = cells[key]; if(el) el.classList.add(cls); }
+
+  function highlight(){
+    const t = plan.tasks[taskIdx];
+    if(!t) return;
+    const rn = function(j){ return plan.multi ? 'p' + j : 'R'; };
+    if(t.kind === 'mul'){
+      mark('A|' + t.i, 'hl'); mark('B|' + t.j, 'hl');
+      if(t.carryIn > 0) mark('mc|' + t.i, 'hlc');
+      mark(rn(t.j) + '|' + (t.i + t.j), 'target');
+      if(t.last && t.prod >= 10) mark(rn(t.j) + '|' + (t.i + t.j + 1), 'target');
+    } else if(t.kind === 'shift'){
+      for(let c = 0; c < t.j; c++) mark(rn(t.j) + '|' + c, 'target');
+    } else if(t.kind === 'zerorow'){
+      mark('B|' + t.j, 'hl');
+      for(let i = 0; i < plan.n; i++) mark(rn(t.j) + '|' + (i + t.j), 'target');
+    } else if(t.kind === 'add'){
+      t.terms.forEach(function(x){ mark('p' + x.j + '|' + t.c, 'hladd'); });
+      if(t.carryIn > 0) mark('ac|' + t.c, 'hla');
+      mark('R|' + t.c, 'target');
+      if(t.last && t.sum >= 10) String(Math.floor(t.sum / 10)).split('').forEach(function(_, k){ mark('R|' + (t.c + 1 + k), 'target'); });
+    } else if(t.kind === 'dec'){
+      countBadges('A', plan.A.dec, 0);
+      countBadges('B', plan.B.dec, 0);
+    }
+  }
+  function countBadges(row, k, start){
+    for(let c = 0; c < k; c++){
+      const el = cells[row + '|' + c];
+      if(!el) continue;
+      const s = document.createElement('span');
+      s.className = 'cnt'; s.textContent = String(start + k - c);
+      el.appendChild(s);
+    }
+  }
+
+  /* =================== notes & log =================== */
+
+  function setNote(){
+    if(plan.D > 0){
+      noteEl.hidden = false;
+      noteEl.innerHTML = 'Räkna först som om kommatecknen inte fanns: <b>' + plan.A.int + ' · ' + plan.B.int +
+        '</b>. Kommat sätts in allra sist &ndash; svaret ska ha lika många decimaler som faktorerna har tillsammans.';
+    } else noteEl.hidden = true;
+  }
+
+  function addLog(html, cls){
+    logEmpty.hidden = true;
+    const li = document.createElement('li');
+    if(cls) li.className = cls;
+    const n = document.createElement('span');
+    n.className = 'n';
+    n.textContent = String(logEl.children.length + 1);
+    li.appendChild(n);
+    const body = document.createElement('div');
+    body.innerHTML = html;
+    li.appendChild(body);
+    logEl.appendChild(li);
+  }
+
+  function logSentence(t){
+    if(t.kind === 'mul'){
+      let s = '<b>' + t.b + ' · ' + t.a + '</b>';
+      if(t.carryIn > 0) s += ' + minnessiffran <b>' + t.carryIn + '</b>';
+      s += ' = <b>' + t.prod + '</b>. ';
+      if(t.last) s += 'Sista siffran – skriv hela <b>' + t.prod + '</b>.';
+      else if(t.prod >= 10) s += 'Skriv <b>' + (t.prod % 10) + '</b>, minnessiffra <b>' + Math.floor(t.prod / 10) + '</b>.';
+      else s += 'Skriv <b>' + t.prod + '</b>.';
+      const lb = plan.labels[t.j];
+      if(t.last && plan.multi) s += ' Raden är klar: ' + lb.text + ' = <b>' + (parseInt(plan.A.int,10) * t.b * pow10(t.j)) + '</b>.';
+      return { html:s };
+    }
+    if(t.kind === 'shift'){
+      return { html:'Ny rad: nu multipliceras med <b>' + ['ental','tiotal','hundratal'][t.j] + 'ssiffran ' + plan.b[t.j] +
+        '</b>, som egentligen betyder <b>' + (plan.b[t.j] * pow10(t.j)) + '</b>. Därför skrivs ' + (t.j === 1 ? 'en platshållarnolla' : t.j + ' platshållarnollor') + ' först.', cls:'note' };
+    }
+    if(t.kind === 'zerorow') return { html:'Siffran i faktor 2 är <b>0</b>. Allt gånger 0 blir 0, så raden fylls med nollor.', cls:'note' };
+    if(t.kind === 'add'){
+      const parts = t.terms.map(function(x){ return x.v; });
+      if(t.carryIn > 0) parts.push(t.carryIn);
+      let s = 'Addera kolumnen: <b>' + parts.join(' + ') + ' = ' + t.sum + '</b>. ';
+      if(t.last) s += 'Skriv hela <b>' + t.sum + '</b>.';
+      else if(t.sum >= 10) s += 'Skriv <b>' + (t.sum % 10) + '</b>, minnessiffra <b>' + Math.floor(t.sum / 10) + '</b>.';
+      else s += 'Skriv <b>' + t.sum + '</b>.';
+      return { html:s, cls:'addn' };
+    }
+    if(t.kind === 'dec'){
+      return { html:'Decimaler: ' + plan.A.dec + ' i ' + sv(plan.A.s) + ' och ' + plan.B.dec + ' i ' + sv(plan.B.s) +
+        ' – tillsammans <b>' + plan.D + '</b>.', cls:'decn' };
+    }
+    if(t.kind === 'comma'){
+      let s = 'Räkna ' + plan.D + ' steg från höger i <b>' + plan.P + '</b> och sätt kommat: <b>' + plan.resultStr + '</b>.';
+      if(plan.padded.length > plan.P.length) s += ' Det fanns för få siffror, så nollor fylldes på framför.';
+      return { html:s, cls:'decn' };
+    }
+    return { html:'' };
+  }
+
+  function rebuildLog(){
+    logEl.innerHTML = '';
+    logEmpty.hidden = false;
+    for(let i = 0; i < taskIdx && i < plan.tasks.length; i++){
+      const l = logSentence(plan.tasks[i]);
+      addLog(l.html, l.cls);
+    }
+  }
+
+  /* =================== prompts =================== */
+
+  function buildAnswerInput(onCheck){
+    const input = document.createElement('input');
+    input.type = 'text'; input.inputMode = 'numeric'; input.autocomplete = 'off';
+    input.addEventListener('keydown', function(e){ if(e.key === 'Enter') onCheck(input); });
+    const btn = document.createElement('button');
+    btn.className = 'btn primary'; btn.type = 'button'; btn.textContent = 'Kolla';
+    btn.addEventListener('click', function(){ onCheck(input); });
+    promptRow.appendChild(input); promptRow.appendChild(btn);
+    setTimeout(function(){ input.focus({ preventScroll:true }); }, 0);
+    return input;
+  }
+  function buildContinue(text, handler){
+    const btn = document.createElement('button');
+    btn.className = 'btn primary'; btn.type = 'button'; btn.textContent = text;
+    btn.addEventListener('click', handler || advance);
+    promptRow.appendChild(btn);
+  }
+  function hintButton(label, items){
+    const hb = document.createElement('button');
+    hb.className = 'btn ghost'; hb.type = 'button'; hb.textContent = label;
+    hb.addEventListener('click', function(){
+      hintEl.innerHTML = '';
+      items.forEach(function(txt){ const s = document.createElement('span'); s.textContent = txt; hintEl.appendChild(s); });
+      hintEl.hidden = false;
+    });
+    promptRow.appendChild(hb);
+  }
+  function ok(msg){ feedbackEl.className = 'feedback correct'; feedbackEl.textContent = msg; }
+  function bad(msg){ feedbackEl.className = 'feedback wrong'; feedbackEl.textContent = msg; }
+  function readInt(input){ const v = input.value.trim(); return /^\d+$/.test(v) ? parseInt(v, 10) : NaN; }
+
+  function renderPrompt(){
+    feedbackEl.textContent = ''; feedbackEl.className = 'feedback';
+    hintEl.hidden = true;
+    promptRow.innerHTML = '';
+
+    const t = plan.tasks[taskIdx];
+    if(!t){ showResult(); return; }
+    promptBox.style.display = 'block';
+    resultBox.classList.remove('show');
+
+    if(t.kind === 'mul'){
+      let q = 'Multiplicera <b>' + t.b + '</b> med <b>' + t.a + '</b>';
+      if(t.carryIn > 0) q += ' och lägg till minnessiffran <b class="c">' + t.carryIn + '</b>';
+      q += '. Vad blir det?';
+      if(t.last) q += ' <span style="color:var(--ink-soft)">(Det är sista siffran på raden – hela talet skrivs ner.)</span>';
+      promptText.innerHTML = q;
+      if(mode === 'quiz'){
+        buildAnswerInput(function(input){
+          const v = readInt(input);
+          if(Number.isNaN(v)) return bad('Skriv ett heltal.');
+          if(v === t.prod){
+            input.disabled = true;
+            if(t.last) ok('Rätt! Skriv hela ' + t.prod + '.');
+            else if(t.prod >= 10) ok('Rätt! Skriv ' + (t.prod % 10) + ' och sätt minnessiffran ' + Math.floor(t.prod / 10) + ' ovanför nästa siffra.');
+            else ok('Rätt! Skriv ' + t.prod + '.');
+            setTimeout(advance, 850);
+          } else if(t.carryIn > 0 && v === t.a * t.b){
+            bad(t.b + ' · ' + t.a + ' = ' + v + ' stämmer, men du glömde minnessiffran ' + t.carryIn + '.');
+          } else {
+            bad('Inte riktigt. Hur mycket är ' + t.b + ' · ' + t.a + '?' + (t.carryIn > 0 ? ' Lägg sedan till ' + t.carryIn + '.' : ''));
+          }
+        });
+        const tab = [];
+        for(let k = 1; k <= 9; k++) tab.push(t.b + ' · ' + k + ' = ' + (t.b * k));
+        hintButton('Visa ' + t.b + ':ans tabell', tab);
+      } else {
+        const lbl = t.b + ' · ' + t.a + (t.carryIn > 0 ? ' + ' + t.carryIn : '') + ' = ' + t.prod;
+        buildContinue(lbl + ' – skriv ner');
+      }
+      return;
+    }
+
+    if(t.kind === 'shift'){
+      const place = ['entalet','tiotalet','hundratalet'][t.j];
+      promptText.innerHTML = 'Nu ska vi multiplicera med <b>' + place + 's&shy;siffran ' + plan.b[t.j] + '</b>. Den står på ' +
+        place + 's plats, så den betyder egentligen <b>' + (plan.b[t.j] * pow10(t.j)) + '</b>. ' +
+        'Därför börjar raden med ' + (t.j === 1 ? 'en <b>platshållarnolla</b>' : t.j + ' <b>platshållarnollor</b>') +
+        ' längst till höger. De gamla minnessiffrorna stryks.';
+      buildContinue('Skriv ' + (t.j === 1 ? 'nollan' : 'nollorna'));
+      return;
+    }
+
+    if(t.kind === 'zerorow'){
+      promptText.innerHTML = 'Siffran i faktor 2 är <b>0</b>. Vad blir alla siffror gånger 0?';
+      buildContinue('Fyll raden med nollor');
+      return;
+    }
+
+    if(t.kind === 'add'){
+      const parts = t.terms.map(function(x){ return String(x.v); });
+      let q = 'Dags att <b class="a">addera</b> delprodukterna, kolumn för kolumn från höger. Räkna ';
+      q += '<b>' + parts.join(' + ') + '</b>';
+      if(t.carryIn > 0) q += ' + minnessiffran <b class="a">' + t.carryIn + '</b>';
+      q += '.';
+      promptText.innerHTML = q;
+      if(mode === 'quiz'){
+        buildAnswerInput(function(input){
+          const v = readInt(input);
+          if(Number.isNaN(v)) return bad('Skriv ett heltal.');
+          if(v === t.sum){
+            input.disabled = true;
+            if(t.last || t.sum < 10) ok('Rätt! Skriv ' + t.sum + '.');
+            else ok('Rätt! Skriv ' + (t.sum % 10) + ' och minnessiffran ' + Math.floor(t.sum / 10) + ' ovanför nästa kolumn.');
+            setTimeout(advance, 850);
+          } else if(t.carryIn > 0 && v === t.sum - t.carryIn){
+            bad('Nästan – glöm inte minnessiffran ' + t.carryIn + '.');
+          } else bad('Inte riktigt. Addera siffrorna i den lila kolumnen en i taget.');
+        });
+      } else {
+        buildContinue(parts.concat(t.carryIn > 0 ? [String(t.carryIn)] : []).join(' + ') + ' = ' + t.sum + ' – skriv ner');
+      }
+      return;
+    }
+
+    if(t.kind === 'dec'){
+      promptText.innerHTML = 'Heltalsuträkningen är klar: <b>' + plan.A.int + ' · ' + plan.B.int + ' = ' + plan.P + '</b>. ' +
+        'Nu kommatecknet! Hur många <b class="d">decimaler</b> (siffror efter kommat) har de två faktorerna <i>tillsammans</i>?';
+      if(mode === 'quiz'){
+        buildAnswerInput(function(input){
+          const v = readInt(input);
+          if(Number.isNaN(v)) return bad('Skriv ett heltal.');
+          if(v === plan.D){ input.disabled = true; ok('Rätt! ' + plan.A.dec + ' + ' + plan.B.dec + ' = ' + plan.D + ' decimaler.'); setTimeout(advance, 850); }
+          else bad('Räkna de röda siffrorna i båda faktorerna: ' + sv(plan.A.s) + ' har ' + plan.A.dec + ', ' + sv(plan.B.s) + ' har ' + plan.B.dec + '.');
+        });
+      } else buildContinue(plan.A.dec + ' + ' + plan.B.dec + ' = ' + plan.D + ' decimaler');
+      return;
+    }
+
+    if(t.kind === 'comma'){
+      let q = 'Svaret ska ha <b class="d">' + plan.D + '</b> decimal' + (plan.D === 1 ? '' : 'er') + '. Räkna ' + plan.D +
+        ' steg från höger i <b>' + plan.P + '</b> och sätt kommat där.';
+      if(plan.padded.length > plan.P.length) q += ' Det finns bara ' + plan.P.length + ' siffr' + (plan.P.length === 1 ? 'a' : 'or') + ', så vi fyller på med nollor framför.';
+      promptText.innerHTML = q;
+      buildContinue('Räkna steg och sätt kommat', animateComma);
+      return;
+    }
+  }
+
+  // counts the decimals one by one from the right, then drops the comma in
+  function animateComma(){
+    if(busy) return;
+    busy = true;
+    promptRow.querySelectorAll('button').forEach(function(b){ b.disabled = true; });
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stepMs = reduce ? 60 : 450;
+    // pre-show padded zeros so there is something to count
+    for(let c = plan.P.length; c <= plan.D; c++){ const el = cells['R|' + c]; el._dg.textContent = '0'; el.classList.add('pad'); }
+    let k = 0;
+    (function tick(){
+      if(k < plan.D){
+        const el = cells['R|' + k];
+        el.classList.add('decd');
+        const s = document.createElement('span'); s.className = 'cnt'; s.textContent = String(k + 1);
+        el.appendChild(s);
+        k++;
+        setTimeout(tick, stepMs);
+      } else {
+        cells['R|' + plan.D].classList.add('hasComma');
+        setTimeout(function(){ busy = false; advance(); }, stepMs + 200);
+      }
+    })();
+  }
+
+  function showResult(){
+    promptBox.style.display = 'none';
+    resultBox.classList.add('show');
+    resultValue.textContent = sv(plan.A.s) + ' · ' + sv(plan.B.s) + ' = ' + plan.simplified;
+    const a = parseFloat(plan.A.s), b = parseFloat(plan.B.s);
+    const ea = sig1(a), eb = sig1(b);
+    let html = 'Överslag: avrunda till <b>' + fmtNum(ea) + ' · ' + fmtNum(eb) + ' ≈ ' + fmtNum(ea * eb) + '</b>. ' +
+      'Svaret <b>' + plan.simplified + '</b> ligger i samma storleksordning' + (plan.D > 0 ? ', så kommat står rätt.' : '.');
+    if(plan.simplified !== plan.resultStr){
+      html += '<br>Nollorna sist efter kommat säger ingenting och kan strykas: <b>' + plan.resultStr + ' = ' + plan.simplified + '</b>.';
+    }
+    if(plan.multi){
+      html += '<br>Varför fungerar det? ' + plan.labels.map(function(l){ return l.text; }).join(' + ') + ' = <b>' + plan.A.int + ' · ' + plan.B.int + '</b>. Delprodukterna är multiplikation med en siffra i taget.';
+    }
+    resultCheck.innerHTML = html;
+  }
+
+  function advance(){
+    const t = plan.tasks[taskIdx];
+    if(!t) return;
+    const l = logSentence(t);
+    addLog(l.html, l.cls);
+    const doneT = taskIdx;
+    taskIdx++;
+    render(doneT); renderPrompt();
+  }
+
+  /* =================== driving =================== */
+
+  function setProblem(a, b){
+    plan = buildPlan(a, b);
+    taskIdx = 0; busy = false;
+    inA.value = sv(plan.A.s); inB.value = sv(plan.B.s);
+    inA.classList.remove('invalid'); inB.classList.remove('invalid');
+    window.__usPlan = plan;
+    buildGrid(); setNote(); rebuildLog();
+    render(); renderPrompt();
+  }
+  function newProblem(){ const p = genProblem(); setProblem(p.a, p.b); }
+  function runOwn(){
+    const a = parseFactor(inA.value, 5), b = parseFactor(inB.value, 3);
+    inA.classList.toggle('invalid', !a);
+    inB.classList.toggle('invalid', !b);
+    if(!a || !b){
+      $('ownHint').innerHTML = 'Kontrollera talen: faktor 1 får ha högst <b>5</b> siffror och faktor 2 högst <b>3</b> siffror (inledande nollor räknas inte), högst 3 decimaler, och ingen får vara 0.';
+      return;
+    }
+    setProblem(a.s, b.s);
+  }
+
+  $('runBtn').addEventListener('click', runOwn);
+  inA.addEventListener('keydown', function(e){ if(e.key === 'Enter') runOwn(); });
+  inB.addEventListener('keydown', function(e){ if(e.key === 'Enter') runOwn(); });
+  $('swapBtn').addEventListener('click', function(){
+    const x = inA.value; inA.value = inB.value; inB.value = x; runOwn();
+  });
+  $('backBtn').addEventListener('click', function(){
+    if(busy || taskIdx === 0) return;
+    taskIdx--; rebuildLog(); render(); renderPrompt();
+  });
+  $('restartBtn').addEventListener('click', function(){
+    if(busy) return;
+    taskIdx = 0; rebuildLog(); render(); renderPrompt();
+  });
+  $('allBtn').addEventListener('click', function(){
+    if(busy) return;
+    taskIdx = plan.tasks.length; rebuildLog(); render(); renderPrompt();
+  });
+
+  setProblem('347', '26');
+  window.__usSolve = buildPlan;
+})();
+</script>
+
+</body>
+</html>
