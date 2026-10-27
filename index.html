@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<title>Lathunden interaktiv</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Lathunden i matematik med interaktiva verktyg: räknesätt, positionssystem, tabeller, huvudräkning, avrundning, räkneregler, geometri, enheter, tid, hastighet, temperatur och romerska siffror.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: uppslagsbok med fast innehållsförteckning till vänster (meny överst på mobil). Rött = lathundens omslag, blått = "så tänker du", grönt = knep. Verktyg ligger i ramade kort. */
+:root{
+  --bg:#f3f4f8; --paper:#ffffff; --ink:#181a20; --muted:#5a6172; --line:#d3d7e0; --grid:#eceef4;
+  --red:#cf2a20; --red-tint:#fdeae8; --blue:#1d5bbd; --blue-tint:#e6eefc; --green:#1d7647; --green-tint:#e2f3e8;
+  --on-accent:#ffffff;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Verdana","Segoe UI",system-ui,sans-serif;
+  --top-h:56px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --on-accent:#14161b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --on-accent:#14161b; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.12;text-wrap:balance}
+p{margin:0;max-width:68ch}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num,table{font-variant-numeric:tabular-nums}
+sup{font-size:.7em}
+
+/* toppfält */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:25;background:var(--paper);border-bottom:1px solid var(--line)}
+.top-in{max-width:1220px;margin:0 auto;height:var(--top-h);display:flex;align-items:center;gap:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand b{background:#c4271d;color:#fff;font-family:var(--f-display);font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:4px;font-size:18px}
+.brand span{color:var(--muted);font-size:14px}
+.where{margin-left:auto;flex:1 1 auto;text-align:right;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.menu-btn{display:none;font:inherit;font-weight:700;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.theme-btn{white-space:nowrap;margin-left:auto;font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
+
+/* skal */
+.shell{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 80px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--top-h) + 20px);align-self:start;max-height:calc(100vh - var(--top-h) - 40px);overflow:auto;padding-right:6px}
+.side h4{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 4px}
+.side h4:first-child{margin-top:0}
+.side a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--ink);padding:5px 10px;border-radius:6px;font-size:15px;border-left:3px solid transparent}
+.side a:hover{background:var(--grid)}
+.side a[aria-current="true"]{background:var(--red-tint);border-left-color:var(--red);font-weight:700}
+.side a small{color:var(--muted);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums}
+main{min-width:0;display:grid;gap:64px}
+
+@media (max-width:920px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .menu-btn{display:inline-block}
+  .brand span{display:none}
+  .where{display:none}
+  .side{position:fixed;z-index:24;top:calc(env(safe-area-inset-top,0px) + var(--top-h));left:0;right:0;max-height:calc(100vh - var(--top-h) - env(safe-area-inset-top,0px));
+    background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 12px 30px rgb(0 0 0/.18);
+    padding:12px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:none;columns:2 180px}
+  .side.open{display:block}
+  .side h4{break-after:avoid}
+}
+
+/* avsnitt */
+.sec{scroll-margin-top:calc(var(--top-h) + 20px);display:grid;gap:18px;min-width:0}
+.sec>*{min-width:0}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--red);font-weight:700}
+.sec h2{font-size:clamp(26px,3.4vw,34px);font-weight:800}
+.lead{color:var(--muted);font-size:17px}
+h3{font-size:19px;font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px 28px;align-items:start}
+.cols>*{min-width:0}
+.box{display:grid;gap:10px;align-content:start}
+.tip,.ok,.warn{padding:10px 14px;border-radius:0 8px 8px 0;font-size:15px;max-width:68ch}
+.tip{background:var(--blue-tint);border-left:4px solid var(--blue)}.tip b{color:var(--blue)}
+.ok{background:var(--green-tint);border-left:4px solid var(--green)}.ok b{color:var(--green)}
+.warn{background:var(--red-tint);border-left:4px solid var(--red)}.warn b{color:var(--red)}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:right;vertical-align:top}
+th{background:var(--grid);font-weight:700;text-align:center}
+.l{text-align:left}
+.eq{font-size:18px;font-variant-numeric:tabular-nums}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 2px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.r{color:var(--red)}.b{color:var(--blue)}.g{color:var(--green)}
+svg{max-width:100%;height:auto;display:block}
+svg text{font-family:var(--f-body);fill:var(--ink)}
+.rows{display:grid;gap:6px}
+.row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.row .why{font-size:14px;color:var(--muted);font-style:italic}
+
+/* verktygskort */
+.tool{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0}
+.tool-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--on-accent);background:var(--blue);padding:3px 8px;border-radius:4px}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.fld{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.in,select.in{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;width:8em;max-width:100%}
+.in.wide{width:16em}
+select.in{width:auto}
+input[type=range]{width:220px;max-width:100%;accent-color:var(--red)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:inline-block;padding:6px 13px;border:1.5px solid var(--line);border-radius:999px;font-size:15px;cursor:pointer;background:var(--paper);user-select:none}
+.seg input:checked+span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.btn{font:inherit;font-size:15px;font-weight:700;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1.5px dashed var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.out{background:var(--grid);border-radius:10px;padding:14px;display:grid;gap:10px;min-width:0}
+.big{font-size:clamp(22px,3vw,30px);font-family:var(--f-display);font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.small{font-size:14px;color:var(--muted)}
+.err{color:var(--red);font-weight:700}
+mark{background:var(--red-tint);color:var(--red);font-weight:700;border-radius:4px;padding:0 3px}
+
+/* start */
+.hero{background:#c4271d;color:#fff;border-radius:14px;padding:clamp(22px,4vw,36px);display:grid;gap:10px}
+.hero h1{font-size:clamp(40px,7vw,72px);font-weight:800;letter-spacing:.03em;color:#fff}
+.hero p{color:#fff;font-size:18px;opacity:.95}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:10px}
+.quick a{display:grid;gap:2px;text-decoration:none;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px}
+.quick a:hover{border-color:var(--red)}
+.quick a b{font-family:var(--f-display);font-size:17px}
+.quick a span{font-size:13px;color:var(--muted)}
+
+/* positionstabell */
+.pv{display:grid;grid-template-columns:repeat(11,minmax(34px,1fr));gap:4px;min-width:470px}
+.pv .h{font-size:11px;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);height:104px;justify-self:center;text-align:left}
+.pv .d{font-size:30px;font-weight:700;text-align:center;border-radius:8px;padding:6px 0;font-family:var(--f-display);transition:background .3s}
+.pv .d.int{background:var(--red-tint);border:1.5px solid var(--red)}
+.pv .d.dec{background:var(--blue-tint);border:1.5px solid var(--blue)}
+.pv .d.dim{opacity:.3}
+.pv .d.comma{background:none;border:none}
+.pv .d.flash{animation:fl .5s}
+@keyframes fl{from{transform:translateY(-6px)}to{transform:none}}
+
+/* talkamrater */
+.pw{display:inline-grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);font-variant-numeric:tabular-nums;text-align:center;min-width:52px;border-radius:4px;overflow:hidden;cursor:pointer;background:var(--paper);font:inherit;color:var(--ink);padding:0}
+.pw>span:first-child{grid-column:1/3;border-bottom:1.5px solid var(--ink);font-weight:700;background:var(--grid);padding:2px}
+.pw>span:nth-child(2){border-right:1.5px solid var(--ink)}
+.pw>span{padding:2px}
+.pw[aria-pressed="true"]{outline:3px solid var(--red);outline-offset:1px}
+.pwlist{display:flex;flex-wrap:wrap;gap:8px}
+
+/* multiplikationstabell */
+.mt{display:grid;grid-template-columns:repeat(11,minmax(24px,1fr));gap:3px;min-width:290px}
+@media (max-width:480px){.theme-btn .tt{display:none}}
+@media (max-width:480px){.mt>*{font-size:12.5px;padding:6px 0}}
+.mt>*{font:inherit;font-variant-numeric:tabular-nums;text-align:center;padding:7px 0;border-radius:5px;font-size:15px}
+.mt .hd{font-weight:800;color:var(--red);background:var(--grid)}
+.mt button{border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.mt button.sq{background:var(--grid);font-weight:700}
+.mt button.path{background:var(--blue-tint);border-color:var(--blue)}
+.mt button.hit{background:var(--red);color:var(--on-accent);border-color:var(--red);font-weight:800}
+.mt .hd.on{background:var(--red);color:var(--on-accent)}
+
+/* romerska chips */
+.rchip{display:inline-grid;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--paper)}
+.rchip b{font-family:var(--f-display);font-size:22px}
+.rchip small{color:var(--muted);font-size:12px}
+
+.months{display:flex;flex-wrap:wrap;gap:6px}
+.foot{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+.pn{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:15px}
+.pn a{text-decoration:none}
+
+@media print{
+  .top,.side,.tool .ctrl,.menu-btn{display:none!important}
+  .shell{display:block}
+  .sec{break-inside:avoid-page}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#start"><b>LATHUNDEN</b><span>interaktiv</span></a>
+    <span class="where" id="where" aria-live="polite"></span>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Byt mellan ljust och mörkt läge"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" style="display:inline-block;vertical-align:-3px"><circle cx="8" cy="8" r="6.5" style="fill:none;stroke:currentColor;stroke-width:1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" style="fill:currentColor"/></svg><span class="tt"> Tema</span></button>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="side">Innehåll</button>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="side" id="side" aria-label="Innehåll">
+  <h4>Start</h4>
+  <a href="#start">Om lathunden</a>
+  <h4>Tal</h4>
+  <a href="#raknesatt">Räknesätten <small>+ − · /</small></a>
+  <a href="#tecken">Matematiska tecken <small>= &lt; &gt;</small></a>
+  <a href="#positioner">Positionssystemet</a>
+  <h4>Räkna</h4>
+  <a href="#talkamrater">Talkamrater</a>
+  <a href="#multiplikation">Multiplikationstabellen</a>
+  <a href="#huvudrakning">Huvudräkning</a>
+  <a href="#avrundning">Avrundning</a>
+  <a href="#regler">Räkneregler</a>
+  <h4>Geometri</h4>
+  <a href="#geometri">Figurer och vinklar</a>
+  <a href="#berakna">Omkrets, area, volym</a>
+  <h4>Mått</h4>
+  <a href="#enheter">Enheter</a>
+  <a href="#matt">Stycketal och äldre mått</a>
+  <a href="#tid">Tid</a>
+  <a href="#hastighet">Hastighet</a>
+  <a href="#temperatur">Temperatur</a>
+  <h4>Övrigt</h4>
+  <a href="#romerska">Romerska siffror</a>
+</nav>
+
+<main id="main">
+
+<!-- START -->
+<section class="sec" id="start" data-title="Start">
+  <div class="hero">
+    <h1>LATHUNDEN</h1>
+    <p>Matematiska nyttigheter att slå upp, se och pröva själv.</p>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h3>Så fungerar sidan</h3>
+      <p>Varje avsnitt har först fakta att slå upp. Under dem finns ett <b>verktyg</b> där du kan skriva in egna tal och se hur det fungerar.</p>
+      <div class="tip"><b>Blå rutor</b> visar hur du kan tänka.</div>
+      <div class="ok"><b>Gröna rutor</b> är knep att komma ihåg.</div>
+      <div class="warn"><b>Röda rutor</b> varnar för vanliga fel.</div>
+    </div>
+    <div class="box">
+      <h3>Hoppa direkt till</h3>
+      <div class="quick">
+        <a href="#multiplikation"><b>Gångertabellen</b><span>Klicka på en ruta, träna</span></a>
+        <a href="#regler"><b>Räkneordning</b><span>Se ett uttryck lösas steg för steg</span></a>
+        <a href="#enheter"><b>Enhetsomvandlare</b><span>Längd, area, volym, vikt</span></a>
+        <a href="#berakna"><b>Area och volym</b><span>Välj figur och mått</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RÄKNESÄTTEN -->
+<section class="sec" id="raknesatt" data-title="Räknesätten">
+  <div><span class="kicker">Tal</span><h2>De fyra räknesätten</h2></div>
+  <div class="tw"><table>
+    <tr><th class="l">Räknesätt</th><th>Exempel</th><th class="l">Delarna heter</th><th class="l">Läses</th></tr>
+    <tr><td class="l"><b>Addition</b></td><td>3 + 4 = 7</td><td class="l">term + term = <b class="r">summa</b></td><td class="l">3 plus 4 är lika med 7</td></tr>
+    <tr><td class="l"><b>Subtraktion</b></td><td>7 − 3 = 4</td><td class="l">term − term = <b class="r">skillnad (differens)</b></td><td class="l">7 minus 3 är lika med 4</td></tr>
+    <tr><td class="l"><b>Multiplikation</b></td><td>3 · 4 = 12</td><td class="l">faktor · faktor = <b class="r">produkt</b></td><td class="l">3 gånger 4 är lika med 12</td></tr>
+    <tr><td class="l"><b>Division</b></td><td><span class="frac"><span>12</span><span>4</span></span> = 3</td><td class="l"><span class="frac"><span>täljare</span><span>nämnare</span></span> = <b class="r">kvot</b></td><td class="l">12 delat med 4 är lika med 3</td></tr>
+  </table></div>
+  <div class="tip"><b>Motsatta räknesätt:</b> subtraktion tar bort det addition lägger till, och division delar upp det multiplikation satt ihop. Använd det för att kontrollera svaret: 3 + 4 = 7 eftersom 7 − 4 = 3.</div>
+  <div class="tool" id="t-rs">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Se räknesättet med prickar</h3></div>
+    <div class="ctrl">
+      <label class="fld">Första talet<input class="in" id="rs-a" inputmode="numeric" value="12"></label>
+      <div class="seg" role="radiogroup" aria-label="Räknesätt">
+        <label><input type="radio" name="rs-op" value="+"><span>+ addition</span></label>
+        <label><input type="radio" name="rs-op" value="-"><span>− subtraktion</span></label>
+        <label><input type="radio" name="rs-op" value="*"><span>· multiplikation</span></label>
+        <label><input type="radio" name="rs-op" value="/" checked><span>/ division</span></label>
+      </div>
+      <label class="fld">Andra talet<input class="in" id="rs-b" inputmode="numeric" value="4"></label>
+    </div>
+    <div class="out" aria-live="polite"><div id="rs-eq"></div><div id="rs-say" class="small"></div><svg id="rs-svg" viewBox="0 0 620 160" role="img" aria-label="Bild av räkningen"></svg></div>
+    <p class="small">Välj heltal från 0 till 20.</p>
+  </div>
+</section>
+
+<!-- TECKEN -->
+<section class="sec" id="tecken" data-title="Matematiska tecken">
+  <div><span class="kicker">Tal</span><h2>Några matematiska tecken</h2></div>
+  <div class="cols">
+    <div class="tw"><table>
+      <tr><th>Tecken</th><th class="l">Betyder</th><th class="l">Exempel</th></tr>
+      <tr><td style="text-align:center;font-size:20px">=</td><td class="l">är lika med</td><td class="l">5 + 2 = 7</td></tr>
+      <tr><td style="text-align:center;font-size:20px">≠</td><td class="l">är inte lika med</td><td class="l">5 + 2 ≠ 8</td></tr>
+      <tr><td style="text-align:center;font-size:20px">≈</td><td class="l">är ungefär lika med</td><td class="l">9,8 ≈ 10</td></tr>
+      <tr><td style="text-align:center;font-size:20px">&gt;</td><td class="l">är större än</td><td class="l">8 &gt; 3</td></tr>
+      <tr><td style="text-align:center;font-size:20px">&lt;</td><td class="l">är mindre än</td><td class="l">3 &lt; 8</td></tr>
+      <tr><td style="text-align:center;font-size:20px">≥ ≤</td><td class="l">större/mindre än eller lika med</td><td class="l">x ≥ 0</td></tr>
+    </table></div>
+    <div class="box">
+      <div class="tip"><b>Tänk:</b> tecknet öppnar sig mot det större talet. Spetsen pekar på det mindre.</div>
+      <div class="ok"><b>Knep:</b> &lt; liknar ett litet L som i ”Lägre än”.</div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Jämför två tal</h3></div>
+    <div class="ctrl">
+      <label class="fld">Tal A<input class="in" id="tk-a" inputmode="decimal" value="0,7"></label>
+      <label class="fld">Tal B<input class="in" id="tk-b" inputmode="decimal" value="0,65"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="tk-big"></div><div id="tk-say"></div><svg id="tk-svg" viewBox="0 0 620 90" role="img" aria-label="Talen på en tallinje"></svg></div>
+    <div class="warn"><b>Vanligt fel:</b> 0,65 ser större ut än 0,7 för att det har fler siffror. Jämför tiondelarna först: 7 tiondelar är mer än 6 tiondelar.</div>
+  </div>
+</section>
+
+<!-- POSITIONSSYSTEMET -->
+<section class="sec" id="positioner" data-title="Positionssystemet">
+  <div><span class="kicker">Tal</span><h2>Det decimala positionssystemet</h2></div>
+  <p class="lead">En siffras plats i talet bestämmer dess värde. Varje steg åt vänster är värt 10 gånger mer.</p>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Bygg ett tal i positionstabellen</h3></div>
+    <div class="ctrl">
+      <label class="fld">Skriv ett tal (högst 7 heltalssiffror och 3 decimaler)<input class="in wide" id="pv-in" inputmode="decimal" value="3 470,5"></label>
+      <button class="btn" id="pv-mul" type="button">· 10</button>
+      <button class="btn" id="pv-div" type="button">/ 10</button>
+    </div>
+    <div class="tw"><div class="pv" id="pv"></div></div>
+    <div class="out" aria-live="polite">
+      <div><span class="small">Så läses talet</span><div id="pv-words" style="font-size:18px"></div></div>
+      <div><span class="small">Siffrornas värden</span><div id="pv-vals" class="num"></div></div>
+    </div>
+    <div class="tip"><b>Tänk:</b> vid · 10 flyttar varje siffra ett steg åt vänster och blir värd 10 gånger mer. Kommat står still.</div>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h3>Decimaler</h3>
+      <div class="tw"><table>
+        <tr><td class="l">8 tiondelar</td><td>0,8</td><td><span class="frac"><span>8</span><span>10</span></span></td></tr>
+        <tr><td class="l">9 hundradelar</td><td>0,09</td><td><span class="frac"><span>9</span><span>100</span></span></td></tr>
+        <tr><td class="l">1 tusendel</td><td>0,001</td><td><span class="frac"><span>1</span><span>1000</span></span></td></tr>
+      </table></div>
+      <svg viewBox="0 0 300 125" role="img" aria-label="0,8 som 8 av 10 staplar och 0,09 som 9 av 100 rutor"><g id="pv-tenths"></g><g id="pv-hund"></g>
+        <text x="60" y="120" font-size="12" text-anchor="middle">0,8 = 8 tiondelar</text><text x="225" y="120" font-size="12" text-anchor="middle">0,09 = 9 hundradelar</text></svg>
+    </div>
+    <div class="box">
+      <h3>Stora tal</h3>
+      <div class="tw"><table>
+        <tr><th class="l">Namn</th><th>Nollor</th><th>Tiopotens</th><th class="l">Tänk</th></tr>
+        <tr><td class="l">tusen</td><td>3</td><td>10<sup>3</sup></td><td class="l">10 · 10 · 10</td></tr>
+        <tr><td class="l"><b>miljon</b></td><td>6</td><td>10<sup>6</sup></td><td class="l">tusen tusen</td></tr>
+        <tr><td class="l"><b>miljard</b></td><td>9</td><td>10<sup>9</sup></td><td class="l">tusen miljoner</td></tr>
+        <tr><td class="l"><b>biljon</b></td><td>12</td><td>10<sup>12</sup></td><td class="l">en miljon miljoner</td></tr>
+        <tr><td class="l"><b>triljon</b></td><td>18</td><td>10<sup>18</sup></td><td class="l">en miljon biljoner</td></tr>
+        <tr><td class="l"><b>kvadriljon</b></td><td>24</td><td>10<sup>24</sup></td><td class="l">en miljon triljoner</td></tr>
+      </table></div>
+      <div class="warn"><b>Se upp:</b> engelskans <i>billion</i> är en miljard (10<sup>9</sup>), inte en biljon.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TALKAMRATER -->
+<section class="sec" id="talkamrater" data-title="Talkamrater">
+  <div><span class="kicker">Räkna</span><h2>Plus och minus – talkamrater</h2></div>
+  <p class="lead"><b>Första</b> plus och minus är alla kombinationer upp till 10. <b>Andra</b> plus och minus går mellan 11 och 18. Varje ruta är en helhet (överst) delad i två delar.</p>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Alla talkamrater till ett tal</h3></div>
+    <div class="ctrl">
+      <label class="fld">Helheten: <b id="tk-sumv" class="num" style="color:var(--ink)">7</b><input type="range" id="tk-sum" min="2" max="18" value="7"></label>
+    </div>
+    <div class="pwlist" id="tk-list"></div>
+    <div class="out" aria-live="polite">
+      <svg id="tk-bar" viewBox="0 0 620 70" role="img" aria-label="Stapel som delas i två delar"></svg>
+      <div id="tk-facts" class="eq"></div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Över tiotalet: fyll först upp till 10</h3></div>
+    <div class="ctrl">
+      <label class="fld">Första talet<select class="in" id="tt-a"></select></label>
+      <span class="eq">+</span>
+      <label class="fld">Andra talet<select class="in" id="tt-b"></select></label>
+    </div>
+    <div class="out" aria-live="polite"><svg id="tt-svg" viewBox="0 0 620 90" role="img" aria-label="Tiorutor"></svg><div id="tt-txt" class="eq"></div></div>
+    <div class="ok"><b>Tiokamrater:</b> 1 + 9, 2 + 8, 3 + 7, 4 + 6, 5 + 5. Kan du dem når du lätt jämna tiotal.</div>
+  </div>
+</section>
+
+<!-- MULTIPLIKATION -->
+<section class="sec" id="multiplikation" data-title="Multiplikationstabellen">
+  <div><span class="kicker">Räkna</span><h2>Multiplikations- och divisionstabellen</h2></div>
+  <p class="lead">Klicka på en ruta. Raden och kolumnen möts där produkten står, och samma ruta ger två divisioner.</p>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Utforska tabellen</h3></div>
+    <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))">
+      <div class="tw"><div class="mt" id="mt" role="grid" aria-label="Multiplikationstabell"></div></div>
+      <div class="out" aria-live="polite" style="align-content:start">
+        <div class="big" id="mt-big"></div>
+        <div id="mt-facts" class="eq"></div>
+        <svg id="mt-area" viewBox="0 0 300 300" role="img" aria-label="Produkten som rektangel av rutor" style="max-width:300px"></svg>
+      </div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Träna</span><h3>Gångertabellsträning</h3></div>
+    <div class="ctrl">
+      <label class="fld">Tabell<select class="in" id="q-tab"><option value="0">Blandat 1–10</option></select></label>
+      <div class="fld"><span>Fråga</span><span class="big" id="q-q" style="color:var(--ink)"></span></div>
+      <label class="fld">Ditt svar<input class="in" id="q-a" inputmode="numeric" autocomplete="off"></label>
+      <button class="btn" id="q-check" type="button">Rätta</button>
+      <button class="btn ghost" id="q-next" type="button">Ny fråga</button>
+    </div>
+    <div class="out" aria-live="polite"><div id="q-fb">Skriv svaret och tryck Enter.</div><div class="small" id="q-score"></div></div>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h3>Kvadrattal</h3>
+      <div class="tw"><table>
+        <tr><td>11 · 11</td><td>121</td><td>16 · 16</td><td>256</td></tr>
+        <tr><td>12 · 12</td><td>144</td><td>17 · 17</td><td>289</td></tr>
+        <tr><td>13 · 13</td><td>169</td><td>18 · 18</td><td>324</td></tr>
+        <tr><td>14 · 14</td><td>196</td><td>19 · 19</td><td>361</td></tr>
+        <tr><td>15 · 15</td><td>225</td><td>25 · 25</td><td>625</td></tr>
+      </table></div>
+    </div>
+    <div class="box">
+      <div class="ok"><b>Halva tabellen räcker:</b> 3 · 7 = 7 · 3. Tabellen är spegelvänd runt diagonalen.</div>
+      <div class="ok"><b>Nians tabell:</b> siffrorna i svaret blir alltid 9 tillsammans. 9 · 6 = 54 och 5 + 4 = 9.</div>
+      <div class="ok"><b>Femmans tabell:</b> ta talet gånger 10 och halvera. 5 · 8 = 80 / 2 = 40.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HUVUDRÄKNING -->
+<section class="sec" id="huvudrakning" data-title="Huvudräkning">
+  <div><span class="kicker">Räkna</span><h2>Skriftlig huvudräkning</h2></div>
+  <p class="lead">Med räknelagarna kan ett svårt tal göras om till lätta delar. Skriv mellanledet, eller håll det i huvudet om du har gott arbetsminne.</p>
+  <div class="cols">
+    <div class="rows">
+      <h3>Addition</h3>
+      <div class="row"><span class="eq">46 + 37 + 58 = 120 + 21 = 141</span><span class="why">varje talsort för sig</span></div>
+      <div class="row"><span class="eq">695 + 268 = 700 + 263 = 963</span><span class="why">5 ental flyttas över</span></div>
+      <div class="row"><span class="eq">3,75 + 4,6 + 9,25 = 13 + 4,6 = 17,6</span><span class="why">talens ordning ändras</span></div>
+      <h3 style="margin-top:8px">Subtraktion</h3>
+      <div class="row"><span class="eq">83 − 57 = 30 − 4 = 26</span><span class="why">varje talsort för sig</span></div>
+      <div class="row"><span class="eq">5002 − 3006 = 2000 − 4 = 1996</span><span class="why">5000 − 3000, 2 − 6</span></div>
+      <div class="row"><span class="eq">437 − 162 = 300 − 30 + 5 = 275</span><span class="why">varje talsort för sig</span></div>
+      <div class="row"><span class="eq">431 − 297 = 434 − 300 = 134</span><span class="why">båda termerna ökas med 3</span></div>
+      <div class="row"><span class="eq">40,3 − 39,5 = 0,5 + 0,3 = 0,8</span><span class="why">räkna upp från 39,5</span></div>
+    </div>
+    <div class="rows">
+      <h3>Multiplikation</h3>
+      <div class="row"><span class="eq">3 · 174 = 300 + 210 + 12 = 522</span><span class="why">varje talsort för sig</span></div>
+      <div class="row"><span class="eq">3 · 299 = 900 − 3 = 897</span><span class="why">först 3 · 300</span></div>
+      <div class="row"><span class="eq">4,5 · 24 = 9 · 12 = 108</span><span class="why">dubbelt – hälften</span></div>
+      <div class="row"><span class="eq">16 · 37 = 8 · 74 = 560 + 32 = 592</span><span class="why">hälften – dubbelt</span></div>
+      <div class="row"><span class="eq">0,05 · 4800 = 5 · 48 = 240</span><span class="why">100 ggr större, 100 ggr mindre</span></div>
+      <h3 style="margin-top:8px">Division</h3>
+      <div class="row"><span class="eq"><span class="frac"><span>126</span><span>18</span></span> = <span class="frac"><span>63</span><span>9</span></span> = 7</span><span class="why">förkortning med 2</span></div>
+      <div class="row"><span class="eq"><span class="frac"><span>12</span><span>1,5</span></span> = <span class="frac"><span>24</span><span>3</span></span> = 8</span><span class="why">förlängning med 2</span></div>
+      <div class="row"><span class="eq"><span class="frac"><span>2</span><span>0,04</span></span> = <span class="frac"><span>200</span><span>4</span></span> = 50</span><span class="why">förlängning med 100</span></div>
+      <div class="row"><span class="eq"><span class="frac"><span>112</span><span>35</span></span> = <span class="frac"><span>224</span><span>70</span></span> = <span class="frac"><span>22,4</span><span>7</span></span> = 3,2</span><span class="why">förläng med 2, förkorta med 10</span></div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Subtrahera genom att räkna upp på tom tallinje</h3></div>
+    <div class="ctrl">
+      <label class="fld">Det större talet<input class="in" id="ru-a" inputmode="decimal" value="431"></label>
+      <span class="eq">−</span>
+      <label class="fld">Det mindre talet<input class="in" id="ru-b" inputmode="decimal" value="297"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="tw"><svg id="ru-svg" viewBox="0 0 640 120" role="img" aria-label="Hopp på tom tallinje" style="min-width:420px"></svg></div><div id="ru-txt" class="eq"></div></div>
+    <div class="tip"><b>Tänk:</b> hoppa från det mindre talet till närmaste jämna tiotal och hundratal, sedan vidare till det större talet. Summan av hoppen är skillnaden.</div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Kort division steg för steg</h3></div>
+    <div class="ctrl">
+      <label class="fld">Täljare (heltal)<input class="in" id="kd-n" inputmode="numeric" value="1841"></label>
+      <label class="fld">Delat med<select class="in" id="kd-d"></select></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="kd-big"></div><ol id="kd-steps" style="margin:0;padding-left:22px"></ol></div>
+    <div class="tip"><b>Kort multiplikation</b> går åt andra hållet: 7 · 263 = 1841. 7 · 3 = 21, skriv 1 med 2 i minnet. 7 · 6 = 42, plus 2 = 44, skriv 4 med 4 i minnet. 7 · 2 = 14, plus 4 = 18.</div>
+  </div>
+</section>
+
+<!-- AVRUNDNING -->
+<section class="sec" id="avrundning" data-title="Avrundning">
+  <div><span class="kicker">Räkna</span><h2>Avrundning</h2></div>
+  <div class="cols">
+    <div class="tw"><table>
+      <tr><th class="l" colspan="2">2 937,458 avrundat till …</th></tr>
+      <tr><td class="l">hela tusental</td><td>≈ 3 000</td></tr>
+      <tr><td class="l">hela hundratal</td><td>≈ 2 900</td></tr>
+      <tr><td class="l">hela tiotal</td><td>≈ 2 940</td></tr>
+      <tr><td class="l">en decimal</td><td>≈ 2 937,5</td></tr>
+      <tr><td class="l">två decimaler</td><td>≈ 2 937,46</td></tr>
+    </table></div>
+    <div class="box">
+      <div class="ok"><b>Titta på siffran direkt efter</b> den plats du avrundar till. 0–4 avrundas nedåt, 5–9 avrundas uppåt.</div>
+      <div class="tip"><b>Öresavrundning</b> till närmaste krona: 1–49 öre avrundas nedåt, 50–99 öre uppåt.</div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Avrunda ett tal</h3></div>
+    <div class="ctrl">
+      <label class="fld">Tal<input class="in" id="av-x" inputmode="decimal" value="2 937,458"></label>
+      <div class="seg" role="radiogroup" aria-label="Avrunda till">
+        <label><input type="radio" name="av-p" value="1000"><span>tusental</span></label>
+        <label><input type="radio" name="av-p" value="100" checked><span>hundratal</span></label>
+        <label><input type="radio" name="av-p" value="10"><span>tiotal</span></label>
+        <label><input type="radio" name="av-p" value="1"><span>heltal</span></label>
+        <label><input type="radio" name="av-p" value="0.1"><span>en decimal</span></label>
+        <label><input type="radio" name="av-p" value="0.01"><span>två decimaler</span></label>
+      </div>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="av-big"></div><div id="av-why"></div><svg id="av-svg" viewBox="0 0 620 90" role="img" aria-label="Talet mellan två avrundningsvärden"></svg></div>
+  </div>
+</section>
+
+<!-- RÄKNEREGLER -->
+<section class="sec" id="regler" data-title="Räkneregler">
+  <div><span class="kicker">Räkna</span><h2>Räkneregler och räknelagar</h2></div>
+  <div class="cols">
+    <div class="box">
+      <h3>Prioriteringsregeln</h3>
+      <svg viewBox="0 0 330 150" role="img" aria-label="Räkneordning som trappa">
+        <g font-size="14">
+          <rect x="0" y="0" width="330" height="32" rx="5" style="fill:var(--red)"/><text x="12" y="21" style="fill:var(--on-accent)" font-weight="700">1  Parenteser ( )</text>
+          <rect x="24" y="38" width="306" height="32" rx="5" style="fill:var(--red-tint)"/><text x="36" y="59">2  Potenser  3²</text>
+          <rect x="48" y="76" width="282" height="32" rx="5" style="fill:var(--blue-tint)"/><text x="60" y="97">3  Multiplikation och division</text>
+          <rect x="72" y="114" width="258" height="32" rx="5" style="fill:var(--grid)"/><text x="84" y="135">4  Addition och subtraktion</text>
+        </g>
+      </svg>
+      <p class="small">Inom samma steg räknar du från vänster till höger.</p>
+    </div>
+    <div class="rows">
+      <div class="row"><span class="eq">15 − (6 + 6) = 15 − 12 = 3</span><span class="why">parentesen först</span></div>
+      <div class="row"><span class="eq">5 · (3 + 4) = 5 · 7 = 35</span><span class="why">parentesen först</span></div>
+      <div class="row"><span class="eq">15 − 2 · 5 = 15 − 10 = 5</span><span class="why">gånger före minus</span></div>
+      <div class="row"><span class="eq">15 + 6 / 2 = 15 + 3 = 18</span><span class="why">delat före plus</span></div>
+      <div class="warn"><b>Vanligt fel:</b> 15 − 2 · 5 är inte 13 · 5. Räkna inte bara från vänster.</div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Lös ett uttryck steg för steg</h3></div>
+    <div class="ctrl">
+      <label class="fld" style="flex:1 1 260px">Uttryck (använd + − · / ^ och parenteser)<input class="in" id="ex-in" style="width:100%" value="15 + 6 / 2 · (3 + 1)^2" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <div class="chips" id="ex-chips"></div>
+    <div class="out" aria-live="polite"><div id="ex-steps" class="rows"></div></div>
+  </div>
+  <h3>Räknelagar</h3>
+  <div class="tw"><table>
+    <tr><th class="l">Lag</th><th class="l">Betyder</th><th class="l">Exempel</th></tr>
+    <tr><td class="l"><b>Kommutativa lagen</b></td><td class="l">ordningen spelar ingen roll</td><td class="l">3 + 8 = 8 + 3 &nbsp; 7 · 2 = 2 · 7</td></tr>
+    <tr><td class="l"><b>Associativa lagen</b></td><td class="l">du får flytta parentesen</td><td class="l">(9 + 8) + 2 = 9 + (8 + 2) &nbsp; (13 · 5) · 2 = 13 · (5 · 2)</td></tr>
+    <tr><td class="l"><b>Distributiva lagen</b></td><td class="l">du får dela upp en faktor</td><td class="l">3 · 17 = 3 · 10 + 3 · 7 = 51 &nbsp; 3 · 299 = 3 · 300 − 3 · 1 = 897</td></tr>
+  </table></div>
+  <div class="ok"><b>Lagarna gäller inte för minus och delat med:</b> 8 − 3 ≠ 3 − 8 och 8 / 2 ≠ 2 / 8.</div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Kvadreringsregeln som area</h3></div>
+    <div class="ctrl">
+      <label class="fld">a = <b id="kv-av" style="color:var(--ink)">5</b><input type="range" id="kv-a" min="1" max="9" value="5"></label>
+      <label class="fld">b = <b id="kv-bv" style="color:var(--ink)">3</b><input type="range" id="kv-b" min="1" max="6" value="3"></label>
+      <div class="seg" role="radiogroup" aria-label="Regel">
+        <label><input type="radio" name="kv-r" value="p" checked><span>(a + b)²</span></label>
+        <label><input type="radio" name="kv-r" value="m"><span>(a − b)²</span></label>
+        <label><input type="radio" name="kv-r" value="k"><span>(a + b)(a − b)</span></label>
+      </div>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="kv-svg" viewBox="0 0 300 300" role="img" aria-label="Regeln ritad som area" style="max-width:300px"></svg><div id="kv-txt" class="eq"></div></div></div>
+  </div>
+</section>
+
+<!-- GEOMETRI -->
+<section class="sec" id="geometri" data-title="Figurer och vinklar">
+  <div><span class="kicker">Geometri</span><h2>Geometriska figurer</h2></div>
+  <svg viewBox="0 0 680 120" role="img" aria-label="Kurva, linje, stråle och sträcka">
+    <g style="fill:none;stroke:var(--ink);stroke-width:2">
+      <path d="M20 40 C60 0 100 70 150 30"/>
+      <line x1="190" y1="60" x2="330" y2="20"/><path d="M196 52 l-8 9 10 1 M324 28 l8 -9 -10 -1"/>
+      <line x1="370" y1="40" x2="500" y2="40"/><path d="M492 34 l8 6 -8 6"/>
+      <line x1="540" y1="40" x2="660" y2="40"/>
+    </g>
+    <g style="fill:var(--ink)"><circle cx="370" cy="40" r="4"/><circle cx="540" cy="40" r="4"/><circle cx="660" cy="40" r="4"/></g>
+    <g font-size="15" text-anchor="middle" font-weight="700"><text x="85" y="95">kurva</text><text x="260" y="95">linje</text><text x="435" y="95">stråle</text><text x="600" y="95">sträcka</text></g>
+    <g font-size="12" text-anchor="middle" style="fill:var(--muted)"><text x="85" y="113" style="fill:var(--muted)">böjd</text><text x="260" y="113" style="fill:var(--muted)">rak, utan ändar</text><text x="435" y="113" style="fill:var(--muted)">en startpunkt</text><text x="600" y="113" style="fill:var(--muted)">två ändpunkter</text></g>
+  </svg>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Vinkelmätaren</h3></div>
+    <div class="ctrl"><label class="fld">Vinkel: <b id="an-v" style="color:var(--ink)">60°</b><input type="range" id="an" min="0" max="180" value="60"></label></div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="an-svg" viewBox="0 0 320 180" role="img" aria-label="Vinkel på gradskiva" style="max-width:420px"></svg><div><div class="big" id="an-name"></div><div id="an-why"></div></div></div></div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Triangelns vinkelsumma är 180°</h3></div>
+    <div class="ctrl">
+      <label class="fld">Vinkel A: <b id="tr-av" style="color:var(--ink)">60°</b><input type="range" id="tr-a" min="5" max="170" value="60"></label>
+      <label class="fld">Vinkel B: <b id="tr-bv" style="color:var(--ink)">70°</b><input type="range" id="tr-b" min="5" max="170" value="70"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="tr-svg" viewBox="0 0 340 220" role="img" aria-label="Triangel" style="max-width:420px"></svg><div><div class="big" id="tr-c"></div><div id="tr-type"></div></div></div></div>
+  </div>
+  <h3>Trianglar och fyrhörningar</h3>
+  <svg viewBox="0 0 680 130" role="img" aria-label="Triangeltyper">
+    <g style="fill:var(--red-tint);stroke:var(--ink);stroke-width:2">
+      <path d="M30 100 L130 100 L80 13 Z"/><path d="M190 100 L330 100 L260 50 Z"/><path d="M390 100 L520 100 L390 20 Z"/><path d="M585 100 L670 100 L555 45 Z"/>
+    </g>
+    <rect x="390" y="88" width="12" height="12" style="fill:none;stroke:var(--red);stroke-width:1.5"/>
+    <g style="stroke:var(--red);stroke-width:2"><line x1="51" y1="58" x2="59" y2="54"/><line x1="101" y1="54" x2="109" y2="58"/><line x1="80" y1="95" x2="80" y2="105"/><line x1="222" y1="70" x2="228" y2="80"/><line x1="292" y1="70" x2="298" y2="80"/></g>
+    <g font-size="14" text-anchor="middle" font-weight="700"><text x="80" y="122">liksidig</text><text x="260" y="122">likbent</text><text x="455" y="122">rätvinklig</text><text x="615" y="122">trubbvinklig</text></g>
+    <g font-size="11"><text x="384" y="65" text-anchor="end" style="fill:var(--muted)">katet</text><text x="455" y="94" text-anchor="middle" style="fill:var(--muted)">katet</text><text x="462" y="54" style="fill:var(--blue)">hypotenusa</text></g>
+  </svg>
+  <svg viewBox="0 0 680 110" role="img" aria-label="Fyrhörningar">
+    <g style="fill:var(--blue-tint);stroke:var(--ink);stroke-width:2">
+      <rect x="20" y="15" width="70" height="70"/><rect x="125" y="30" width="110" height="55"/><path d="M275 85 L325 85 L355 15 L305 15 Z"/><path d="M390 85 L490 85 L520 30 L420 30 Z"/><path d="M555 85 L670 85 L640 30 L585 30 Z"/>
+    </g>
+    <g font-size="13" text-anchor="middle" font-weight="700"><text x="55" y="104">kvadrat</text><text x="180" y="104">rektangel</text><text x="315" y="104">romb</text><text x="455" y="104">parallellogram</text><text x="612" y="104">parallelltrapets</text></g>
+  </svg>
+  <h3>Andra figurer och kroppar</h3>
+  <svg viewBox="0 0 680 215" role="img" aria-label="Cirkel, ellips, månghörning, kub, rätblock, klot, cylinder, kon, prisma och pyramid">
+    <g style="fill:var(--grid);stroke:var(--ink);stroke-width:2"><circle cx="55" cy="45" r="35"/><ellipse cx="170" cy="45" rx="55" ry="30"/><path d="M270 20 L330 10 L370 45 L330 80 L275 70 Z"/></g>
+    <line x1="270" y1="20" x2="370" y2="45" style="stroke:var(--red);stroke-dasharray:5 4;stroke-width:1.5"/>
+    <g style="fill:none;stroke:var(--ink);stroke-width:2">
+      <path d="M420 30 h55 v55 h-55 Z M420 30 l18 -16 h55 l-18 16 M493 14 v55 l-18 16"/>
+      <path d="M520 45 h100 v40 h-100 Z M520 45 l20 -18 h100 l-20 18 M640 27 v40 l-20 18"/>
+      <circle cx="55" cy="160" r="38"/><ellipse cx="55" cy="160" rx="38" ry="10" style="stroke-dasharray:4 4"/>
+      <ellipse cx="170" cy="128" rx="35" ry="10"/><path d="M135 128 v60 M205 128 v60"/><path d="M135 188 a35 10 0 0 0 70 0"/>
+      <path d="M260 192 L300 115 L340 192"/><path d="M260 192 a40 11 0 0 0 80 0"/><path d="M260 192 a40 11 0 0 1 80 0" style="stroke-dasharray:4 4"/>
+      <path d="M390 192 L440 192 L415 140 Z M415 140 L475 125 L500 177 L440 192"/>
+      <path d="M545 190 L615 190 L640 170 M545 190 L590 110 L615 190 M590 110 L640 170"/><path d="M545 190 L570 170 L640 170 M570 170 L590 110" style="stroke-dasharray:4 4"/>
+    </g>
+    <g font-size="13" text-anchor="middle"><text x="55" y="97">cirkel</text><text x="170" y="97">ellips</text><text x="320" y="97">månghörning</text><text x="455" y="104">kub</text><text x="580" y="104">rätblock</text>
+      <text x="55" y="212">klot</text><text x="170" y="212">cylinder</text><text x="300" y="212">kon</text><text x="445" y="212">prisma</text><text x="590" y="212">pyramid</text><text x="320" y="38" font-size="11" style="fill:var(--red)">diagonal</text></g>
+  </svg>
+</section>
+
+<!-- BERÄKNA -->
+<section class="sec" id="berakna" data-title="Omkrets, area, volym">
+  <div><span class="kicker">Geometri</span><h2>Omkrets, area och volym</h2></div>
+  <div class="cols">
+    <div class="ok"><b>Omkrets</b> är längden runt figuren. Enhet: cm, m …</div>
+    <div class="ok"><b>Area</b> är ytan inuti, räknad i rutor. Enhet: cm², m² …</div>
+    <div class="ok"><b>Volym</b> är hur mycket som får plats, räknad i kuber. Enhet: cm³, liter …</div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räkna ut med formel</h3></div>
+    <div class="seg" role="radiogroup" aria-label="Figur" id="ar-shapes"></div>
+    <div class="ctrl" id="ar-inputs"></div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="ar-svg" viewBox="0 0 300 220" role="img" aria-label="Figuren med mått" style="max-width:340px"></svg><div id="ar-res" class="rows"></div></div></div>
+  </div>
+  <div class="tw"><table>
+    <tr><th class="l">Figur</th><th class="l">Omkrets / begränsningsarea</th><th class="l">Area / volym</th></tr>
+    <tr><td class="l">Kvadrat</td><td class="l">O = 4 · s</td><td class="l">A = s · s</td></tr>
+    <tr><td class="l">Rektangel</td><td class="l">O = 2 · (l + b)</td><td class="l">A = l · b</td></tr>
+    <tr><td class="l">Triangel</td><td class="l">O = summan av sidorna</td><td class="l">A = b · h / 2</td></tr>
+    <tr><td class="l">Cirkel</td><td class="l">O = π · d = 2 · π · r</td><td class="l">A = π · r · r</td></tr>
+    <tr><td class="l">Kub</td><td class="l">A = 6 · s · s</td><td class="l">V = s · s · s</td></tr>
+    <tr><td class="l">Rätblock</td><td class="l">A = 2 · (l·b + l·h + b·h)</td><td class="l">V = l · b · h</td></tr>
+    <tr><td class="l">Cylinder</td><td class="l">A = 2 · π · r · r + 2 · π · r · h</td><td class="l">V = π · r · r · h</td></tr>
+  </table></div>
+  <div class="tip"><b>Tänk volym som lager:</b> för rätblock, cylinder och prisma är V = bottenyta · höjd. Kon och pyramid rymmer en tredjedel av det.</div>
+</section>
+
+<!-- ENHETER -->
+<section class="sec" id="enheter" data-title="Enheter">
+  <div><span class="kicker">Mått</span><h2>Längd, area, volym och vikt</h2></div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Enhetsomvandlare med enhetstrappa</h3></div>
+    <div class="seg" role="radiogroup" aria-label="Storhet" id="uc-cat"></div>
+    <div class="ctrl">
+      <label class="fld">Värde<input class="in" id="uc-v" inputmode="decimal" value="3,5"></label>
+      <label class="fld">Från<select class="in" id="uc-from"></select></label>
+      <button class="btn ghost" id="uc-swap" type="button" aria-label="Byt plats på enheterna">⇄</button>
+      <label class="fld">Till<select class="in" id="uc-to"></select></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="uc-big"></div><div id="uc-why"></div><div class="tw"><svg id="uc-svg" viewBox="0 0 680 170" role="img" aria-label="Enhetstrappa" style="min-width:520px"></svg></div></div>
+  </div>
+  <div class="cols">
+    <div class="box"><h3>Längd <span class="small">steg om 10</span></h3>
+      <p class="eq" style="font-size:16px;line-height:1.8">1 mil = 10 km<br>1 km = 1 000 m<br>1 m = 10 dm = 100 cm = 1 000 mm</p></div>
+    <div class="box"><h3>Area <span class="small">steg om 100</span></h3>
+      <p class="eq" style="font-size:16px;line-height:1.8">1 km² = 100 ha · 1 ha = 100 ar<br>1 ar = 100 m²<br>1 m² = 100 dm² = 10 000 cm²</p></div>
+    <div class="box"><h3>Volym <span class="small">steg om 1000</span></h3>
+      <p class="eq" style="font-size:16px;line-height:1.8">1 m³ = 1 000 dm³ = 1 000 liter<br>1 dm³ = 1 liter = 1 000 cm³<br>1 l = 10 dl = 100 cl = 1 000 ml</p></div>
+    <div class="box"><h3>Vikt</h3>
+      <p class="eq" style="font-size:16px;line-height:1.8">1 ton = 1 000 kg<br>1 kg = 10 hg = 1 000 g<br>1 g = 1 000 mg</p></div>
+  </div>
+  <div class="cols">
+    <div class="ok"><b>Förled:</b> kilo = tusen, hekto = hundra, deci = tiondel, centi = hundradel, milli = tusendel.</div>
+    <div class="tip"><b>Tänk:</b> 1 liter ryms i en kub med sidan 1 dm, och 1 liter vatten väger 1 kg.</div>
+    <div class="warn"><b>Area och volym:</b> 1 m = 10 dm men 1 m² = 100 dm² och 1 m³ = 1 000 dm³. Rita rutor så ser du varför.</div>
+  </div>
+</section>
+
+<!-- MÅTT -->
+<section class="sec" id="matt" data-title="Stycketal och äldre mått">
+  <div><span class="kicker">Mått</span><h2>Stycketal, gamla och engelska mått</h2></div>
+  <div class="cols">
+    <div class="box"><h3>Stycketal</h3>
+      <div class="tw"><table>
+        <tr><td class="l">1 par</td><td>2 stycken</td></tr>
+        <tr><td class="l">1 dussin</td><td>12 stycken</td></tr>
+        <tr><td class="l">1 tjog</td><td>20 stycken</td></tr>
+        <tr><td class="l">1 gross</td><td>12 dussin = 144 stycken</td></tr>
+      </table></div>
+      <svg viewBox="0 0 220 64" role="img" aria-label="Ett dussin ägg i kartong"><rect x="5" y="5" width="210" height="54" rx="10" style="fill:var(--grid);stroke:var(--muted)"/><g id="eggs"></g></svg>
+    </div>
+    <div class="box"><h3>Gamla svenska mått</h3>
+      <div class="tw"><table>
+        <tr><td class="l">1 tum</td><td>≈ 2,5 cm</td></tr>
+        <tr><td class="l">1 fot</td><td>≈ 3 dm</td></tr>
+        <tr><td class="l">1 aln</td><td>≈ 6 dm</td></tr>
+        <tr><td class="l">1 tunnland</td><td>≈ 5 000 m² ≈ ½ hektar</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <h3>Engelska och amerikanska mått</h3>
+  <div class="tw"><table>
+    <tr><th class="l">Enhet</th><th>Metriskt</th><th class="l">Ungefär</th></tr>
+    <tr><td class="l">1 inch (tum)</td><td>2,54 cm</td><td class="l">en tumme bred</td></tr>
+    <tr><td class="l">1 foot = 12 inches</td><td>30,48 cm</td><td class="l">en linjal</td></tr>
+    <tr><td class="l">1 yard = 3 feet</td><td>0,914 m</td><td class="l">knappt en meter</td></tr>
+    <tr><td class="l">1 mile (engelsk mil)</td><td>1,609 km</td><td class="l">1,6 km</td></tr>
+    <tr><td class="l">1 pint (UK / USA)</td><td>0,568 l / 0,473 l</td><td class="l">ett halvlitersglas</td></tr>
+    <tr><td class="l">1 gallon (UK / USA)</td><td>4,546 l / 3,785 l</td><td class="l">en stor dunk</td></tr>
+    <tr><td class="l">1 pound (lb)</td><td>0,454 kg</td><td class="l">knappt ett halvt kilo</td></tr>
+    <tr><td class="l">1 ounce (oz)</td><td>28,35 g</td><td class="l">några sockerbitar</td></tr>
+  </table></div>
+  <p class="small">Alla engelska mått finns också i <a href="#enheter">enhetsomvandlaren</a>.</p>
+</section>
+
+<!-- TID -->
+<section class="sec" id="tid" data-title="Tid">
+  <div><span class="kicker">Mått</span><h2>Tid</h2></div>
+  <div class="cols">
+    <div class="tw"><table>
+      <tr><td class="l">1 sekel</td><td>100 år</td></tr>
+      <tr><td class="l">1 decennium</td><td>10 år</td></tr>
+      <tr><td class="l">1 år</td><td>12 månader = 52 veckor + 1 dag = 365 dygn</td></tr>
+      <tr><td class="l">1 skottår</td><td>366 dygn (29 februari)</td></tr>
+      <tr><td class="l">1 tertial</td><td>⅓ år = 4 månader</td></tr>
+      <tr><td class="l">1 kvartal</td><td>¼ år = 3 månader</td></tr>
+      <tr><td class="l">1 vecka</td><td>7 dygn</td></tr>
+      <tr><td class="l">1 dygn</td><td>24 timmar (h)</td></tr>
+      <tr><td class="l">1 timme</td><td>60 minuter (min)</td></tr>
+      <tr><td class="l">1 minut</td><td>60 sekunder (s)</td></tr>
+    </table></div>
+    <div class="box">
+      <div class="warn"><b>Tid räknas inte i tiondelar.</b> 1,5 h är 1 h 30 min, inte 1 h 50 min.</div>
+      <div class="ok"><b>Datum skrivs</b> år-månad-dag: 29 februari 2028 = 2028-02-29 eller 29/2 2028.</div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Knogregeln – dagar i månaden</h3></div>
+    <svg id="kn-svg" viewBox="0 0 680 150" role="img" aria-label="Två knutna händer med månaderna på knogar och i gropar"></svg>
+    <div class="months" id="kn-btns" role="group" aria-label="Välj månad"></div>
+    <div class="out" aria-live="polite" id="kn-out"></div>
+  </div>
+  <div class="cols">
+    <div class="tool">
+      <div class="tool-h"><span class="tag">Verktyg</span><h3>Decimaltimmar ↔ timmar och minuter</h3></div>
+      <div class="ctrl"><label class="fld">Timmar med decimaler<input class="in" id="ti-dec" inputmode="decimal" value="1,75"></label></div>
+      <div class="ctrl">
+        <label class="fld">Timmar<input class="in" id="ti-h" inputmode="numeric" style="width:5em"></label>
+        <label class="fld">Minuter<input class="in" id="ti-m" inputmode="numeric" style="width:5em"></label>
+      </div>
+      <div class="out" aria-live="polite" id="ti-out"></div>
+    </div>
+    <div class="tool">
+      <div class="tool-h"><span class="tag">Verktyg</span><h3>Är det skottår?</h3></div>
+      <div class="ctrl"><label class="fld">År<input class="in" id="sk-y" inputmode="numeric" value="2028"></label></div>
+      <div class="out" aria-live="polite" id="sk-out"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HASTIGHET -->
+<section class="sec" id="hastighet" data-title="Hastighet">
+  <div><span class="kicker">Mått</span><h2>Hastighet</h2></div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Sträcka, hastighet och tid</h3></div>
+    <div class="seg" role="radiogroup" aria-label="Vad söker du?">
+      <label><input type="radio" name="st-u" value="s" checked><span>Sök sträckan s</span></label>
+      <label><input type="radio" name="st-u" value="v"><span>Sök hastigheten v</span></label>
+      <label><input type="radio" name="st-u" value="t"><span>Sök tiden t</span></label>
+    </div>
+    <div class="ctrl">
+      <label class="fld" id="st-sf">Sträcka (km)<input class="in" id="st-s" inputmode="decimal" value="180"></label>
+      <label class="fld" id="st-vf">Hastighet (km/h)<input class="in" id="st-v" inputmode="decimal" value="90"></label>
+      <label class="fld" id="st-tf">Tid (h)<input class="in" id="st-t" inputmode="decimal" value="2"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="st-svg" viewBox="0 0 300 150" role="img" aria-label="Triangel med s överst och v och t nederst" style="max-width:300px"></svg><div id="st-res"></div></div></div>
+    <div class="tip"><b>Täck över</b> det du söker i triangeln. Det som står kvar visar hur du räknar: bredvid varandra = gånger, över varandra = delat med.</div>
+  </div>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Omvandla hastighet</h3></div>
+    <div class="ctrl">
+      <label class="fld">km/h<input class="in sp" id="sp-kmh" data-f="1" inputmode="decimal" value="90"></label>
+      <label class="fld">m/s<input class="in sp" id="sp-ms" data-f="3.6" inputmode="decimal"></label>
+      <label class="fld">miles/h<input class="in sp" id="sp-mph" data-f="1.609344" inputmode="decimal"></label>
+      <label class="fld">knop<input class="in sp" id="sp-kn" data-f="1.852" inputmode="decimal"></label>
+    </div>
+    <div class="cols">
+      <div class="ok"><b>km/h → m/s:</b> dela med 3,6. 36 km/h = 10 m/s.</div>
+      <div class="tip">Knop används för båtar och flyg. Ljusets hastighet ≈ 300 000 km/s. Ljudets hastighet i luft ≈ 340 m/s.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPERATUR -->
+<section class="sec" id="temperatur" data-title="Temperatur">
+  <div><span class="kicker">Mått</span><h2>Temperatur – Celsius och Fahrenheit</h2></div>
+  <p class="lead">I Sverige mäter vi i Celsius. I USA används Fahrenheit. Vatten fryser vid 0 °C = 32 °F och kokar vid 100 °C = 212 °F.</p>
+  <div class="tool">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Dra i termometern</h3></div>
+    <div class="ctrl">
+      <label class="fld">°C: <b id="te-cv" style="color:var(--ink)">20</b><input type="range" id="te-r" min="-40" max="110" value="20"></label>
+      <label class="fld">Celsius<input class="in" id="te-c" inputmode="decimal" value="20"></label>
+      <label class="fld">Fahrenheit<input class="in" id="te-f" inputmode="decimal"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="te-svg" viewBox="0 0 300 380" role="img" aria-label="Termometer med Celsius och Fahrenheit" style="max-width:300px"></svg><div class="rows" id="te-txt"></div></div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>°F → °C:</b> subtrahera 32, multiplicera med 5/9.</div>
+    <div class="tip"><b>°C → °F:</b> multiplicera med 9/5, addera 32.</div>
+    <div class="ok"><b>Snabbt i huvudet:</b> °F ≈ °C · 2 + 30.</div>
+  </div>
+</section>
+
+<!-- ROMERSKA -->
+<section class="sec" id="romerska" data-title="Romerska siffror">
+  <div><span class="kicker">Övrigt</span><h2>Romerska siffror</h2></div>
+  <div class="cols">
+    <div class="box">
+      <div class="tw"><table>
+        <tr><th>I</th><th>V</th><th>X</th><th>L</th><th>C</th><th>D</th><th>M</th></tr>
+        <tr><td style="text-align:center">1</td><td style="text-align:center">5</td><td style="text-align:center">10</td><td style="text-align:center">50</td><td style="text-align:center">100</td><td style="text-align:center">500</td><td style="text-align:center">1 000</td></tr>
+      </table></div>
+      <div class="ok"><b>Samma eller mindre efter → addera.</b> VI = 6, XV = 15, MMM = 3 000</div>
+      <div class="tip"><b>Mindre före större → subtrahera.</b> IV = 4, IX = 9, XC = 90, CD = 400, CM = 900</div>
+      <div class="warn"><b>Högst tre lika i rad.</b> 4 skrivs IV, inte IIII.</div>
+    </div>
+    <div class="tool">
+      <div class="tool-h"><span class="tag">Verktyg</span><h3>Översätt romerska siffror</h3></div>
+      <div class="ctrl">
+        <label class="fld">Vanligt tal (1–3999)<input class="in" id="ro-n" inputmode="numeric" value="2026"></label>
+        <label class="fld">Romerskt<input class="in" id="ro-r" autocomplete="off" spellcheck="false" style="text-transform:uppercase"></label>
+      </div>
+      <div class="out" aria-live="polite"><div class="chips" id="ro-chips"></div><div id="ro-txt"></div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="pn"><span>Innehållet följer häftet <i>Lathunden – sexton sidor matematiska nyttigheter</i>, kompletterat med bilder och verktyg.</span><a href="#start">↑ Till början</a></div>
+</footer>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg";
+function S(tag,a,parent,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;if(parent)parent.appendChild(e);return e}
+function clear(el){while(el.firstChild)el.removeChild(el.firstChild)}
+function fit(svg,pad=8){try{const b=svg.getBBox();if(b.width&&b.height)svg.setAttribute("viewBox",`${b.x-pad} ${b.y-pad} ${b.width+2*pad} ${b.height+2*pad}`);svg.style.maxWidth=Math.round((b.width+2*pad)*1.3)+"px"}catch(e){}}
+const NFc={};function nf(x,d=6){if(!isFinite(x))return"–";if(Math.abs(x)<1e-12)x=0;NFc[d]=NFc[d]||new Intl.NumberFormat("sv-SE",{maximumFractionDigits:d});return NFc[d].format(x)}
+function num(s){if(s==null)return NaN;const t=String(s).replace(/[\s  ]/g,"").replace(",",".").replace(/[−–]/g,"-");if(t===""||t==="-"||t===".")return NaN;return Number(t)}
+function seg(name){const r=$(`input[name="${name}"]:checked`);return r?r.value:null}
+function on(els,ev,fn){(Array.isArray(els)?els:[els]).forEach(e=>e&&e.addEventListener(ev,fn))}
+function safe(name,fn){try{fn()}catch(e){console.error(name,e)}}
+const C=v=>`var(--${v})`;
+
+/* ---------- tema ---------- */
+safe("tema",()=>{
+  const root=document.documentElement;
+  try{const t=localStorage.getItem("lh-theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+  $("#themeBtn").addEventListener("click",()=>{
+    const cur=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+    const nx=cur==="dark"?"light":"dark";root.setAttribute("data-theme",nx);try{localStorage.setItem("lh-theme",nx)}catch(e){}
+  });
+});
+
+/* ---------- navigering ---------- */
+safe("nav",()=>{
+  const side=$("#side"),btn=$("#menuBtn"),where=$("#where");
+  btn.addEventListener("click",()=>{const o=side.classList.toggle("open");btn.setAttribute("aria-expanded",o)});
+  $$("#side a").forEach(a=>a.addEventListener("click",()=>{side.classList.remove("open");btn.setAttribute("aria-expanded","false")}));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&side.classList.contains("open")){side.classList.remove("open");btn.setAttribute("aria-expanded","false");btn.focus()}});
+  const links=new Map($$("#side a").map(a=>[a.getAttribute("href").slice(1),a]));
+  function setCur(id){links.forEach((a,k)=>a.setAttribute("aria-current",k===id?"true":"false"));const s=document.getElementById(id);where.textContent=s&&id!=="start"?s.dataset.title:""}
+  if("IntersectionObserver" in window){
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setCur(e.target.id)})},{rootMargin:"-35% 0px -60% 0px"});
+    $$(".sec").forEach(s=>io.observe(s));
+  }
+  setCur((location.hash||"#start").slice(1));
+});
+
+/* ---------- prickar ---------- */
+function dotRow(svg,items,opt={}){ // items: [{color,cross,ring}]
+  const per=opt.per||10,sp=opt.sp||26,r=opt.r||9,x0=opt.x0||20,y0=opt.y0||20;
+  items.forEach((it,i)=>{const c=i%per,row=Math.floor(i/per);const x=x0+c*sp+(c>=5?8:0),y=y0+row*sp;
+    S("circle",{cx:x,cy:y,r:r,style:`fill:${it.ring?"none":C(it.color)};stroke:${C(it.color)};stroke-width:2`},svg);
+    if(it.cross)S("path",{d:`M${x-r} ${y+r} L${x+r} ${y-r}`,style:`stroke:${C("ink")};stroke-width:2`},svg);
+  });
+  return Math.ceil(items.length/per);
+}
+
+/* ---------- räknesätt ---------- */
+safe("rs",()=>{
+  const svg=$("#rs-svg");
+  function upd(){
+    let a=Math.round(num($("#rs-a").value)),b=Math.round(num($("#rs-b").value));const op=seg("rs-op");clear(svg);
+    if(!(a>=0&&a<=20&&b>=0&&b<=20)){$("#rs-eq").innerHTML='<span class="err">Välj heltal mellan 0 och 20.</span>';$("#rs-say").textContent="";svg.setAttribute("viewBox","0 0 620 10");return}
+    const lab={"+":["term","term","summa","plus"],"-":["term","term","skillnad","minus"],"*":["faktor","faktor","produkt","gånger"],"/":["täljare","nämnare","kvot","delat med"]}[op];
+    const sym={"+":"+","-":"−","*":"·","/":"/"}[op];
+    let res,txt;
+    if(op==="+")res=a+b;else if(op==="-")res=a-b;else if(op==="*")res=a*b;else res=b===0?NaN:a/b;
+    const part=(v,l,red)=>`<span style="display:inline-grid;text-align:center;margin:0 4px"><span class="big${red?" r":""}">${v}</span><span class="small${red?" r":""}">${l}</span></span>`;
+    if(op==="/"){
+      $("#rs-eq").innerHTML=b===0?'<span class="err">Man kan inte dela med 0.</span>':`<span style="display:inline-grid;text-align:center;vertical-align:middle"><span class="small">täljare</span><span class="big" style="border-bottom:2px solid currentColor">${a}</span><span class="big">${b}</span><span class="small">nämnare</span></span> <span class="big">=</span> ${part(nf(res,3)+(a%b?" ":""),"kvot",true)}${a%b?`<span class="small"> (${Math.floor(a/b)} hela grupper och ${a%b} över)</span>`:""}`;
+    }else $("#rs-eq").innerHTML=`${part(a,lab[0])}<span class="big">${sym}</span>${part(b,lab[1])}<span class="big">=</span>${part(res,lab[2],true)}`;
+    $("#rs-say").textContent=isFinite(res)?`”${a} ${lab[3]} ${b} är lika med ${nf(res,3)}”`:"";
+    let rows=1;
+    if(op==="+"){const it=[...Array(a)].map(()=>({color:"red"})).concat([...Array(b)].map(()=>({color:"blue"})));rows=dotRow(svg,it);txt=`${a} röda och ${b} blå prickar, ${res} tillsammans`}
+    else if(op==="-"){if(b>a){S("text",{x:20,y:30,"font-size":15},svg,"Svaret blir negativt. Det går inte att ta bort fler prickar än det finns.");rows=1}
+      else{const it=[...Array(a)].map((_,i)=>({color:i<a-b?"red":"muted",cross:i>=a-b,ring:i>=a-b}));rows=dotRow(svg,it)}}
+    else if(op==="*"){for(let r=0;r<a;r++)for(let c=0;c<b;c++)S("circle",{cx:20+c*24,cy:18+r*22,r:8,style:`fill:${C(r%2?"blue":"red")}`},svg);
+      if(a>0&&b>0)S("text",{x:30+b*24,y:22+(a-1)*11,"font-size":14},svg,`${a} rader med ${b} i varje`);rows=Math.max(1,a*22/26)}
+    else if(b>0){const q=Math.floor(a/b),rest=a%b,cols=Math.min(b,5),bw=Math.max(q,1)>5?5*22+16:Math.max(q,1)*22+16,bh=Math.ceil(Math.max(q,1)/5)*22+16;
+      for(let g=0;g<b;g++){const gx=10+(g%cols)*(bw+12),gy=8+Math.floor(g/cols)*(bh+12);S("rect",{x:gx,y:gy,width:bw,height:bh,rx:8,style:`fill:none;stroke:${C("blue")};stroke-width:2`},svg);
+        for(let k=0;k<q;k++)S("circle",{cx:gx+19+(k%5)*22,cy:gy+19+Math.floor(k/5)*22,r:8,style:`fill:${C("red")}`},svg)}
+      const gr=Math.ceil(b/cols),ty=8+gr*(bh+12);for(let k=0;k<rest;k++)S("circle",{cx:20+k*22,cy:ty+12,r:8,style:`fill:none;stroke:${C("red")};stroke-width:2`},svg);
+      if(rest)S("text",{x:30+rest*22,y:ty+17,"font-size":14},svg,`${rest} över`);
+      fit(svg);return}
+    fit(svg);
+  }
+  on([$("#rs-a"),$("#rs-b")],"input",upd);$$('input[name="rs-op"]').forEach(r=>r.addEventListener("change",upd));upd();
+});
+
+/* ---------- tallinje-hjälp ---------- */
+function niceStep(span,target=8){const raw=span/target,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return p*(m<1.5?1:m<3.5?2:m<7.5?5:10)}
+function numberLine(svg,lo,hi,marks,W=620){
+  clear(svg);const x=v=>30+(v-lo)/(hi-lo)*(W-60);S("line",{x1:20,y1:50,x2:W-20,y2:50,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+  const st=niceStep(hi-lo);for(let v=Math.ceil(lo/st)*st;v<=hi+1e-9;v+=st){S("line",{x1:x(v),y1:44,x2:x(v),y2:56,style:`stroke:${C("ink")}`},svg);S("text",{x:x(v),y:74,"text-anchor":"middle","font-size":12,style:`fill:${C("muted")}`},svg,nf(v,6))}
+  marks.forEach(m=>{S("circle",{cx:x(m.v),cy:50,r:7,style:`fill:${C(m.color)}`},svg);S("text",{x:x(m.v),y:m.up?30:30,"text-anchor":"middle","font-size":15,"font-weight":700,style:`fill:${C(m.color)}`},svg,m.label)});
+  return x;
+}
+
+/* ---------- tecken ---------- */
+safe("tecken",()=>{
+  function upd(){const a=num($("#tk-a").value),b=num($("#tk-b").value);
+    if(!isFinite(a)||!isFinite(b)){$("#tk-big").innerHTML='<span class="err">Skriv två tal.</span>';$("#tk-say").textContent="";clear($("#tk-svg"));return}
+    const sg=a>b?">":a<b?"<":"=";$("#tk-big").innerHTML=`${nf(a)} <span class="r">${sg}</span> ${nf(b)}`;
+    $("#tk-say").textContent=`${nf(a)} är ${a>b?"större än":a<b?"mindre än":"lika med"} ${nf(b)}.`+(a!==b?` Skillnaden är ${nf(Math.abs(a-b))}.`:"");
+    let lo=Math.min(a,b),hi=Math.max(a,b),pad=(hi-lo)*.4||Math.max(1,Math.abs(a)*.2);lo-=pad;hi+=pad;
+    const svg=$("#tk-svg");numberLine(svg,lo,hi,[{v:a,label:"A",color:"red"},{v:b,label:"B",color:"blue"}]);
+    S("text",{x:600,y:88,"text-anchor":"end","font-size":11,style:`fill:${C("muted")}`},svg,"större åt höger →");
+  }
+  on([$("#tk-a"),$("#tk-b")],"input",upd);upd();
+});
+
+/* ---------- svenska talord ---------- */
+const ONES=["noll","ett","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv","tretton","fjorton","femton","sexton","sjutton","arton","nitton"];
+const TENS=["","","tjugo","trettio","fyrtio","femtio","sextio","sjuttio","åttio","nittio"];
+const w99=n=>n<20?ONES[n]:TENS[Math.floor(n/10)]+(n%10?ONES[n%10]:"");
+const w999=n=>{const h=Math.floor(n/100),r=n%100;return(h?(h===1?"ett":ONES[h])+"hundra":"")+(r?w99(r):"")};
+const enF=s=>s.replace(/ett$/,"en");
+function words(n,utrum){if(n===0)return"noll";const m=Math.floor(n/1e6),t=Math.floor(n/1000)%1000,r=n%1000,p=[];
+  if(m)p.push(m===1?"en miljon":enF(w999(m))+" miljoner");if(t)p.push(t===1?"ettusen":w999(t)+"tusen");if(r)p.push(utrum?enF(w999(r)):w999(r));return p.join(" ")}
+
+/* ---------- positionssystem ---------- */
+safe("pv",()=>{
+  const names=["miljontal","hundratusental","tiotusental","tusental","hundratal","tiotal","ental",",","tiondelar","hundradelar","tusendelar"];
+  const sing=["miljontal","hundratusental","tiotusental","tusental","hundratal","tiotal","ental","","tiondel","hundradel","tusendel"];
+  const exps=[6,5,4,3,2,1,0,null,-1,-2,-3];
+  const pv=$("#pv");let last=null;
+  function parse(){const s=$("#pv-in").value.replace(/[\s  ]/g,"").replace(".",",");if(!/^\d{1,7}(,\d{0,3})?$/.test(s))return null;const [i,d=""]=s.split(",");return Number(i)*1000+Number((d+"000").slice(0,3))}
+  function render(n,flash){pv.innerHTML="";
+    names.forEach(nm=>{const h=document.createElement("div");h.className="h";h.textContent=nm===","?"":nm;pv.appendChild(h)});
+    let hi=-3;for(let e=6;e>=-3;e--)if(Math.floor(n/Math.pow(10,e+3))%10){hi=e;break}
+    let lo=0;for(let e=-3;e<0;e++)if(Math.floor(n/Math.pow(10,e+3))%10){lo=e;break}
+    exps.forEach((e,i)=>{const d=document.createElement("div");
+      if(e===null){d.className="d comma";d.textContent=",";pv.appendChild(d);return}
+      const dg=Math.floor(n/Math.pow(10,e+3))%10;d.className="d "+(e>=0?"int":"dec")+((e>hi&&e>0)||(e<lo)?" dim":"")+(flash?" flash":"");d.textContent=dg;d.title=`${dg} ${sing[i]}`;pv.appendChild(d)});
+    const I=Math.floor(n/1000),F=n%1000;let fd=F?(F%10?3:F%100?2:1):0;const fv=fd?F/Math.pow(10,3-fd):0;
+    const den=["tiondel","hundradel","tusendel"][fd-1];
+    let w=words(I);if(fd)w=(I?w+" hela och ":"")+(fv===1?"en "+den:enF(words(fv,true))+" "+den+"ar");
+    $("#pv-words").textContent=w;
+    const vals=[];exps.forEach((e,i)=>{if(e===null)return;const dg=Math.floor(n/Math.pow(10,e+3))%10;if(dg)vals.push(`${dg} ${dg===1?sing[i]:names[i]} = ${nf(dg*Math.pow(10,e),3)}`)});
+    $("#pv-vals").innerHTML=vals.join("<br>")||"0";
+    $("#pv-mul").disabled=n*10>=1e10;$("#pv-div").disabled=n%10!==0||n===0;last=n;
+  }
+  function fromInput(){const n=parse();if(n==null){$("#pv-words").innerHTML='<span class="err">Skriv högst 7 siffror före kommat och 3 efter.</span>';return}render(n)}
+  function setN(n){const I=Math.floor(n/1000),F=n%1000;$("#pv-in").value=nf(I,0)+(F?","+String(F).padStart(3,"0").replace(/0+$/,""):"");render(n,true)}
+  $("#pv-in").addEventListener("input",fromInput);
+  $("#pv-mul").addEventListener("click",()=>last!=null&&setN(last*10));
+  $("#pv-div").addEventListener("click",()=>last!=null&&setN(last/10));
+  fromInput();
+  const t=$("#pv-tenths");for(let i=0;i<10;i++)S("rect",{x:10+i*10,y:8,width:10,height:90,style:`fill:${i<8?C("red"):C("paper")};stroke:${C("ink")};stroke-width:.8`},t);
+  const h=$("#pv-hund");for(let r=0;r<10;r++)for(let c=0;c<10;c++)S("rect",{x:180+c*9,y:8+r*9,width:9,height:9,style:`fill:${r*10+c<9?C("blue"):C("paper")};stroke:${C("ink")};stroke-width:.5`},h);
+});
+
+/* ---------- talkamrater ---------- */
+safe("tk",()=>{
+  const list=$("#tk-list");let sel=null;
+  function facts(w,a){const b=w-a;$("#tk-facts").innerHTML=`${w} = ${a} + ${b}<br>${w} = ${b} + ${a}<br>${w} − ${a} = ${b}<br>${w} − ${b} = ${a}`;
+    const svg=$("#tk-bar");clear(svg);const u=Math.min(32,580/w);
+    for(let i=0;i<w;i++)S("rect",{x:20+i*u,y:22,width:u-2,height:30,rx:3,style:`fill:${C(i<a?"red":"blue")}`},svg);
+    S("text",{x:20+a*u/2,y:16,"text-anchor":"middle","font-size":14,"font-weight":700,style:`fill:${C("red")}`},svg,a);
+    S("text",{x:20+a*u+b*u/2,y:16,"text-anchor":"middle","font-size":14,"font-weight":700,style:`fill:${C("blue")}`},svg,b);
+    S("text",{x:20+w*u/2,y:68,"text-anchor":"middle","font-size":13},svg,`helhet ${w}`);fit(svg);
+  }
+  function upd(){const w=+$("#tk-sum").value;$("#tk-sumv").textContent=w;list.innerHTML="";
+    const lo=Math.max(Math.ceil(w/2),w-9>0?Math.ceil(w/2):1),hi=Math.min(9,w-1),opts=[];
+    for(let a=Math.min(w-1,w>10?9:w-1);a>=Math.ceil(w/2);a--)opts.push(a);
+    opts.forEach((a,i)=>{const bt=document.createElement("button");bt.type="button";bt.className="pw";bt.setAttribute("aria-label",`${w} är ${a} och ${w-a}`);bt.innerHTML=`<span>${w}</span><span>${a}</span><span>${w-a}</span>`;
+      bt.addEventListener("click",()=>{$$(".pw",list).forEach(x=>x.setAttribute("aria-pressed","false"));bt.setAttribute("aria-pressed","true");facts(w,a)});list.appendChild(bt)});
+    const first=list.querySelector(".pw");if(first)first.click();
+  }
+  $("#tk-sum").addEventListener("input",upd);upd();
+  const A=$("#tt-a"),B=$("#tt-b");for(let i=1;i<=9;i++){A.add(new Option(i,i));B.add(new Option(i,i))}A.value=8;B.value=7;
+  function tt(){const a=+A.value,b=+B.value,s=a+b,svg=$("#tt-svg");clear(svg);
+    const frame=(x0,fill)=>{for(let i=0;i<10;i++){const x=x0+(i%5)*30,y=12+Math.floor(i/5)*30;S("rect",{x:x,y:y,width:28,height:28,rx:3,style:`fill:${C("paper")};stroke:${C("ink")};stroke-width:1.5`},svg);if(fill[i])S("circle",{cx:x+14,cy:y+14,r:10,style:`fill:${C(fill[i])}`},svg)}};
+    const f1=[],f2=[];for(let i=0;i<10;i++)f1.push(i<a?"red":i<a+b?"blue":null);for(let i=0;i<10;i++)f2.push(i<s-10?"blue":null);
+    frame(20,f1);if(s>10)frame(200,f2);
+    S("text",{x:95,y:86,"text-anchor":"middle","font-size":12,style:`fill:${C("muted")}`},svg,"första tiorutan");if(s>10)S("text",{x:275,y:86,"text-anchor":"middle","font-size":12,style:`fill:${C("muted")}`},svg,"andra tiorutan");
+    if(s>10){const x=10-a,y=b-x;$("#tt-txt").innerHTML=`${a} + ${b} = ${a} <span class="b">+ ${x}</span> <span class="b">+ ${y}</span> = 10 + ${y} = <b class="r">${s}</b><div class="small">Dela ${b} i ${x} och ${y}. ${a} + ${x} = 10 fyller första tiorutan.</div>`}
+    fit(svg);
+    if(s<=10) $("#tt-txt").innerHTML=`${a} + ${b} = <b class="r">${s}</b><div class="small">${s===10?"Tiokamrater! Tiorutan blir precis full.":"Summan ryms i första tiorutan."}</div>`;
+  }
+  on([A,B],"change",tt);tt();
+});
+
+/* ---------- multiplikation ---------- */
+safe("mt",()=>{
+  const g=$("#mt");let cells=[],heads=[];
+  const corner=document.createElement("div");corner.className="hd";corner.textContent="·";g.appendChild(corner);
+  for(let c=1;c<=10;c++){const h=document.createElement("div");h.className="hd";h.textContent=c;h.dataset.c=c;g.appendChild(h);heads.push(h)}
+  for(let r=1;r<=10;r++){const h=document.createElement("div");h.className="hd";h.textContent=r;h.dataset.r=r;g.appendChild(h);heads.push(h);
+    for(let c=1;c<=10;c++){const b=document.createElement("button");b.type="button";b.textContent=r*c;b.dataset.r=r;b.dataset.c=c;b.className=r===c?"sq":"";b.setAttribute("aria-label",`${r} gånger ${c} är ${r*c}`);
+      b.addEventListener("click",()=>pick(r,c));b.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")pick(r,c)});g.appendChild(b);cells.push(b)}}
+  function pick(r,c){cells.forEach(b=>{const br=+b.dataset.r,bc=+b.dataset.c;b.classList.toggle("hit",br===r&&bc===c);b.classList.toggle("path",!(br===r&&bc===c)&&((br===r&&bc<c)||(bc===c&&br<r)))});
+    heads.forEach(h=>h.classList.toggle("on",(+h.dataset.r===r)||(+h.dataset.c===c)));
+    const p=r*c;$("#mt-big").innerHTML=`${r} · ${c} = <span class="r">${p}</span>`;
+    $("#mt-facts").innerHTML=`${c} · ${r} = ${p}<br><span class="frac"><span>${p}</span><span>${r}</span></span> = ${c} &nbsp; <span class="frac"><span>${p}</span><span>${c}</span></span> = ${r}`;
+    const svg=$("#mt-area");clear(svg);const u=Math.min(26,270/Math.max(r,c));
+    for(let i=0;i<r;i++)for(let j=0;j<c;j++)S("rect",{x:20+j*u,y:20+i*u,width:u-2,height:u-2,rx:3,style:`fill:${C(i%2?"blue-tint":"red-tint")};stroke:${C(i%2?"blue":"red")}`},svg);
+    S("text",{x:20+c*u/2,y:14,"text-anchor":"middle","font-size":13},svg,`${c}`);S("text",{x:10,y:20+r*u/2+4,"text-anchor":"middle","font-size":13},svg,`${r}`);
+    svg.setAttribute("viewBox",`0 0 300 ${Math.max(60,30+r*u)}`);
+  }
+  pick(3,7);
+  const tab=$("#q-tab");for(let i=1;i<=10;i++)tab.add(new Option(`${i}:ans tabell`,i));
+  let cur=null,streak=0,right=0,total=0;
+  function next(){const t=+tab.value;const a=t||1+Math.floor(Math.random()*10),b=1+Math.floor(Math.random()*10);const div=Math.random()<.3;
+    cur=div?{q:`${a*b} / ${a}`,a:b}:(Math.random()<.5?{q:`${a} · ${b}`,a:a*b}:{q:`${b} · ${a}`,a:a*b});$("#q-q").textContent=cur.q+" = ?";$("#q-a").value="";$("#q-fb").textContent="Skriv svaret och tryck Enter."}
+  function check(){if(!cur)return;const v=num($("#q-a").value);if(!isFinite(v)){$("#q-fb").innerHTML='<span class="err">Skriv ett tal.</span>';return}total++;
+    if(v===cur.a){right++;streak++;$("#q-fb").innerHTML=`<b class="g">Rätt!</b> ${cur.q} = ${cur.a}`;setTimeout(next,900)}else{streak=0;$("#q-fb").innerHTML=`<b class="r">Inte riktigt.</b> ${cur.q} = ${cur.a}. Försök med en ny.`;setTimeout(next,1800)}
+    $("#q-score").textContent=`${right} rätt av ${total} · ${streak} rätt i rad`}
+  $("#q-check").addEventListener("click",check);$("#q-next").addEventListener("click",next);tab.addEventListener("change",next);
+  $("#q-a").addEventListener("keydown",e=>{if(e.key==="Enter")check()});next();
+});
+
+/* ---------- räkna upp ---------- */
+safe("ru",()=>{
+  function dec(s){const m=String(s).replace(/[\s ]/g,"").split(/[.,]/);return m[1]?m[1].length:0}
+  function upd(){const sa=$("#ru-a").value,sb=$("#ru-b").value,a=num(sa),b=num(sb),svg=$("#ru-svg");clear(svg);
+    const d=Math.max(dec(sa),dec(sb));
+    if(!isFinite(a)||!isFinite(b)||a<0||b<0||d>2||a>1e7){$("#ru-txt").innerHTML='<span class="err">Skriv två positiva tal med högst två decimaler.</span>';return}
+    if(b>a){$("#ru-txt").innerHTML='<span class="err">Det första talet ska vara större.</span>';return}
+    const sc=Math.pow(10,d),A=Math.round(a*sc),B=Math.round(b*sc);const js=[];let cur=B;
+    const gs=[];for(let g=10;g<=A*10&&g<=1e9;g*=10)gs.push(g);
+    for(const g of gs){const nx=Math.ceil(cur/g)*g;if(nx>cur&&nx<=A){js.push([cur,nx]);cur=nx}}
+    for(const g of gs.slice().reverse()){const t=Math.floor(A/g)*g;if(t>cur){js.push([cur,t]);cur=t}}
+    if(cur<A)js.push([cur,A]);
+    if(!js.length){$("#ru-txt").innerHTML=`Talen är lika. Skillnaden är 0.`;return}
+    const wts=js.map(([p,q])=>Math.sqrt(q-p)+.6),tot=wts.reduce((s,x)=>s+x,0);let x=30;const xs=[x];wts.forEach(w=>{x+=w/tot*580;xs.push(x)});
+    S("line",{x1:15,y1:90,x2:625,y2:90,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+    js.forEach(([p,q],i)=>{const x1=xs[i],x2=xs[i+1],col=i%2?"blue":"red",h=Math.min(70,(x2-x1)*.6+18);
+      S("path",{d:`M${x1} 86 Q${(x1+x2)/2} ${86-h*1.3} ${x2} 86`,style:`fill:none;stroke:${C(col)};stroke-width:2.5`},svg);
+      S("text",{x:(x1+x2)/2,y:86-h*.65-6,"text-anchor":"middle","font-size":13,"font-weight":700,style:`fill:${C(col)}`},svg,"+"+nf((q-p)/sc,2))});
+    xs.forEach((xx,i)=>{const v=i===0?B:js[i-1][1];S("line",{x1:xx,y1:84,x2:xx,y2:96,style:`stroke:${C("ink")}`},svg);S("text",{x:xx,y:113,"text-anchor":"middle","font-size":12,"font-weight":i===0||i===xs.length-1?700:400},svg,nf(v/sc,2))});
+    $("#ru-txt").innerHTML=`${nf(a,2)} − ${nf(b,2)} = ${js.map(([p,q])=>nf((q-p)/sc,2)).join(" + ")} = <b class="r">${nf((A-B)/sc,2)}</b>`;
+  }
+  on([$("#ru-a"),$("#ru-b")],"input",upd);upd();
+});
+
+/* ---------- kort division ---------- */
+safe("kd",()=>{
+  const D=$("#kd-d");for(let i=2;i<=9;i++)D.add(new Option(i,i));D.value=7;
+  function upd(){const s=$("#kd-n").value.replace(/[\s ]/g,""),d=+D.value;
+    if(!/^\d{1,9}$/.test(s)){$("#kd-big").innerHTML='<span class="err">Skriv ett heltal (högst 9 siffror).</span>';$("#kd-steps").innerHTML="";return}
+    let cur=0,q="",steps=[],carries=[];const dg=s.split("").map(Number);
+    dg.forEach((x,i)=>{cur=cur*10+x;if(q===""&&cur<d&&i<dg.length-1){carries.push(null);return}
+      const qd=Math.floor(cur/d),r=cur%d;q+=qd;steps.push(`${d} i ${cur} går ${qd} ${qd===1?"gång":"gånger"}${r?`, ${r} över`:""}.`);carries.push(r&&i<dg.length-1?r:null);cur=r});
+    let disp="";dg.forEach((x,i)=>{disp+=x;if(carries[i]!=null)disp+=`<sup class="r">${carries[i]}</sup>`});
+    const rest=cur;$("#kd-big").innerHTML=`<span class="frac"><span>${disp}</span><span>${d}</span></span> = ${Number(q||0)}${rest?` <span class="small">rest ${rest}</span>`:""}`;
+    $("#kd-steps").innerHTML=steps.map(t=>`<li>${t}</li>`).join("")+(rest?`<li>Det blir ${rest} över. ${s} / ${d} = ${q} och ${rest}/${d} ≈ ${nf(Number(s)/d,3)}</li>`:"");
+  }
+  on([$("#kd-n")],"input",upd);D.addEventListener("change",upd);upd();
+});
+
+/* ---------- avrundning ---------- */
+safe("av",()=>{
+  const nm={"1000":"hela tusental","100":"hela hundratal","10":"hela tiotal","1":"heltal","0.1":"en decimal","0.01":"två decimaler"};
+  const nxt={"1000":"hundratalssiffran","100":"tiotalssiffran","10":"entalssiffran","1":"tiondelssiffran","0.1":"hundradelssiffran","0.01":"tusendelssiffran"};
+  function upd(){const x=num($("#av-x").value),ps=seg("av-p"),p=+ps,svg=$("#av-svg");
+    if(!isFinite(x)||x<0){$("#av-big").innerHTML='<span class="err">Skriv ett positivt tal.</span>';$("#av-why").textContent="";clear(svg);return}
+    const dp=p<1?Math.round(-Math.log10(p)):0,k=Math.round(1/Math.min(p,1)*1000)/1000;
+    const lo=Math.floor(x/p+1e-9)*p,hi=lo+p,res=Math.floor(x/p+.5+1e-9)*p;
+    const dig=Math.floor(x/(p/10)+1e-9)%10;
+    $("#av-big").innerHTML=`${nf(x,6)} ≈ <span class="r">${nf(res,dp)}</span>`;
+    $("#av-why").innerHTML=`Avrundat till ${nm[ps]}. Titta på ${nxt[ps]}: den är <b>${dig}</b>, alltså avrundas ${dig>=5?"<b>uppåt</b>":"<b>nedåt</b>"}.`;
+    const X=v=>40+(v-lo)/(hi-lo)*540;clear(svg);
+    S("rect",{x:40,y:44,width:270,height:12,style:`fill:${C("blue-tint")}`},svg);S("rect",{x:310,y:44,width:270,height:12,style:`fill:${C("red-tint")}`},svg);
+    S("line",{x1:30,y1:50,x2:590,y2:50,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+    [[lo,"ink"],[lo+p/2,"muted"],[hi,"ink"]].forEach(([v,c])=>{S("line",{x1:X(v),y1:42,x2:X(v),y2:58,style:`stroke:${C(c)}`},svg);S("text",{x:X(v),y:78,"text-anchor":"middle","font-size":13,style:`fill:${C(c)}`},svg,nf(v,dp+1))});
+    S("circle",{cx:X(x),cy:50,r:7,style:`fill:${C("red")}`},svg);S("text",{x:X(x),y:28,"text-anchor":"middle","font-size":14,"font-weight":700,style:`fill:${C("red")}`},svg,nf(x,6));
+    const tx=X(res);S("path",{d:`M${X(x)} 42 Q${(X(x)+tx)/2} 12 ${tx} 40`,style:`fill:none;stroke:${C("red")};stroke-width:2;stroke-dasharray:4 3`},svg);
+  }
+  $("#av-x").addEventListener("input",upd);$$('input[name="av-p"]').forEach(r=>r.addEventListener("change",upd));upd();
+});
+
+/* ---------- uttryck steg för steg ---------- */
+safe("ex",()=>{
+  const ex=["15 − 2 · 5","15 + 6 / 2","5 · (3 + 4)","15 − (6 + 6)","2 + 3^2","(2 + 3)^2","100 / (4 + 6) · 3","3,5 · 4 − 6 / 1,5"];
+  const ch=$("#ex-chips");ex.forEach(e=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=e;b.addEventListener("click",()=>{$("#ex-in").value=e;run()});ch.appendChild(b)});
+  function tok(str){let s=str.replace(/[×·*]/g,"*").replace(/[÷:]/g,"/").replace(/[−–]/g,"-").replace(/²/g,"^2").replace(/³/g,"^3").replace(/\s+/g,"").replace(/(\d),(\d)/g,"$1.$2");
+    if(!s)throw"Skriv ett uttryck.";
+    const m=s.match(/\d+(?:\.\d+)?|[+\-*/^()]/g)||[];if(m.join("")!==s)throw"Uttrycket innehåller tecken som inte känns igen.";
+    const t=[];m.forEach(x=>{const prev=t[t.length-1];
+      if(/\d/.test(x)){if(prev&&(prev.t==="n"||prev.v===")"))t.push({t:"o",v:"*"});t.push({t:"n",v:Number(x)});return}
+      if(x==="("&&prev&&(prev.t==="n"||prev.v===")"))t.push({t:"o",v:"*"});
+      if(x==="-"&&(!prev||prev.v==="("||(prev.t==="o"&&"+-*/^".includes(prev.v)))){t.push({t:"u"});return}
+      t.push({t:x==="("||x===")"?"p":"o",v:x})});
+    // slå ihop unärt minus
+    const o=[];for(let i=0;i<t.length;i++){if(t[i].t==="u"){const n=t[i+1];if(n&&n.t==="n"){o.push({t:"n",v:-n.v});i++;continue}o.push({t:"n",v:-1});o.push({t:"o",v:"*"});continue}o.push(t[i])}
+    return o}
+  const sym={"+":"+","-":"−","*":"·","/":"/"};
+  function show(t,hi){let h="";for(let i=0;i<t.length;i++){const x=t[i];
+      if(x.t==="o"&&x.v==="^"&&t[i+1]&&t[i+1].t==="n"){h+=`<sup>${nf(t[i+1].v,6)}</sup>`;i++;continue}
+      if(x.t==="n"){let s=nf(x.v,6);if(x.v<0&&i>0)s="("+s+")";h+=i===hi?`<mark>${s}</mark>`:s}else if(x.t==="p")h+=x.v;else h+=` ${sym[x.v]} `}
+    return h.replace(/\( /g,"(").replace(/ \)/g,")")}
+  function run(){const out=$("#ex-steps");out.innerHTML="";let t;
+    try{t=tok($("#ex-in").value)}catch(e){out.innerHTML=`<span class="err">${e}</span>`;return}
+    const lines=[`<div class="row"><span class="eq">${show(t,-1)}</span><span class="why">uttrycket</span></div>`];
+    try{for(let guard=0;guard<60&&!(t.length===1&&t[0].t==="n");guard++){
+      let i=-1;for(let k=t.length-1;k>=0;k--)if(t[k].v==="("&&t[k].t==="p"){i=k;break}
+      let j=-1;if(i>=0){for(let k=i+1;k<t.length;k++)if(t[k].v===")"){j=k;break}if(j<0)throw"En parentes saknar sin slutparentes."}
+      else if(t.some(x=>x.v===")"))throw"En slutparentes saknar sin startparentes.";
+      const s0=i>=0?i+1:0,e0=i>=0?j-1:t.length-1;
+      if(i>=0&&e0===s0&&t[s0].t==="n"){t.splice(j,1);t.splice(i,1);continue}
+      if(e0<s0)throw"Tom parentes.";
+      let k=-1,rule;
+      for(let q=e0;q>=s0;q--)if(t[q].v==="^"&&t[q].t==="o"){k=q;rule="potens";break}
+      if(k<0)for(let q=s0;q<=e0;q++)if(t[q].t==="o"&&(t[q].v==="*"||t[q].v==="/")){k=q;rule="md";break}
+      if(k<0)for(let q=s0;q<=e0;q++)if(t[q].t==="o"&&(t[q].v==="+"||t[q].v==="-")){k=q;rule="as";break}
+      if(k<0)throw"Uttrycket är inte fullständigt.";
+      const L=t[k-1],R=t[k+1];if(!L||!R||L.t!=="n"||R.t!=="n"||k-1<s0||k+1>e0)throw"Ett tal saknas vid ett räknetecken.";
+      let v;const o=t[k].v;if(o==="+")v=L.v+R.v;else if(o==="-")v=L.v-R.v;else if(o==="*")v=L.v*R.v;else if(o==="/"){if(R.v===0)throw"Division med 0 går inte.";v=L.v/R.v}else v=Math.pow(L.v,R.v);
+      v=Math.round(v*1e10)/1e10;
+      const calc=o==="^"?`${nf(L.v)}<sup>${nf(R.v)}</sup> = ${nf(v)}`:`${nf(L.v)} ${sym[o]} ${nf(R.v)} = ${nf(v)}`;
+      const why=i>=0?"parentesen först":(rule==="potens"?"potens":rule==="md"?(o==="*"?"multiplikation":"division")+" före plus och minus":"plus och minus från vänster");
+      t.splice(k-1,3,{t:"n",v:v});
+      // ta bort parentes kring ensamt tal direkt
+      let hi=k-1;if(i>=0&&t[i]&&t[i+2]&&t[i+1].t==="n"&&t[i+2].v===")"&&t[i].v==="("){t.splice(i+2,1);t.splice(i,1);hi=i}
+      lines.push(`<div class="row"><span class="eq">= ${show(t,hi)}</span><span class="why">${why} · ${calc}</span></div>`);
+    }}catch(e){lines.push(`<div class="err">${e}</div>`)}
+    out.innerHTML=lines.join("");
+  }
+  $("#ex-in").addEventListener("input",run);run();
+});
+
+/* ---------- kvadreringsregeln ---------- */
+safe("kv",()=>{
+  function upd(){const a=+$("#kv-a").value,b=+$("#kv-b").value,r=seg("kv-r");$("#kv-av").textContent=a;$("#kv-bv").textContent=b;const svg=$("#kv-svg");clear(svg);
+    const u=Math.min(26,250/(a+b)),o=30,rect=(x,y,w,h,c,lab)=>{S("rect",{x:o+x*u,y:o+y*u,width:w*u,height:h*u,style:`fill:${C(c)};stroke:${C("ink")};stroke-width:1.5`},svg);if(lab&&w*u>18&&h*u>14)S("text",{x:o+(x+w/2)*u,y:o+(y+h/2)*u+5,"text-anchor":"middle","font-size":14},svg,lab)};
+    const lbl=(x,y,t,c="muted")=>S("text",{x:x,y:y,"text-anchor":"middle","font-size":13,style:`fill:${C(c)}`},svg,t);
+    if(r==="p"){rect(0,0,a,a,"red-tint",`a² = ${a*a}`);rect(a,0,b,a,"blue-tint",`ab`);rect(0,a,a,b,"blue-tint",`ab`);rect(a,a,b,b,"grid",`b²`);
+      lbl(o+a*u/2,o-8,`a = ${a}`);lbl(o+(a+b/2)*u,o-8,`b = ${b}`);
+      $("#kv-txt").innerHTML=`(a + b)² = a² + 2ab + b²<br>(${a} + ${b})² = ${a*a} + ${2*a*b} + ${b*b} = <b class="r">${(a+b)**2}</b><div class="small">Den stora kvadraten har sidan ${a+b}. Den består av två kvadrater och två lika rektanglar.</div>`}
+    else if(r==="m"){if(b>=a){$("#kv-txt").innerHTML='<span class="err">Välj b mindre än a.</span>';return}
+      rect(0,0,a,a,"grid");rect(0,0,a-b,a-b,"red-tint",`(a − b)²`);rect(a-b,0,b,a,"blue-tint");rect(0,a-b,a,b,"blue-tint");rect(a-b,a-b,b,b,"red",null);
+      lbl(o+a*u/2,o-8,`a = ${a}`);
+      $("#kv-txt").innerHTML=`(a − b)² = a² − 2ab + b²<br>(${a} − ${b})² = ${a*a} − ${2*a*b} + ${b*b} = <b class="r">${(a-b)**2}</b><div class="small">Ta bort två rektanglar ab från a². Hörnet b² togs då bort två gånger, så det läggs tillbaka.</div>`}
+    else{if(b>=a){$("#kv-txt").innerHTML='<span class="err">Välj b mindre än a.</span>';return}
+      rect(0,0,a,a,"red-tint");rect(a-b,a-b,b,b,"grid","b²");lbl(o+a*u/2,o-8,`a = ${a}`);
+      S("rect",{x:o+(a-b)*u,y:o+(a-b)*u,width:b*u,height:b*u,style:`fill:none;stroke:${C("red")};stroke-width:2.5;stroke-dasharray:5 3`},svg);
+      $("#kv-txt").innerHTML=`(a + b)(a − b) = a² − b²<br>(${a} + ${b})(${a} − ${b}) = ${a+b} · ${a-b} = <b class="r">${a*a-b*b}</b><br>${a*a} − ${b*b} = ${a*a-b*b}<div class="small">Klipp bort hörnet b² från a². Det som blir kvar kan läggas om till en rektangel ${a+b} · ${a-b}.</div>`}
+    svg.setAttribute("viewBox",`0 0 300 ${o+(a+b)*u+10}`);
+  }
+  on([$("#kv-a"),$("#kv-b")],"input",upd);$$('input[name="kv-r"]').forEach(r=>r.addEventListener("change",upd));upd();
+});
+
+/* ---------- vinklar ---------- */
+safe("an",()=>{
+  function upd(){const v=+$("#an").value;$("#an-v").textContent=v+"°";const svg=$("#an-svg");clear(svg);const cx=160,cy=160,R=140;
+    S("path",{d:`M${cx-R} ${cy} A${R} ${R} 0 0 1 ${cx+R} ${cy} Z`,style:`fill:${C("grid")};stroke:${C("line")}`},svg);
+    for(let d=0;d<=180;d+=10){const a=d*Math.PI/180,x1=cx+R*Math.cos(a),y1=cy-R*Math.sin(a),k=d%30?.93:.88;S("line",{x1:x1,y1:y1,x2:cx+R*k*Math.cos(a),y2:cy-R*k*Math.sin(a),style:`stroke:${C("muted")}`},svg);
+      if(d%30===0)S("text",{x:cx+(R-30)*Math.cos(a),y:cy-(R-30)*Math.sin(a)+4,"text-anchor":"middle","font-size":11,style:`fill:${C("muted")}`},svg,d)}
+    const a=v*Math.PI/180;
+    if(v>0&&v<180&&v!==90){const r=46,large=v>180?1:0;S("path",{d:`M${cx} ${cy} L${cx+r} ${cy} A${r} ${r} 0 ${large} 0 ${cx+r*Math.cos(a)} ${cy-r*Math.sin(a)} Z`,style:`fill:${C("red-tint")};stroke:${C("red")};stroke-width:2`},svg)}
+    if(v===90)S("rect",{x:cx,y:cy-22,width:22,height:22,style:`fill:${C("red-tint")};stroke:${C("red")};stroke-width:2`},svg);
+    if(v===180)S("path",{d:`M${cx+40} ${cy} A40 40 0 0 0 ${cx-40} ${cy}`,style:`fill:none;stroke:${C("red")};stroke-width:2`},svg);
+    S("line",{x1:cx,y1:cy,x2:cx+R,y2:cy,style:`stroke:${C("ink")};stroke-width:3`},svg);
+    S("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a),y2:cy-R*Math.sin(a),style:`stroke:${C("blue")};stroke-width:3`},svg);
+    S("circle",{cx:cx,cy:cy,r:4,style:`fill:${C("ink")}`},svg);
+    const [n,w]=v===0?["nollvinkel","Vinkelbenen ligger på varandra."]:v<90?["spetsig vinkel","Mindre än 90°, smalare än ett hörn på ett papper."]:v===90?["rät vinkel","Exakt 90°, som hörnet på ett papper. Markeras med en liten kvadrat."]:v<180?["trubbig vinkel","Mellan 90° och 180°, bredare än ett pappershörn."]:["rak vinkel","Exakt 180°, vinkelbenen bildar en rak linje."];
+    $("#an-name").innerHTML=`${v}° <span class="r">${n}</span>`;$("#an-why").textContent=w;
+  }
+  $("#an").addEventListener("input",upd);upd();
+});
+safe("tr",()=>{
+  function upd(){let A=+$("#tr-a").value,B=+$("#tr-b").value;$("#tr-av").textContent=A+"°";$("#tr-bv").textContent=B+"°";const Cc=180-A-B,svg=$("#tr-svg");clear(svg);
+    if(Cc<=0){$("#tr-c").innerHTML=`<span class="err">A + B = ${A+B}°</span>`;$("#tr-type").textContent="Två vinklar kan inte bli 180° eller mer tillsammans. Då möts aldrig sidorna.";return}
+    const rA=A*Math.PI/180,rB=B*Math.PI/180,rC=Cc*Math.PI/180,L=1,b=L*Math.sin(rB)/Math.sin(rC);
+    const P=[[0,0],[L,0],[b*Math.cos(rA),b*Math.sin(rA)]];const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);
+    const minx=Math.min(...xs),maxx=Math.max(...xs),maxy=Math.max(...ys),sc=Math.min(280/(maxx-minx),170/maxy);
+    const Q=P.map(([x,y])=>[30+(x-minx)*sc,200-y*sc]);
+    S("path",{d:`M${Q[0]} L${Q[1]} L${Q[2]} Z`,style:`fill:${C("red-tint")};stroke:${C("ink")};stroke-width:2`},svg);
+    const labs=[["A",A,"red"],["B",B,"blue"],["C",Cc,"green"]];
+    Q.forEach((q,i)=>{const o1=Q[(i+1)%3],o2=Q[(i+2)%3],mx=(o1[0]+o2[0])/2,my=(o1[1]+o2[1])/2,dx=mx-q[0],dy=my-q[1],dl=Math.hypot(dx,dy)||1,k=Math.min(34,dl*.35);
+      S("text",{x:q[0]+dx/dl*k,y:q[1]+dy/dl*k+5,"text-anchor":"middle","font-size":13,"font-weight":700,style:`fill:${C(labs[i][2])}`},svg,labs[i][1]+"°")});
+    $("#tr-c").innerHTML=`C = 180° − ${A}° − ${B}° = <span class="g">${Cc}°</span>`;
+    const mx=Math.max(A,B,Cc),kind=mx>90?"trubbvinklig":mx===90?"rätvinklig":"spetsvinklig";
+    const eq=A===B&&B===Cc?"liksidig":(A===B||B===Cc||A===Cc)?"likbent":"oliksidig";
+    $("#tr-type").innerHTML=`Triangeln är <b>${kind}</b> och <b>${eq}</b>. Summan A + B + C = <b>180°</b>.`;
+  }
+  on([$("#tr-a"),$("#tr-b")],"input",upd);upd();
+});
+
+/* ---------- area/volym ---------- */
+safe("ar",()=>{
+  const P=Math.PI;
+  const shapes={
+    kvadrat:{n:"Kvadrat",f:[["s","sida",5]],calc:({s})=>[["Omkrets","O = 4 · s",`4 · ${nf(s)}`,4*s,1],["Area","A = s · s",`${nf(s)} · ${nf(s)}`,s*s,2]]},
+    rektangel:{n:"Rektangel",f:[["l","längd",6],["b","bredd",4]],calc:({l,b})=>[["Omkrets","O = 2 · (l + b)",`2 · (${nf(l)} + ${nf(b)})`,2*(l+b),1],["Area","A = l · b",`${nf(l)} · ${nf(b)}`,l*b,2]]},
+    triangel:{n:"Triangel",f:[["b","bas",6],["h","höjd",4]],calc:({b,h})=>[["Area","A = b · h / 2",`${nf(b)} · ${nf(h)} / 2`,b*h/2,2]]},
+    cirkel:{n:"Cirkel",f:[["r","radie",3]],calc:({r})=>[["Diameter","d = 2 · r",`2 · ${nf(r)}`,2*r,1],["Omkrets","O = 2 · π · r",`2 · π · ${nf(r)}`,2*P*r,1],["Area","A = π · r · r",`π · ${nf(r)} · ${nf(r)}`,P*r*r,2]]},
+    parallellogram:{n:"Parallellogram",f:[["b","bas",6],["h","höjd",3]],calc:({b,h})=>[["Area","A = b · h",`${nf(b)} · ${nf(h)}`,b*h,2]]},
+    trapets:{n:"Parallelltrapets",f:[["a","undre sida a",8],["b","övre sida b",4],["h","höjd",3]],calc:({a,b,h})=>[["Area","A = (a + b) · h / 2",`(${nf(a)} + ${nf(b)}) · ${nf(h)} / 2`,(a+b)*h/2,2]]},
+    kub:{n:"Kub",f:[["s","sida",3]],calc:({s})=>[["Begränsningsarea","A = 6 · s · s",`6 · ${nf(s)} · ${nf(s)}`,6*s*s,2],["Volym","V = s · s · s",`${nf(s)} · ${nf(s)} · ${nf(s)}`,s**3,3]]},
+    ratblock:{n:"Rätblock",f:[["l","längd",5],["b","bredd",3],["h","höjd",2]],calc:({l,b,h})=>[["Begränsningsarea","A = 2 · (l·b + l·h + b·h)",`2 · (${nf(l*b)} + ${nf(l*h)} + ${nf(b*h)})`,2*(l*b+l*h+b*h),2],["Volym","V = l · b · h",`${nf(l)} · ${nf(b)} · ${nf(h)}`,l*b*h,3]]},
+    cylinder:{n:"Cylinder",f:[["r","radie",2],["h","höjd",5]],calc:({r,h})=>[["Begränsningsarea","A = 2πr² + 2πrh",`2 · π · ${nf(r)}² + 2 · π · ${nf(r)} · ${nf(h)}`,2*P*r*r+2*P*r*h,2],["Volym","V = π · r · r · h",`π · ${nf(r)} · ${nf(r)} · ${nf(h)}`,P*r*r*h,3]]},
+    kon:{n:"Kon",f:[["r","radie",2],["h","höjd",6]],calc:({r,h})=>[["Volym","V = π · r · r · h / 3",`π · ${nf(r)} · ${nf(r)} · ${nf(h)} / 3`,P*r*r*h/3,3]]},
+    pyramid:{n:"Pyramid",f:[["s","bottensida",4],["h","höjd",6]],calc:({s,h})=>[["Volym","V = s · s · h / 3",`${nf(s)} · ${nf(s)} · ${nf(h)} / 3`,s*s*h/3,3]]},
+    klot:{n:"Klot",f:[["r","radie",3]],calc:({r})=>[["Area","A = 4 · π · r · r",`4 · π · ${nf(r)} · ${nf(r)}`,4*P*r*r,2],["Volym","V = 4 · π · r · r · r / 3",`4 · π · ${nf(r)}³ / 3`,4*P*r**3/3,3]]}
+  };
+  const segEl=$("#ar-shapes");let cur="rektangel";
+  Object.entries(shapes).forEach(([k,s])=>{const l=document.createElement("label");l.innerHTML=`<input type="radio" name="ar-s" value="${k}"${k===cur?" checked":""}><span>${s.n}</span>`;segEl.appendChild(l)});
+  segEl.addEventListener("change",e=>{cur=e.target.value;build()});
+  function build(){const box=$("#ar-inputs");box.innerHTML="";
+    shapes[cur].f.forEach(([k,lab,def])=>{const l=document.createElement("label");l.className="fld";l.innerHTML=`${lab} (${k})<input class="in" id="ar-${k}" inputmode="decimal" value="${def}" style="width:6em">`;box.appendChild(l)});
+    const u=document.createElement("label");u.className="fld";u.innerHTML=`Enhet<select class="in" id="ar-u"><option>mm</option><option selected>cm</option><option>dm</option><option>m</option></select>`;box.appendChild(u);
+    $$("input,select",box).forEach(i=>i.addEventListener("input",calc));calc()}
+  function calc(){const s=shapes[cur],v={};let ok=true;s.f.forEach(([k])=>{v[k]=num($("#ar-"+k).value);if(!(v[k]>0))ok=false});const u=$("#ar-u").value;
+    const out=$("#ar-res");if(!ok){out.innerHTML='<span class="err">Skriv positiva mått.</span>';draw(v,u);return}
+    if(cur==="trapets"&&v.b>=v.a){}
+    const L={mm:.001,cm:.01,dm:.1,m:1}[u];
+    out.innerHTML=s.calc(v).map(([t,f,sub,r,p])=>{const unit=u+(p===2?"²":p===3?"³":"");let extra="";if(p===3){const lit=r*Math.pow(L*10,3);extra=` <span class="small">= ${nf(lit,3)} liter</span>`}
+      return `<div class="row" style="display:grid;gap:2px"><span class="small">${t}</span><span class="eq">${f}</span><span class="eq">= ${sub}</span><span class="eq">= <b class="r">${nf(r,2)} ${unit}</b>${extra}</span></div>`}).join("")+(cur==="triangel"?'<p class="small">Omkretsen är summan av de tre sidorna.</p>':"")+(/cirkel|cylinder|kon|klot/.test(cur)?'<p class="small">π ≈ 3,14. Svaret är avrundat till två decimaler.</p>':"");
+    draw(v,u)}
+  function draw(v,u){const svg=$("#ar-svg");clear(svg);const st=`fill:${C("red-tint")};stroke:${C("ink")};stroke-width:2`,st3=`fill:${C("blue-tint")};stroke:${C("ink")};stroke-width:2`,st3b=`fill:${C("grid")};stroke:${C("ink")};stroke-width:2`;
+    const T=(x,y,t,c="ink",a="middle")=>S("text",{x:x,y:y,"text-anchor":a,"font-size":14,"font-weight":700,style:`fill:${C(c)}`},svg,t);
+    const f=x=>isFinite(x)&&x>0?nf(x)+" "+u:"?";const dsh=c=>`stroke:${C(c)};stroke-width:1.5;stroke-dasharray:5 4;fill:none`;
+    const fit=(w,h,W=240,H=160)=>{const k=Math.min(W/(w||1),H/(h||1));return[w*k,h*k]};
+    if(cur==="kvadrat"){S("rect",{x:70,y:30,width:160,height:160,style:st},svg);T(150,212,"s = "+f(v.s));}
+    else if(cur==="rektangel"){const[w,h]=fit(v.l||6,v.b||4);S("rect",{x:150-w/2,y:110-h/2,width:w,height:h,style:st},svg);T(150,110+h/2+20,"l = "+f(v.l));T(150+w/2-10,114,"b = "+f(v.b),"ink","end")}
+    else if(cur==="triangel"){const[w,h]=fit(v.b||6,v.h||4,220,150);const x0=150-w/2,y0=185;S("path",{d:`M${x0} ${y0} L${x0+w} ${y0} L${x0+w*.65} ${y0-h} Z`,style:st},svg);S("line",{x1:x0+w*.65,y1:y0,x2:x0+w*.65,y2:y0-h,style:dsh("blue")},svg);T(150,y0+22,"b = "+f(v.b));T(x0+w*.65+8,y0-h/2,"h = "+f(v.h),"blue","start")}
+    else if(cur==="cirkel"){S("circle",{cx:150,cy:110,r:85,style:st},svg);S("line",{x1:150,y1:110,x2:235,y2:110,style:`stroke:${C("red")};stroke-width:2.5`},svg);S("circle",{cx:150,cy:110,r:4,style:`fill:${C("ink")}`},svg);T(192,102,"r = "+f(v.r),"red")}
+    else if(cur==="parallellogram"){const[w,h]=fit((v.b||6)*1.25,v.h||3,240,150);const bw=w/1.25,x0=150-w/2,y0=110+h/2;S("path",{d:`M${x0} ${y0} L${x0+bw} ${y0} L${x0+w} ${y0-h} L${x0+w-bw} ${y0-h} Z`,style:st},svg);S("line",{x1:x0+w-bw,y1:y0,x2:x0+w-bw,y2:y0-h,style:dsh("blue")},svg);T(x0+bw/2,y0+22,"b = "+f(v.b));T(x0+w-bw+6,110,"h","blue","start")}
+    else if(cur==="trapets"){const a=v.a||8,b=v.b||4,[w,h]=fit(Math.max(a,b),v.h||3,240,140),k=w/Math.max(a,b),aw=a*k,bw=b*k,y0=110+h/2;S("path",{d:`M${150-aw/2} ${y0} L${150+aw/2} ${y0} L${150+bw/2} ${y0-h} L${150-bw/2} ${y0-h} Z`,style:st},svg);S("line",{x1:150-bw/2,y1:y0,x2:150-bw/2,y2:y0-h,style:dsh("blue")},svg);T(150,y0+22,"a = "+f(v.a));T(150,y0-h-10,"b = "+f(v.b));T(150-bw/2+6,110,"h","blue","start")}
+    else if(cur==="kub"||cur==="ratblock"){const l=cur==="kub"?1:(v.l||5),b=cur==="kub"?1:(v.b||3),h=cur==="kub"?1:(v.h||2);const m=Math.max(l+b*.5,h+b*.5);const k=190/m,W=l*k,H=h*k,D=b*k*.5,x0=150-(W+D)/2,y0=110+(H+D)/2;
+      S("path",{d:`M${x0} ${y0} h${W} v${-H} h${-W} Z`,style:st3},svg);S("path",{d:`M${x0} ${y0-H} l${D} ${-D} h${W} l${-D} ${D} Z`,style:st3b},svg);S("path",{d:`M${x0+W} ${y0} l${D} ${-D} v${-H} l${-D} ${D} Z`,style:st3b},svg);
+      if(cur==="kub")T(x0+W/2,y0+20,"s = "+f(v.s));else{T(x0+W/2,y0+20,"l = "+f(v.l));T(x0+W+D/2+8,y0-D/2+4,"b = "+f(v.b),"ink","start");T(x0-6,y0-H/2,"h = "+f(v.h),"ink","end")}}
+    else if(cur==="cylinder"||cur==="kon"){const[w,h]=fit(2*(v.r||2),v.h||5,200,150),rx=w/2,ry=rx*.28,yb=190,yt=yb-h;
+      if(cur==="cylinder"){S("path",{d:`M${150-rx} ${yt} V${yb} A${rx} ${ry} 0 0 0 ${150+rx} ${yb} V${yt}`,style:st3},svg);S("ellipse",{cx:150,cy:yt,rx:rx,ry:ry,style:st3b},svg)}
+      else{S("path",{d:`M${150-rx} ${yb} L150 ${yt} L${150+rx} ${yb} A${rx} ${ry} 0 0 1 ${150-rx} ${yb}`,style:st3},svg)}
+      S("path",{d:`M${150-rx} ${yb} A${rx} ${ry} 0 0 1 ${150+rx} ${yb}`,style:dsh("ink")},svg);
+      S("line",{x1:150,y1:yb,x2:150+rx,y2:yb,style:`stroke:${C("red")};stroke-width:2.5`},svg);T(150+rx/2,yb+20,"r = "+f(v.r),"red");
+      S("line",{x1:150,y1:yb,x2:150,y2:yt,style:dsh("blue")},svg);T(156,(yb+yt)/2,"h = "+f(v.h),"blue","start")}
+    else if(cur==="pyramid"){S("path",{d:"M60 180 L190 180 L250 140 M60 180 L150 30 L190 180 M150 30 L250 140",style:`fill:none;stroke:${C("ink")};stroke-width:2`},svg);S("path",{d:"M60 180 L120 140 L250 140 M120 140 L150 30",style:dsh("ink")},svg);S("line",{x1:150,y1:30,x2:155,y2:160,style:dsh("blue")},svg);T(125,202,"s = "+f(v.s));T(160,110,"h = "+f(v.h),"blue","start")}
+    else if(cur==="klot"){S("circle",{cx:150,cy:110,r:85,style:st3},svg);S("ellipse",{cx:150,cy:110,rx:85,ry:22,style:dsh("ink")},svg);S("line",{x1:150,y1:110,x2:235,y2:110,style:`stroke:${C("red")};stroke-width:2.5`},svg);T(192,102,"r = "+f(v.r),"red")}
+  }
+  build();
+});
+
+/* ---------- enhetsomvandlare ---------- */
+safe("uc",()=>{
+  const cats={
+    "Längd":{base:"m",step:10,stair:[["mil",1e4],["km",1e3],["hm",100,1],["dam",10,1],["m",1],["dm",.1],["cm",.01],["mm",.001]],extra:[["tum (inch)",.0254],["fot (foot)",.3048],["yard",.9144],["engelsk mil (mile)",1609.344]]},
+    "Area":{base:"m²",step:100,stair:[["kvadratmil",1e8],["km²",1e6],["ha",1e4],["ar",100],["m²",1],["dm²",.01],["cm²",1e-4],["mm²",1e-6]],extra:[["tunnland",4936.4],["kvadratfot",.09290304]]},
+    "Volym":{base:"liter",step:10,stair:[["m³",1000],["hl",100],["dal",10,1],["l",1],["dl",.1],["cl",.01],["ml",.001]],alias:{"l":"liter = dm³","ml":"ml = cm³"},extra:[["dm³",1],["cm³",.001],["mm³",1e-6],["pint (UK)",.56826],["pint (USA)",.473176],["gallon (UK)",4.54609],["gallon (USA)",3.785412]]},
+    "Vikt":{base:"g",step:10,stair:[["ton",1e6],["100 kg",1e5,1],["10 kg",1e4,1],["kg",1e3],["hg",100],["dag",10,1],["g",1],["dg",.1],["cg",.01],["mg",.001]],extra:[["pound (lb)",453.59237],["ounce (oz)",28.349523]]}
+  };
+  const cseg=$("#uc-cat");let cat="Längd";
+  Object.keys(cats).forEach(k=>{const l=document.createElement("label");l.innerHTML=`<input type="radio" name="uc-c" value="${k}"${k===cat?" checked":""}><span>${k}</span>`;cseg.appendChild(l)});
+  cseg.addEventListener("change",e=>{cat=e.target.value;fill()});
+  const F=$("#uc-from"),T=$("#uc-to");
+  function opts(sel){sel.innerHTML="";const c=cats[cat];const g1=document.createElement("optgroup");g1.label="Metriska";c.stair.filter(s=>!s[2]).forEach(([n,f])=>g1.appendChild(new Option(n,n)));sel.appendChild(g1);
+    const g2=document.createElement("optgroup");g2.label="Andra mått";c.extra.forEach(([n])=>g2.appendChild(new Option(n,n)));sel.appendChild(g2)}
+  function fill(){opts(F);opts(T);const d={"Längd":["m","cm"],"Area":["m²","dm²"],"Volym":["l","dl"],"Vikt":["kg","g"]}[cat];F.value=d[0];T.value=d[1];upd()}
+  const fac=n=>{const c=cats[cat];const a=c.stair.find(s=>s[0]===n)||c.extra.find(s=>s[0]===n);return a?a[1]:NaN};
+  function upd(){const v=num($("#uc-v").value),c=cats[cat],f=F.value,t=T.value,svg=$("#uc-svg");clear(svg);
+    if(!isFinite(v)){$("#uc-big").innerHTML='<span class="err">Skriv ett värde.</span>';$("#uc-why").textContent="";return}
+    const r=v*fac(f)/fac(t);$("#uc-big").innerHTML=`${nf(v,6)} ${f} = <span class="r">${nf(r,6)} ${t}</span>`;
+    const iF=c.stair.findIndex(s=>s[0]===f),iT=c.stair.findIndex(s=>s[0]===t);
+    // trappa
+    const n=c.stair.length,w=640/n;
+    c.stair.forEach(([nm,fx,gh],i)=>{const x=20+i*w,y=10+i*(100/(n-1));const hl=i===iF?"red":i===iT?"blue":null;
+      S("rect",{x:x,y:y,width:w-4,height:30,rx:5,style:`fill:${C(hl?hl:gh?"grid":"paper")};stroke:${C(hl||(gh?"line":"ink"))};stroke-width:${hl?2:1}`},svg);
+      S("text",{x:x+(w-4)/2,y:y+20,"text-anchor":"middle","font-size":14,"font-weight":gh?400:700,style:`fill:${hl?C("on-accent"):C(gh?"muted":"ink")}`},svg,nm);
+      if(i<n-1){const ratio=Math.round(fx/c.stair[i+1][1]);S("text",{x:x+w-2,y:y+52,"text-anchor":"middle","font-size":11,style:`fill:${C("muted")}`},svg,"·"+nf(ratio,0))}});
+    S("text",{x:20,y:165,"font-size":12,style:`fill:${C("muted")}`},svg,"Nedför trappan (mindre enhet): multiplicera.  Uppför: dividera.");
+    if(iF>=0&&iT>=0){if(iF===iT){$("#uc-why").textContent="Samma enhet, värdet ändras inte.";return}
+      const steps=Math.abs(iT-iF),fct=Math.round(Math.max(fac(f),fac(t))/Math.min(fac(f),fac(t)));const down=iT>iF;
+      $("#uc-why").innerHTML=`Från <b class="r">${f}</b> till <b class="b">${t}</b> är <b>${steps} ${steps===1?"steg":"steg"} ${down?"nedåt":"uppåt"}</b> i trappan. ${down?"Multiplicera":"Dividera"} med <b>${nf(fct,0)}</b>.`+(cat==="Volym"?'<div class="small">1 liter = 1 dm³ och 1 ml = 1 cm³.</div>':"")}
+    else $("#uc-why").innerHTML=`1 ${f} = ${nf(fac(f)/fac(t),6)} ${t}. Multiplicera med det talet.`;
+  }
+  on([$("#uc-v")],"input",upd);on([F,T],"change",upd);$("#uc-swap").addEventListener("click",()=>{const a=F.value;F.value=T.value;T.value=a;upd()});fill();
+  const eg=$("#eggs");for(let r=0;r<2;r++)for(let c=0;c<6;c++)S("ellipse",{cx:28+c*33,cy:21+r*22,rx:12,ry:9,style:`fill:${C("paper")};stroke:${C("ink")}`},eg);
+});
+
+/* ---------- tid ---------- */
+safe("tid",()=>{
+  const M=[["januari",31],["februari",28],["mars",31],["april",30],["maj",31],["juni",30],["juli",31],["augusti",31],["september",30],["oktober",31],["november",30],["december",31]];
+  const svg=$("#kn-svg"),x0=30,x1=410;
+  const hand=(x,k)=>{let d=`M${x-24} 120 `;for(let i=0;i<k;i++){const px=x+i*96;d+=`Q${px} 36 ${px+24} 80 Q${px+48} 112 ${px+72} 80 `}return d};
+  S("path",{d:"M"+(x0-24)+" 120 Q"+x0+" 36 "+(x0+24)+" 80 Q"+(x0+48)+" 112 "+(x0+72)+" 80 Q"+(x0+96)+" 36 "+(x0+120)+" 80 Q"+(x0+144)+" 112 "+(x0+168)+" 80 Q"+(x0+192)+" 36 "+(x0+216)+" 80 Q"+(x0+240)+" 112 "+(x0+264)+" 80 Q"+(x0+288)+" 36 "+(x0+312)+" 120",style:`fill:${C("grid")};stroke:${C("ink")};stroke-width:2`},svg);
+  S("path",{d:"M"+(x1-24)+" 120 Q"+x1+" 36 "+(x1+24)+" 80 Q"+(x1+48)+" 112 "+(x1+72)+" 80 Q"+(x1+96)+" 36 "+(x1+120)+" 80 Q"+(x1+144)+" 112 "+(x1+168)+" 80 Q"+(x1+192)+" 36 "+(x1+216)+" 120",style:`fill:${C("grid")};stroke:${C("ink")};stroke-width:2`},svg);
+  const tx=[];M.forEach(([n,d],i)=>{const h2=i>=7,j=h2?i-7:i,x=(h2?x1:x0)+j*48+(j%2?0:2),kn=j%2===0;
+    tx.push(S("text",{x:x,y:kn?28:140,"text-anchor":"middle","font-size":13,"font-weight":700,style:`fill:${C(kn?"red":"blue")}`},svg,n.slice(0,3)))});
+  
+  const box=$("#kn-btns");
+  function pick(i){const [n,d]=M[i];tx.forEach((t,k)=>{t.setAttribute("font-size",k===i?17:13);t.style.textDecoration=k===i?"underline":"none"});
+    $$("button",box).forEach((b,k)=>b.setAttribute("aria-pressed",k===i));
+    $("#kn-out").innerHTML=i===1?`<span class="big">Februari har <span class="r">28</span> dagar</span><div>29 dagar under skottår. Februari ligger i en grop men är undantaget.</div>`:`<span class="big">${n[0].toUpperCase()+n.slice(1)} har <span class="r">${d}</span> dagar</span><div>${d===31?"Månaden ligger på en knoge.":"Månaden ligger i en grop."}${i===6||i===7?" Juli och augusti har båda 31 dagar: juli på sista knogen på vänster hand, augusti på första knogen på höger.":""}</div>`}
+  M.forEach(([n],i)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=n;b.addEventListener("click",()=>pick(i));box.appendChild(b)});
+  pick(new Date().getMonth());
+  // decimaltimmar
+  function fromDec(){const d=num($("#ti-dec").value);if(!isFinite(d)||d<0){$("#ti-out").innerHTML='<span class="err">Skriv ett positivt tal.</span>';return}
+    let h=Math.floor(d),m=Math.round((d-h)*60*100)/100;if(m>=60){h++;m-=60}$("#ti-h").value=h;$("#ti-m").value=nf(m,2);
+    $("#ti-out").innerHTML=`<span class="big">${nf(d,4)} h = ${h} h ${nf(m,2)} min</span><div class="small">${nf(d-h,4)} h · 60 = ${nf(m,2)} min</div>`}
+  function fromHM(){const h=num($("#ti-h").value)||0,m=num($("#ti-m").value)||0;if(h<0||m<0){return}const d=h+m/60;$("#ti-dec").value=nf(d,4);
+    $("#ti-out").innerHTML=`<span class="big">${nf(h,0)} h ${nf(m,2)} min = ${nf(d,4)} h</span><div class="small">${nf(m,2)} min / 60 = ${nf(m/60,4)} h</div>`}
+  $("#ti-dec").addEventListener("input",fromDec);on([$("#ti-h"),$("#ti-m")],"input",fromHM);fromDec();
+  function leap(){const y=Math.round(num($("#sk-y").value));if(!isFinite(y)||y<1){$("#sk-out").innerHTML='<span class="err">Skriv ett årtal.</span>';return}
+    const l=(y%4===0&&y%100!==0)||y%400===0;let why=y%4!==0?`${y} går inte att dela med 4.`:y%100!==0?`${y} går att dela med 4 och är inget sekelår.`:y%400===0?`${y} är ett sekelår som går att dela med 400.`:`${y} är ett sekelår som inte går att dela med 400.`;
+    $("#sk-out").innerHTML=`<span class="big">${y} ${l?'<span class="g">är skottår</span>':'<span class="r">är inte skottår</span>'}</span><div>${why} ${l?"Året har 366 dagar.":"Året har 365 dagar."}</div>`}
+  $("#sk-y").addEventListener("input",leap);leap();
+});
+
+/* ---------- hastighet ---------- */
+safe("st",()=>{
+  const svg=$("#st-svg");
+  function tri(u){clear(svg);S("path",{d:"M150 10 L285 140 L15 140 Z",style:`fill:${C("blue-tint")};stroke:${C("ink")};stroke-width:2`},svg);S("line",{x1:63,y1:86,x2:237,y2:86,style:`stroke:${C("ink")};stroke-width:2`},svg);S("line",{x1:150,y1:86,x2:150,y2:140,style:`stroke:${C("ink")};stroke-width:2`},svg);
+    [["s",150,70],["v",105,124],["t",195,124]].forEach(([k,x,y])=>{S("text",{x:x,y:y,"text-anchor":"middle","font-size":26,"font-weight":700,style:`fill:${C(k===u?"red":"ink")};${k===u?"text-decoration:underline":""}`},svg,k)})}
+  function upd(){const u=seg("st-u");["s","v","t"].forEach(k=>{$(`#st-${k}f`).hidden=k===u});tri(u);
+    const s=num($("#st-s").value),v=num($("#st-v").value),t=num($("#st-t").value);let h="";
+    const hm=x=>{const H=Math.floor(x),m=Math.round((x-H)*60);return m===60?`${H+1} h 0 min`:`${H} h ${m} min`};
+    if(u==="s"){if(!(v>0&&t>0))h='<span class="err">Skriv hastighet och tid.</span>';else h=`<div class="eq">s = v · t</div><div class="eq">s = ${nf(v)} · ${nf(t)}</div><div class="big">s = <span class="r">${nf(v*t,2)} km</span></div>`}
+    if(u==="v"){if(!(s>0&&t>0))h='<span class="err">Skriv sträcka och tid.</span>';else h=`<div class="eq">v = s / t</div><div class="eq">v = ${nf(s)} / ${nf(t)}</div><div class="big">v = <span class="r">${nf(s/t,2)} km/h</span></div><div class="small">= ${nf(s/t/3.6,2)} m/s</div>`}
+    if(u==="t"){if(!(s>0&&v>0))h='<span class="err">Skriv sträcka och hastighet.</span>';else h=`<div class="eq">t = s / v</div><div class="eq">t = ${nf(s)} / ${nf(v)}</div><div class="big">t = <span class="r">${nf(s/v,3)} h</span></div><div class="small">= ${hm(s/v)}</div>`}
+    $("#st-res").innerHTML=h}
+  $$('input[name="st-u"]').forEach(r=>r.addEventListener("change",upd));on([$("#st-s"),$("#st-v"),$("#st-t")],"input",upd);upd();
+  const sp=$$(".sp");function conv(src){const kmh=num(src.value)*(+src.dataset.f);sp.forEach(i=>{if(i!==src)i.value=isFinite(kmh)?nf(kmh/(+i.dataset.f),2):""})}
+  sp.forEach(i=>i.addEventListener("input",()=>conv(i)));conv($("#sp-kmh"));
+});
+
+/* ---------- temperatur ---------- */
+safe("te",()=>{
+  const svg=$("#te-svg"),top=24,bot=320,cmin=-40,cmax=110,yC=c=>bot-(c-cmin)/(cmax-cmin)*(bot-top),yF=f=>yC((f-32)*5/9);
+  S("rect",{x:135,y:top-10,width:30,height:bot-top+20,rx:15,style:`fill:${C("paper")};stroke:${C("ink")};stroke-width:2`},svg);
+  const merc=S("rect",{x:143,y:0,width:14,height:0,style:`fill:${C("red")}`},svg);
+  S("circle",{cx:150,cy:bot+30,r:24,style:`fill:${C("red")};stroke:${C("ink")};stroke-width:2`},svg);
+  S("text",{x:112,y:14,"text-anchor":"end","font-size":14,"font-weight":700},svg,"°C");S("text",{x:188,y:14,"font-size":14,"font-weight":700,style:`fill:${C("blue")}`},svg,"°F");
+  for(let c=-40;c<=110;c+=10){const y=yC(c);S("line",{x1:c%50?124:116,y1:y,x2:135,y2:y,style:`stroke:${C("ink")}`},svg);if(c%20===0)S("text",{x:112,y:y+4,"text-anchor":"end","font-size":12},svg,String(c).replace("-","−"))}
+  for(let f=-40;f<=230;f+=20){const y=yF(f);if(y<top-2||y>bot+2)continue;S("line",{x1:165,y1:y,x2:176,y2:y,style:`stroke:${C("blue")}`},svg);S("text",{x:182,y:y+4,"font-size":12,style:`fill:${C("blue")}`},svg,String(f).replace("-","−"))}
+  [[0,"fryser"],[100,"kokar"],[37,"kroppen"]].forEach(([c,l])=>{S("text",{x:4,y:yC(c)+4,"font-size":11,style:`fill:${C("muted")}`},svg,l);S("line",{x1:44,y1:yC(c),x2:100,y2:yC(c),style:`stroke:${C("muted")};stroke-dasharray:2 3`},svg)});
+  const mark=S("line",{x1:110,y1:0,x2:200,y2:0,style:`stroke:${C("red")};stroke-width:2`},svg);
+  function show(c,src){const f=c*9/5+32;if(src!=="c")$("#te-c").value=nf(c,1);if(src!=="f")$("#te-f").value=nf(f,1);
+    const cl=Math.max(cmin,Math.min(cmax,c));if(src!=="r")$("#te-r").value=Math.round(cl);$("#te-cv").textContent=nf(c,1);
+    const y=yC(cl);merc.setAttribute("y",y);merc.setAttribute("height",bot+12-y);mark.setAttribute("y1",y);mark.setAttribute("y2",y);
+    const desc=c<=-30?"bitande kallt":c<0?"minusgrader, vatten fryser":c<15?"svalt":c<25?"rumstemperatur":c<38?"varmt":c<100?"hett":"vatten kokar";
+    $("#te-txt").innerHTML=`<div class="big">${nf(c,1)} °C = <span class="b">${nf(f,1)} °F</span></div><div class="small">${desc}</div>
+      <div class="row" style="display:grid"><span class="small">°C → °F</span><span class="eq">${nf(c,1)} · 9 / 5 + 32 = ${nf(c*9/5,2)} + 32 = ${nf(f,1)}</span></div>
+      <div class="row" style="display:grid"><span class="small">°F → °C</span><span class="eq">(${nf(f,1)} − 32) · 5 / 9 = ${nf(f-32,2)} · 5 / 9 = ${nf(c,1)}</span></div>
+      <div class="small">Huvudräkning: ${nf(c,1)} · 2 + 30 ≈ ${nf(c*2+30,0)} °F</div>`}
+  $("#te-r").addEventListener("input",e=>show(+e.target.value,"r"));
+  $("#te-c").addEventListener("input",e=>{const c=num(e.target.value);if(isFinite(c))show(c,"c")});
+  $("#te-f").addEventListener("input",e=>{const f=num(e.target.value);if(isFinite(f))show((f-32)*5/9,"f")});
+  show(20);
+});
+
+/* ---------- romerska ---------- */
+safe("ro",()=>{
+  const map=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];
+  const toR=n=>{const parts=[];for(const[v,r]of map)while(n>=v){parts.push([v,r]);n-=v}return parts};
+  const val={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+  function fromR(s){if(!/^[IVXLCDM]+$/.test(s))return null;let t=0;for(let i=0;i<s.length;i++){const a=val[s[i]],b=val[s[i+1]]||0;t+=a<b?-a:a}const back=toR(t).map(p=>p[1]).join("");return back===s?t:{bad:t,back}}
+  function render(parts,n){$("#ro-chips").innerHTML=parts.map(([v,r])=>`<span class="rchip"><b>${r}</b><small>${nf(v,0)}</small></span>`).join('<span class="eq" style="align-self:center">+</span>');
+    $("#ro-txt").innerHTML=`<span class="big">${nf(n,0)} = <span class="r">${parts.map(p=>p[1]).join("")}</span></span>`}
+  $("#ro-n").addEventListener("input",()=>{const n=Math.round(num($("#ro-n").value));if(!(n>=1&&n<=3999)){$("#ro-chips").innerHTML="";$("#ro-txt").innerHTML='<span class="err">Välj ett tal från 1 till 3999.</span>';return}const p=toR(n);$("#ro-r").value=p.map(x=>x[1]).join("");render(p,n)});
+  $("#ro-r").addEventListener("input",()=>{const s=$("#ro-r").value.toUpperCase().replace(/\s/g,"");if(!s){return}const r=fromR(s);
+    if(r===null){$("#ro-chips").innerHTML="";$("#ro-txt").innerHTML='<span class="err">Använd bara I, V, X, L, C, D och M.</span>';return}
+    if(typeof r==="object"){$("#ro-chips").innerHTML="";$("#ro-txt").innerHTML=`<span class="err">${s} är inte korrekt skrivet.</span> Menar du <b>${r.back}</b> = ${nf(r.bad,0)}?`;return}
+    $("#ro-n").value=r;render(toR(r),r)});
+  $("#ro-n").dispatchEvent(new Event("input"));
+});
+
+})();
+</script>
+</body>
+</html>
