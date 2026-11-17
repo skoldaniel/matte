@@ -1,0 +1,1291 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<title>Lathunden kapitel 3 – Bråk och procent</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interaktiv genomgång av kapitel 3 Bråk och procent i Bryggan: teori, verktyg och stöd till varje uppgift.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Samma formspråk som Lathunden: rött = kapitlet, blått = så tänker du, grönt = knep. Uppgiftsstödet visas i ett gult kort överst i avsnittet. */
+:root{
+  --bg:#f3f4f8; --paper:#ffffff; --ink:#181a20; --muted:#5a6172; --line:#d3d7e0; --grid:#eceef4;
+  --red:#cf2a20; --red-tint:#fdeae8; --blue:#1d5bbd; --blue-tint:#e6eefc; --green:#1d7647; --green-tint:#e2f3e8;
+  --gold:#8a5a00; --gold-tint:#fff4d6; --on-accent:#ffffff;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Verdana","Segoe UI",system-ui,sans-serif;
+  --top-h:60px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --gold:#f2c35b; --gold-tint:#33290f; --on-accent:#14161b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --gold:#f2c35b; --gold-tint:#33290f; --on-accent:#14161b; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.12;text-wrap:balance}
+p{margin:0;max-width:68ch}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num,table{font-variant-numeric:tabular-nums}
+
+/* toppfält */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:25;background:var(--paper);border-bottom:1px solid var(--line)}
+.top-in{max-width:1260px;margin:0 auto;height:var(--top-h);display:flex;align-items:center;gap:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);flex:none}
+.brand b{background:#c4271d;color:#fff;font-family:var(--f-display);font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:4px;font-size:18px}
+.brand span{color:var(--muted);font-size:14px;white-space:nowrap}
+.search{position:relative;flex:1 1 auto;max-width:440px;margin-left:auto}
+.search input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px 8px 38px}
+.search input:focus{border-color:var(--red);outline:none;background:var(--paper)}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:12px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--paper);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgb(0 0 0/.18);max-height:min(60vh,420px);overflow:auto;padding:6px;z-index:40}
+.sugg button{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;width:100%;text-align:left;font:inherit;background:none;border:0;border-radius:8px;padding:8px 10px;color:var(--ink);cursor:pointer}
+.sugg button:hover,.sugg button.act{background:var(--grid)}
+.sugg b{font-family:var(--f-display);color:var(--red);white-space:nowrap}
+.sugg small{grid-column:2;color:var(--muted);font-size:13px}
+.sugg .none{padding:10px;color:var(--muted);font-size:14px}
+.menu-btn,.theme-btn{flex:none;font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
+.menu-btn{display:none;font-weight:700}
+
+/* skal */
+.shell{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 80px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--top-h) + 20px);align-self:start;max-height:calc(100vh - var(--top-h) - 40px);overflow:auto;padding-right:6px}
+.side h4{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 4px}
+.side h4:first-child{margin-top:0}
+.side a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--ink);padding:5px 10px;border-radius:6px;font-size:15px;border-left:3px solid transparent}
+.side a:hover{background:var(--grid)}
+.side a[aria-current="true"]{background:var(--red-tint);border-left-color:var(--red);font-weight:700}
+.side a small{color:var(--muted);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:400}
+main{min-width:0;display:grid;gap:64px}
+@media (max-width:920px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .menu-btn{display:inline-block}
+  .brand span,.search kbd{display:none}
+  .side{position:fixed;z-index:24;top:calc(env(safe-area-inset-top,0px) + var(--top-h));left:0;right:0;max-height:calc(100vh - var(--top-h) - env(safe-area-inset-top,0px));
+    background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 12px 30px rgb(0 0 0/.18);
+    padding:12px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:none;columns:2 220px}
+  .side.open{display:block}
+  .side h4{break-after:avoid}
+}
+@media (max-width:520px){.brand b{font-size:15px;padding:3px 7px}.theme-btn .tt{display:none}.top-in{gap:8px}}
+
+/* avsnitt */
+.sec{scroll-margin-top:calc(var(--top-h) + 20px);display:grid;gap:18px;min-width:0}
+.sec>*{min-width:0}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--red);font-weight:700}
+.kicker i{font-style:normal;color:var(--muted);font-weight:400;letter-spacing:.04em;text-transform:none}
+.sec h2{font-size:clamp(26px,3.4vw,34px);font-weight:800}
+.lead{color:var(--muted);font-size:17px}
+h3{font-size:19px;font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px 28px;align-items:start}
+.cols>*{min-width:0}
+.box{display:grid;gap:10px;align-content:start}
+.tip,.ok,.warn{padding:10px 14px;border-radius:0 8px 8px 0;font-size:15px;max-width:68ch}
+.tip{background:var(--blue-tint);border-left:4px solid var(--blue)}.tip b{color:var(--blue)}
+.ok{background:var(--green-tint);border-left:4px solid var(--green)}.ok b{color:var(--green)}
+.warn{background:var(--red-tint);border-left:4px solid var(--red)}.warn b{color:var(--red)}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:right;vertical-align:middle}
+th{background:var(--grid);font-weight:700;text-align:center}
+.l{text-align:left}
+.eq{font-size:18px;font-variant-numeric:tabular-nums;line-height:2}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 2px;font-variant-numeric:tabular-nums}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.r{color:var(--red)}.b{color:var(--blue)}.g{color:var(--green)}
+svg{max-width:100%;height:auto;display:block}
+svg text{font-family:var(--f-body);fill:var(--ink)}
+.rows{display:grid;gap:6px}
+.row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.row .why{font-size:14px;color:var(--muted);font-style:italic}
+.ex{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px}
+.ex>b:first-child{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+ol.steps{margin:0;padding-left:22px;display:grid;gap:4px}
+
+/* verktyg */
+.tool{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0;scroll-margin-top:calc(var(--top-h) + 20px)}
+.tool.flash{animation:tf 1.2s}
+@keyframes tf{0%{box-shadow:0 0 0 0 var(--red)}30%{box-shadow:0 0 0 5px var(--red)}100%{box-shadow:0 0 0 0 transparent}}
+.tool-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--on-accent);background:var(--blue);padding:3px 8px;border-radius:4px}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.fld{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.in,select.in{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;width:8em;max-width:100%}
+.in.s{width:5.5em}.in.wide{width:14em}
+select.in{width:auto}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:inline-block;padding:6px 13px;border:1.5px solid var(--line);border-radius:999px;font-size:15px;cursor:pointer;background:var(--paper);user-select:none}
+.seg input:checked+span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.btn{font:inherit;font-size:15px;font-weight:700;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1.5px dashed var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.chip:hover{border-color:var(--red)}
+.out{background:var(--grid);border-radius:10px;padding:14px;display:grid;gap:10px;min-width:0}
+.big{font-size:clamp(22px,3vw,30px);font-family:var(--f-display);font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.big .frac{font-family:var(--f-body);font-size:.8em}
+.small{font-size:14px;color:var(--muted)}
+.err{color:var(--red);font-weight:700}
+
+/* uppgiftskort */
+.card{background:var(--gold-tint);border:2px solid var(--gold);border-radius:14px;padding:18px 20px;display:grid;gap:12px;scroll-margin-top:calc(var(--top-h) + 16px);animation:pop .35s}
+@keyframes pop{from{transform:translateY(-6px);opacity:.3}to{transform:none;opacity:1}}
+.card-h{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap}
+.card-h .num{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--gold);line-height:1}
+.card-h .meta{display:grid;font-size:13px;color:var(--muted);line-height:1.35}
+.card-h .meta b{color:var(--ink);font-size:15px}
+.card-h .x{margin-left:auto;font:inherit;font-size:22px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px}
+.card-h .x:hover{background:var(--paper)}
+.card .q{font-size:17px;line-height:1.9}
+.card .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--gold)}
+.card .hint{background:var(--paper);border-radius:8px;padding:10px 14px;line-height:1.9}
+.card .ans{background:var(--paper);border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;line-height:1.9}
+.card-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.card-f .sp{flex:1}
+
+/* start */
+.hero{background:#c4271d;color:#fff;border-radius:14px;padding:clamp(22px,4vw,36px);display:grid;gap:10px}
+.hero h1{font-size:clamp(34px,6vw,62px);font-weight:800;color:#fff}
+.hero p{color:#fff;font-size:18px;opacity:.95}
+.hero .kick{font-size:13px;text-transform:uppercase;letter-spacing:.14em;font-weight:700;opacity:.9}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+.tgrid button{font:inherit;font-size:14px;font-variant-numeric:tabular-nums;font-weight:700;padding:7px 0;border-radius:6px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.tgrid button.f{background:var(--blue-tint);border-color:transparent}
+.tgrid button.p{background:var(--red-tint);border-color:transparent}
+.tgrid button:hover{border-color:var(--ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.extra{display:grid;gap:12px}
+.extra .grp{display:grid;gap:6px}
+.extra .grp>b{font-size:14px}
+.foot{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+.formula{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.formula>div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.formula>div b{font-family:var(--f-display);font-size:16px}
+.pgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:min(100%,260px);aspect-ratio:1}
+.pgrid button{border:0;padding:0;border-radius:2px;background:var(--paper);outline:1px solid var(--line);cursor:pointer}
+.pgrid button.on{background:var(--red)}
+@media print{.top,.side,.tool,.menu-btn,.card-f{display:none!important}.shell{display:block}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#start"><b>KAP 3</b><span>Bråk och procent</span></a>
+    <div class="search" role="search">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="7" cy="7" r="5" style="fill:none;stroke:var(--muted);stroke-width:1.8"/><path d="M11 11l3.5 3.5" style="stroke:var(--muted);stroke-width:1.8;stroke-linecap:round"/></svg>
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Sök uppgift, t.ex. 47" aria-label="Sök uppgift eller ord" aria-controls="sugg" aria-expanded="false">
+      <kbd>/</kbd>
+      <div class="sugg" id="sugg" role="listbox" hidden></div>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Byt mellan ljust och mörkt läge"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" style="display:inline-block;vertical-align:-3px"><circle cx="8" cy="8" r="6.5" style="fill:none;stroke:currentColor;stroke-width:1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" style="fill:currentColor"/></svg><span class="tt"> Tema</span></button>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="side">Innehåll</button>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="side" id="side" aria-label="Innehåll">
+  <h4>Start</h4>
+  <a href="#start">Översikt och uppgifter</a>
+  <a href="#begrepp">Begrepp</a>
+  <h4>Bråk</h4>
+  <a href="#andel">Andel i bråkform <small>1–5</small></a>
+  <a href="#jamfor">Jämföra bråk <small>6–10</small></a>
+  <a href="#samma">Samma värde <small>11–16</small></a>
+  <a href="#forkorta">Förkorta och förlänga <small>17–22</small></a>
+  <a href="#addera">Addera och subtrahera <small>23–27</small></a>
+  <a href="#multi">Bråk gånger heltal <small>28–33</small></a>
+  <a href="#delbrak">Delen med bråk <small>34–39</small></a>
+  <a href="#tid">Bråkdelar av tid <small>40–46</small></a>
+  <a href="#decimal">Andel i decimalform <small>47–57</small></a>
+  <h4>Procent</h4>
+  <a href="#procent">Procent <small>58–64</small></a>
+  <a href="#former">Bråk, decimal, procent <small>65–69</small></a>
+  <a href="#andelp">Andelen i procent <small>70–74</small></a>
+  <a href="#forandring">Procentuell förändring <small>75–80</small></a>
+  <a href="#jamforp">Jämför med procent <small>81–84</small></a>
+  <a href="#hela">Det hela, 100 % <small>85–90</small></a>
+  <a href="#delenp">Delen med procent <small>91–105</small></a>
+  <a href="#faktor">Förändringsfaktor <small>106–115</small></a>
+  <a href="#ranta">Ränta <small>116–122</small></a>
+  <h4>Repetera</h4>
+  <a href="#blandat">Tester och blandat</a>
+  <a href="#sammanfattning">Sammanfattning</a>
+</nav>
+
+<main id="main">
+
+<!-- START -->
+<section class="sec" id="start" data-title="Start">
+  <div class="slot"></div>
+  <div class="hero">
+    <span class="kick">Bryggan · kapitel 3</span>
+    <h1>Bråk och procent</h1>
+    <p>Slå upp metoden, pröva med egna tal och få stöd till varje uppgift i kapitlet.</p>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h3>Så använder du sidan</h3>
+      <p>Skriv ett <b>uppgiftsnummer</b> i sökrutan högst upp (tryck <b>/</b> för att hoppa dit). Då öppnas ett stödkort i rätt avsnitt med en ledtråd, en knapp som fyller i verktyget med uppgiftens tal och facit som du väljer att visa.</p>
+      <div class="tip"><b>Sökexempel:</b> <code>47</code>, <code>88</code>, <code>minitest 3B 2</code>, <code>kt 9</code>, <code>sf 12</code>, <code>uppslaget F</code> eller ett ord som <code>rabatt</code>.</div>
+      <div class="ok"><b>Knep:</b> försök själv med ledtråden innan du öppnar facit.</div>
+    </div>
+    <div class="box">
+      <h3>Hoppa direkt till</h3>
+      <div class="chips" id="quick"></div>
+    </div>
+  </div>
+  <div class="box">
+    <h3>Alla uppgifter</h3>
+    <div class="legend"><span style="--c:var(--blue-tint)">Bråk och decimalform, 1–57</span><span style="--c:var(--red-tint)">Procent, 58–122</span></div>
+    <div class="tgrid" id="tgrid" aria-label="Välj en uppgift"></div>
+  </div>
+</section>
+
+<!-- BEGREPP -->
+<section class="sec" id="begrepp" data-title="Begrepp">
+  <div><span class="kicker">Start</span><h2>Begrepp i kapitlet</h2></div>
+  <div class="tw"><table>
+    <tr><th class="l">Ord</th><th class="l">Betyder</th><th class="l">Exempel</th></tr>
+    <tr><td class="l"><b>bråk</b></td><td class="l">tal som beskriver delar av en hel eller av ett antal</td><td class="l"><span class="frac"><span>3</span><span>4</span></span> eller 3/4</td></tr>
+    <tr><td class="l"><b>täljare</b></td><td class="l">talet ovanför bråkstrecket – hur många delar</td><td class="l"><span class="frac"><span class="r">3</span><span>4</span></span></td></tr>
+    <tr><td class="l"><b>nämnare</b></td><td class="l">talet under bråkstrecket – vilken sorts delar</td><td class="l"><span class="frac"><span>3</span><span class="r">4</span></span> = fjärdedelar</td></tr>
+    <tr><td class="l"><b>andel</b></td><td class="l">hur stor del något är av det hela</td><td class="l">delen / det hela</td></tr>
+    <tr><td class="l"><b>förkorta</b></td><td class="l">dela täljare och nämnare med samma tal</td><td class="l"><span class="frac"><span>8</span><span>12</span></span> = <span class="frac"><span>2</span><span>3</span></span></td></tr>
+    <tr><td class="l"><b>förlänga</b></td><td class="l">multiplicera täljare och nämnare med samma tal</td><td class="l"><span class="frac"><span>3</span><span>4</span></span> = <span class="frac"><span>6</span><span>8</span></span></td></tr>
+    <tr><td class="l"><b>bråkform · decimalform · procentform</b></td><td class="l">tre sätt att skriva samma andel</td><td class="l"><span class="frac"><span>1</span><span>4</span></span> = 0,25 = 25 %</td></tr>
+    <tr><td class="l"><b>förändringsfaktor</b></td><td class="l">talet du multiplicerar med för att få det nya värdet direkt</td><td class="l">+14 % → 1,14 &nbsp; −14 % → 0,86</td></tr>
+    <tr><td class="l"><b>ränta · räntesats</b></td><td class="l">det du betalar för ett lån · räntan i procent</td><td class="l">8 % av 12 000 kr = 960 kr</td></tr>
+    <tr><td class="l"><b>effektiv ränta</b></td><td class="l">avgifter omräknade till ränta, så att lån kan jämföras</td><td class="l">”räntefritt” lån med 15 % avgifter</td></tr>
+  </table></div>
+</section>
+
+<!-- ANDEL I BRÅKFORM -->
+<section class="sec" id="andel" data-title="Andel i bråkform">
+  <div><span class="kicker">Bråk <i>· uppgift 1–5 · s. 82</i></span><h2>Andel i bråkform</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Ett bråk beskriver en andel: delar av en hel eller delar av ett antal. Delarna måste vara <b>lika stora</b>.</p>
+  <div class="cols">
+    <div class="ex"><b>Så läses bråket</b>
+      <div class="eq"><span class="frac" style="font-size:24px"><span class="r">2</span><span class="b">3</span></span> = två tredjedelar</div>
+      <div><b class="r">Täljaren 2</b> talar om hur många delar det är.<br><b class="b">Nämnaren 3</b> talar om vad det är för slags delar.</div></div>
+    <div class="box">
+      <div class="tip"><b>Ordet ger bråket:</b> ”fem åttondelar” → täljare 5, nämnare 8 → <span class="frac"><span>5</span><span>8</span></span>.</div>
+      <div class="warn"><b>Vanligt fel:</b> en figur i tre <i>olika stora</i> bitar visar inte tredjedelar. Dela först in figuren i lika stora delar.</div>
+      <div class="ok"><b>Inte röd:</b> det som är kvar. Är <span class="frac"><span>1</span><span>3</span></span> röd är <span class="frac"><span>2</span><span>3</span></span> inte röd.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-andel">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Bygg ett bråk</h3></div>
+    <div class="ctrl">
+      <label class="fld">Täljare<input class="in s" id="an-n" inputmode="numeric" value="2"></label>
+      <label class="fld">Nämnare<input class="in s" id="an-d" inputmode="numeric" value="3"></label>
+      <div class="seg" role="radiogroup" aria-label="Form"><label><input type="radio" name="an-s" value="bar" checked><span>Rektangel</span></label><label><input type="radio" name="an-s" value="pie"><span>Cirkel</span></label></div>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="an-big"></div><div id="an-say"></div><svg id="an-svg" viewBox="0 0 560 120" role="img" aria-label="Bråket som bild"></svg></div>
+  </div>
+</section>
+
+<!-- JÄMFÖRA -->
+<section class="sec" id="jamfor" data-title="Jämföra bråk">
+  <div><span class="kicker">Bråk <i>· uppgift 6–10 · s. 83</i></span><h2>Jämföra bråk</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Lika nämnare</b><div class="eq"><span class="frac"><span>4</span><span>5</span></span> &gt; <span class="frac"><span>3</span><span>5</span></span></div><div>Samma sorts delar. Flest delar är störst.</div></div>
+    <div class="ex"><b>Lika täljare</b><div class="eq"><span class="frac"><span>2</span><span>3</span></span> &gt; <span class="frac"><span>2</span><span>5</span></span></div><div>Lika många delar. Tredjedelar är större bitar än femtedelar.</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Jämför med 1:</b> täljare &lt; nämnare → mindre än 1. Täljare = nämnare → exakt 1. Täljare &gt; nämnare → större än 1.</div>
+    <div class="tip"><b>Jämför med <span class="frac"><span>1</span><span>2</span></span>:</b> dubbla täljaren. Blir det mindre än nämnaren är bråket mindre än en halv. <span class="frac"><span>5</span><span>12</span></span>: 10 &lt; 12.</div>
+    <div class="ok"><b>Allt annat:</b> förläng till samma nämnare, eller gör om till decimalform.</div>
+  </div>
+  <div class="tool" id="t-cmp">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Vilket bråk är störst?</h3></div>
+    <div class="ctrl">
+      <label class="fld">Bråk A<input class="in" id="cm-a" value="6/11"></label>
+      <label class="fld">Bråk B<input class="in" id="cm-b" value="6/9"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="cm-big"></div><div id="cm-why"></div><svg id="cm-svg" viewBox="0 0 560 130" role="img" aria-label="Bråken som staplar"></svg></div>
+    <p class="small">Skriv bråk som 3/4, blandad form som 1 1/2, eller decimaltal.</p>
+  </div>
+</section>
+
+<!-- SAMMA VÄRDE -->
+<section class="sec" id="samma" data-title="Samma värde">
+  <div><span class="kicker">Bråk <i>· uppgift 11–16 · s. 84</i></span><h2>Olika bråk men samma värde</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Samma andel kan skrivas med olika bråk: <span class="frac"><span>1</span><span>2</span></span> = <span class="frac"><span>2</span><span>4</span></span> = <span class="frac"><span>3</span><span>6</span></span>. Bitarna blir mindre men fler – lika mycket är färgat.</p>
+  <svg id="sv-wall" viewBox="0 0 560 190" role="img" aria-label="Bråkvägg med halvor, tredjedelar, fjärdedelar och sjättedelar"></svg>
+  <div class="cols">
+    <div class="tip"><b>Värdet <span class="frac"><span>1</span><span>2</span></span>:</b> nämnaren är dubbelt så stor som täljaren. <b>Värdet <span class="frac"><span>1</span><span>4</span></span>:</b> nämnaren är fyra gånger så stor.</div>
+    <div class="ok"><b>Rutan i <span class="frac"><span>3</span><span>4</span></span> = <span class="frac"><span>□</span><span>8</span></span>:</b> 4 · 2 = 8, alltså 3 · 2 = 6. Gör samma sak uppe och nere.</div>
+  </div>
+  <p class="small">Verktyget för att förlänga och förkorta finns i nästa avsnitt.</p>
+</section>
+
+<!-- FÖRKORTA FÖRLÄNGA -->
+<section class="sec" id="forkorta" data-title="Förkorta och förlänga">
+  <div><span class="kicker">Bråk <i>· uppgift 17–22 · s. 85</i></span><h2>Förkorta och förlänga bråk</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Förkorta</b><div class="eq"><span class="frac"><span>8</span><span>12</span></span> = <span class="frac"><span>8 / 4</span><span>12 / 4</span></span> = <span class="frac"><span>2</span><span>3</span></span></div><div><b>Dividera</b> täljare och nämnare med samma tal. Här med 4.</div></div>
+    <div class="ex"><b>Förlänga</b><div class="eq"><span class="frac"><span>3</span><span>4</span></span> = <span class="frac"><span>3 · 2</span><span>4 · 2</span></span> = <span class="frac"><span>6</span><span>8</span></span></div><div><b>Multiplicera</b> täljare och nämnare med samma tal. Här med 2.</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>”Så liten nämnare som möjligt”:</b> förkorta tills inget tal (utom 1) går jämnt upp i både täljare och nämnare. Prova 2, 3, 5 …</div>
+    <div class="tip"><b>”Vilket tal är bråket förkortat/förlängt med?”</b> Dela den större nämnaren med den mindre.</div>
+    <div class="warn"><b>Vanligt fel:</b> att bara ändra täljaren eller bara nämnaren. Då ändras värdet.</div>
+  </div>
+  <div class="tool" id="t-ff">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Förläng och förkorta</h3></div>
+    <div class="ctrl">
+      <label class="fld">Bråk<input class="in" id="ff-in" value="18/24"></label>
+      <label class="fld">Med talet<input class="in s" id="ff-k" inputmode="numeric" value="2"></label>
+      <button class="btn" type="button" id="ff-up">Förläng</button>
+      <button class="btn" type="button" id="ff-down">Förkorta</button>
+      <button class="btn ghost" type="button" id="ff-max">Förkorta så långt det går</button>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="ff-big"></div><div id="ff-why"></div><svg id="ff-svg" viewBox="0 0 560 120" role="img" aria-label="Före och efter"></svg></div>
+  </div>
+</section>
+
+<!-- ADDERA -->
+<section class="sec" id="addera" data-title="Addera och subtrahera">
+  <div><span class="kicker">Bråk <i>· uppgift 23–27 · s. 86</i></span><h2>Addera och subtrahera bråk</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Samma nämnare</b><div class="eq"><span class="frac"><span>3</span><span>8</span></span> + <span class="frac"><span>2</span><span>8</span></span> = <span class="frac"><span>5</span><span>8</span></span> &nbsp; <span class="frac"><span>5</span><span>7</span></span> − <span class="frac"><span>3</span><span>7</span></span> = <span class="frac"><span>2</span><span>7</span></span></div><div>Räkna med täljarna. Nämnaren är sorten och ändras inte.</div></div>
+    <div class="ex"><b>Olika nämnare</b><div class="eq"><span class="frac"><span>1</span><span>2</span></span> + <span class="frac"><span>1</span><span>3</span></span> = <span class="frac"><span>3</span><span>6</span></span> + <span class="frac"><span>2</span><span>6</span></span> = <span class="frac"><span>5</span><span>6</span></span></div><div>Förläng först så att nämnarna blir lika (sjättedelar).</div></div>
+  </div>
+  <div class="cols">
+    <div class="warn"><b>Vanligt fel:</b> <span class="frac"><span>3</span><span>4</span></span> + <span class="frac"><span>2</span><span>4</span></span> är inte <span class="frac"><span>5</span><span>8</span></span>. Tre fjärdedelar och två fjärdedelar blir fem <i>fjärdedelar</i>.</div>
+    <div class="tip"><b>Gemensam nämnare:</b> leta efter minsta tal som båda nämnarna går jämnt upp i. 4 och 10 → 20. 3 och 5 → 15.</div>
+  </div>
+  <div class="tool" id="t-add">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räkna steg för steg</h3></div>
+    <div class="ctrl">
+      <label class="fld">Bråk 1<input class="in" id="ad-a" value="2/5"></label>
+      <div class="seg" role="radiogroup" aria-label="Räknesätt"><label><input type="radio" name="ad-op" value="+" checked><span>+</span></label><label><input type="radio" name="ad-op" value="-"><span>−</span></label></div>
+      <label class="fld">Bråk 2<input class="in" id="ad-b" value="3/10"></label>
+      <label class="fld">Bråk 3 (valfritt)<input class="in" id="ad-c" value="" placeholder="t.ex. 2/5"></label>
+    </div>
+    <div class="out" aria-live="polite"><ol class="steps eq" id="ad-steps"></ol><svg id="ad-svg" viewBox="0 0 560 120" role="img" aria-label="Bråken med gemensam nämnare"></svg></div>
+  </div>
+</section>
+
+<!-- MULTIPLICERA -->
+<section class="sec" id="multi" data-title="Bråk gånger heltal">
+  <div><span class="kicker">Bråk <i>· uppgift 28–33 · s. 87</i></span><h2>Multiplicera bråk med ett heltal</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Exempel</b><div>Till en sockerkaka behövs <span class="frac"><span>3</span><span>4</span></span> dl vatten. Till två kakor:</div>
+      <div class="eq">2 · <span class="frac"><span>3</span><span>4</span></span> = <span class="frac"><span>2 · 3</span><span>4</span></span> = <span class="frac"><span>6</span><span>4</span></span> = 1 <span class="frac"><span>1</span><span>2</span></span> dl</div></div>
+    <div class="box">
+      <div class="tip"><b>Regel:</b> multiplicera heltalet med <b>täljaren</b>. Nämnaren ändras inte: 2 · 3 fjärdedelar = 6 fjärdedelar.</div>
+      <div class="ok"><b>Blandad form:</b> <span class="frac"><span>7</span><span>3</span></span> = 2 hela (6 tredjedelar) och <span class="frac"><span>1</span><span>3</span></span> kvar = 2 <span class="frac"><span>1</span><span>3</span></span>.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-mul">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Heltal gånger bråk</h3></div>
+    <div class="ctrl">
+      <label class="fld">Heltal<input class="in s" id="mu-n" inputmode="numeric" value="2"></label><span class="eq">·</span>
+      <label class="fld">Bråk<input class="in" id="mu-f" value="3/4"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="mu-big"></div><div id="mu-why"></div><svg id="mu-svg" viewBox="0 0 560 120" role="img" aria-label="Bråken som staplar"></svg></div>
+  </div>
+</section>
+
+<!-- DELEN MED BRÅK -->
+<section class="sec" id="delbrak" data-title="Delen med bråk">
+  <div><span class="kicker">Bråk <i>· uppgift 34–39 · s. 88</i></span><h2>Beräkna delen med bråk</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Exempel</b><div>Det fanns 24 paprikor och <span class="frac"><span>2</span><span>3</span></span> såldes.</div>
+      <div class="eq"><span class="frac"><span>1</span><span>3</span></span> av 24 = <span class="frac"><span>24</span><span>3</span></span> = 8 &nbsp;&nbsp; <span class="frac"><span>2</span><span>3</span></span> av 24 = 2 · 8 = 16</div></div>
+    <div class="box">
+      <div class="tip"><b>Två steg:</b> dela med nämnaren (en del), multiplicera med täljaren (så många delar).</div>
+      <div class="ok"><b>Eller tvärtom:</b> 24 · <span class="frac"><span>2</span><span>3</span></span> = <span class="frac"><span>48</span><span>3</span></span> = 16. Välj det som passar dig bäst.</div>
+      <div class="tip"><b>”Var sjätte”</b> = <span class="frac"><span>1</span><span>6</span></span>. <b>”Två av tre”</b> = <span class="frac"><span>2</span><span>3</span></span>.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-del">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Bråkdelen av ett antal</h3></div>
+    <div class="ctrl">
+      <label class="fld">Bråk<input class="in" id="de-f" value="2/3"></label><span class="eq">av</span>
+      <label class="fld">Det hela<input class="in" id="de-x" inputmode="decimal" value="24"></label>
+      <label class="fld">Enhet<input class="in s" id="de-u" value="st"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="de-big"></div><div id="de-why" class="eq"></div><svg id="de-svg" viewBox="0 0 560 120" role="img" aria-label="Antalet delat i grupper"></svg></div>
+  </div>
+</section>
+
+<!-- TID -->
+<section class="sec" id="tid" data-title="Bråkdelar av tid">
+  <div><span class="kicker">Bråk <i>· uppgift 40–46 · s. 89</i></span><h2>Bråkdelar av tid</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="tw"><table>
+      <tr><td class="l">1 år</td><td>12 månader</td></tr>
+      <tr><td class="l"><span class="frac"><span>1</span><span>4</span></span> år</td><td>ett kvartal = 3 mån</td></tr>
+      <tr><td class="l">1 dygn</td><td>24 timmar (h)</td></tr>
+      <tr><td class="l">1 h</td><td>60 minuter (min)</td></tr>
+      <tr><td class="l"><span class="frac"><span>1</span><span>4</span></span> h · <span class="frac"><span>3</span><span>4</span></span> h</td><td>en kvart · tre kvart</td></tr>
+      <tr><td class="l">1 min</td><td>60 sekunder (s)</td></tr>
+    </table></div>
+    <div class="box">
+      <div class="tip"><b>Samma metod som delen med bråk:</b> <span class="frac"><span>5</span><span>6</span></span> h = 60 / 6 · 5 = 10 · 5 = 50 min.</div>
+      <div class="tip"><b>Baklänges (uppgift 46):</b> andel = delen / det hela. 40 min av en timme = <span class="frac"><span>40</span><span>60</span></span> = <span class="frac"><span>2</span><span>3</span></span>.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-tid">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Bråk av en tidsenhet</h3></div>
+    <div class="ctrl">
+      <label class="fld">Bråk<input class="in" id="ti-f" value="5/6"></label><span class="eq">av ett</span>
+      <div class="seg" role="radiogroup" aria-label="Tidsenhet">
+        <label><input type="radio" name="ti-u" value="ar"><span>år</span></label>
+        <label><input type="radio" name="ti-u" value="dygn"><span>dygn</span></label>
+        <label><input type="radio" name="ti-u" value="h" checked><span>timme</span></label>
+        <label><input type="radio" name="ti-u" value="min"><span>minut</span></label>
+      </div>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="ti-svg" viewBox="0 0 240 240" role="img" aria-label="Urtavla delad i lika delar" style="max-width:240px"></svg><div><div class="big" id="ti-big"></div><div id="ti-why" class="eq"></div></div></div></div>
+    <div class="ctrl"><label class="fld">Baklänges: hur stor andel är<input class="in s" id="ti-x" inputmode="numeric" value="40"></label><span class="small" id="ti-xu">minuter av en timme?</span></div>
+    <div class="out" aria-live="polite" id="ti-back"></div>
+  </div>
+</section>
+
+<!-- DECIMALFORM -->
+<section class="sec" id="decimal" data-title="Andel i decimalform">
+  <div><span class="kicker">Bråk <i>· uppgift 47–57 · s. 90–91</i></span><h2>Andel i decimalform</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="tw"><table>
+      <tr><th colspan="2">Kom ihåg</th></tr>
+      <tr><td><span class="frac"><span>1</span><span>2</span></span></td><td>0,5</td></tr>
+      <tr><td><span class="frac"><span>1</span><span>4</span></span></td><td>0,25</td></tr>
+      <tr><td><span class="frac"><span>3</span><span>4</span></span></td><td>0,75</td></tr>
+      <tr><td><span class="frac"><span>1</span><span>5</span></span></td><td>0,2</td></tr>
+      <tr><td><span class="frac"><span>1</span><span>10</span></span></td><td>0,1</td></tr>
+      <tr><td><span class="frac"><span>1</span><span>3</span></span></td><td>≈ 0,33</td></tr>
+      <tr><td><span class="frac"><span>2</span><span>3</span></span></td><td>≈ 0,67</td></tr>
+    </table></div>
+    <div class="box">
+      <div class="tip"><b>Räknaren:</b> täljare ÷ nämnare. <span class="frac"><span>1</span><span>5</span></span> → 1 ÷ 5 = 0,2.</div>
+      <div class="ok"><b>Utan räknare:</b> förläng till tiondelar eller hundradelar. <span class="frac"><span>3</span><span>25</span></span> = <span class="frac"><span>12</span><span>100</span></span> = 0,12.</div>
+      <div class="tip"><b>Avrunda till två decimaler:</b> <span class="frac"><span>2</span><span>3</span></span> = 0,6666… ≈ 0,67. Titta på tredje decimalen.</div>
+      <div class="ok"><b>Jämföra och addera:</b> gör om allt till decimalform först (uppgift 53–57). 400 g = 0,4 kg.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-dec">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Bråk till decimalform</h3></div>
+    <div class="ctrl"><label class="fld">Bråk<input class="in" id="dc-f" value="3/25"></label></div>
+    <div class="out" aria-live="polite"><div class="big" id="dc-big"></div><div id="dc-why" class="eq"></div><svg id="dc-svg" viewBox="0 0 560 80" role="img" aria-label="Talet på en tallinje"></svg></div>
+  </div>
+</section>
+
+<!-- PROCENT -->
+<section class="sec" id="procent" data-title="Procent">
+  <div><span class="kicker">Procent <i>· uppgift 58–64 · s. 92</i></span><h2>Procent</h2></div>
+  <div class="slot"></div>
+  <div class="tw"><table>
+    <tr><th>En hel</th><th>Hälften</th><th>En fjärdedel</th><th>Tre fjärdedelar</th></tr>
+    <tr><td style="text-align:center">100 % = 1</td><td style="text-align:center">50 % = <span class="frac"><span>1</span><span>2</span></span></td><td style="text-align:center">25 % = <span class="frac"><span>1</span><span>4</span></span></td><td style="text-align:center">75 % = <span class="frac"><span>3</span><span>4</span></span></td></tr>
+  </table></div>
+  <div class="cols">
+    <div class="ex"><b>Exempel</b><div class="eq">25 % av 20 = <span class="frac"><span>1</span><span>4</span></span> av 20 = <span class="frac"><span>20</span><span>4</span></span> = 5</div></div>
+    <div class="box">
+      <div class="tip"><b>50 %:</b> dela med 2. <b>25 %:</b> dela med 4. <b>75 %:</b> 3 · 25 %.</div>
+      <div class="tip"><b>Baklänges (uppgift 64):</b> om 75 % är 180 kr är 25 % = 180 / 3 = 60 kr och 100 % = 4 · 60 kr.</div>
+      <div class="ok"><b>Ord för procent:</b> varannan = 50 %, var fjärde = 25 %, knappt = lite under, drygt = lite över.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-hund">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Hundrarutan – klicka eller dra</h3></div>
+    <div class="cols" style="align-items:center">
+      <div class="pgrid" id="hu-grid" role="group" aria-label="Hundra rutor"></div>
+      <div class="box">
+        <label class="fld">Procent: <b id="hu-v" style="color:var(--ink)">25 %</b><input type="range" id="hu-r" min="0" max="100" value="25" style="width:240px;max-width:100%;accent-color:var(--red)"></label>
+        <div class="out" aria-live="polite"><div class="big" id="hu-big"></div><div id="hu-why"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMER -->
+<section class="sec" id="former" data-title="Bråk, decimal, procent">
+  <div><span class="kicker">Procent <i>· uppgift 65–69 · s. 93</i></span><h2>Bråk-, decimal- och procentform</h2></div>
+  <div class="slot"></div>
+  <p class="lead"><b>Procent betyder hundradel.</b> 1 % = <span class="frac"><span>1</span><span>100</span></span> = 0,01.</p>
+  <div class="cols">
+    <div class="ex"><b>Procent → decimal</b><div class="eq">5 % = <span class="frac"><span>5</span><span>100</span></span> = 0,05</div><div>Dela med 100 – kommat två steg åt vänster.</div></div>
+    <div class="ex"><b>Decimal → procent</b><div class="eq">0,35 = <span class="frac"><span>35</span><span>100</span></span> = 35 %</div><div>Gånger 100 – kommat två steg åt höger.</div></div>
+    <div class="ex"><b>Bråk → procent</b><div class="eq"><span class="frac"><span>3</span><span>5</span></span> = <span class="frac"><span>60</span><span>100</span></span> = 0,6 = 60 %</div><div>Förläng till hundradelar, eller räkna täljare ÷ nämnare.</div></div>
+  </div>
+  <div class="warn"><b>Vanligt fel:</b> 6 % är 0,06 – inte 0,6. Och 0,465 är 46,5 %.</div>
+  <div class="tool" id="t-conv">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Omvandlaren</h3></div>
+    <div class="ctrl"><label class="fld">Skriv ett bråk, decimaltal eller procent<input class="in wide" id="cv-in" value="0,465"></label></div>
+    <div class="chips" id="cv-chips"></div>
+    <div class="out" aria-live="polite"><div class="tw"><table id="cv-tab"></table></div><div id="cv-why"></div></div>
+  </div>
+</section>
+
+<!-- ANDELEN I PROCENT -->
+<section class="sec" id="andelp" data-title="Andelen i procent">
+  <div><span class="kicker">Procent <i>· uppgift 70–74 · s. 94</i></span><h2>Beräkna andelen i procentform</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Formel</b><div class="eq">Andelen = <span class="frac"><span>delen</span><span>det hela</span></span></div></div>
+    <div class="ex"><b>Exempel</b><div class="eq">3 kr av 5 kr = <span class="frac"><span>3</span><span>5</span></span> = 0,6 = 60 %</div><div class="eq">4 av 15 = <span class="frac"><span>4</span><span>15</span></span> ≈ 0,27 = 27 %</div><div class="small">Avrunda till två decimaler så att du kan svara i hela procent.</div></div>
+  </div>
+  <div class="tip"><b>Rabatterbjudanden (uppgift 72):</b> ”köp 5, betala för 4” = 1 gratis av 5. Delen är det du får gratis, det hela är allt du får.</div>
+  <div class="tool" id="t-andelp">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Hur många procent är …?</h3></div>
+    <div class="ctrl">
+      <label class="fld">Delen<input class="in" id="ap-a" inputmode="decimal" value="4"></label><span class="eq">av</span>
+      <label class="fld">Det hela<input class="in" id="ap-b" inputmode="decimal" value="15"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="ap-big"></div><div id="ap-why" class="eq"></div><svg id="ap-svg" viewBox="0 0 560 70" role="img" aria-label="Delen som del av en stapel"></svg></div>
+  </div>
+</section>
+
+<!-- FÖRÄNDRING -->
+<section class="sec" id="forandring" data-title="Procentuell förändring">
+  <div><span class="kicker">Procent <i>· uppgift 75–80 · s. 95</i></span><h2>Procentuell ökning och minskning</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Exempel</b><div>Priset sänks från 400 kr till 300 kr.</div><div class="eq">Prissänkning: 400 − 300 = 100 kr</div><div class="eq">Sänkning i procent = <span class="frac"><span>100</span><span>400</span></span> = 0,25 = 25 %</div></div>
+    <div class="box">
+      <div class="tip"><b>Två steg:</b> räkna ut förändringen i kronor. Dela sedan med det <b>tidigare</b> priset.</div>
+      <div class="ok"><b>Formel:</b> förändring i procent = <span class="frac"><span>förändringen</span><span>tidigare värde</span></span></div>
+      <div class="warn"><b>Vanligt fel:</b> att dela med det nya priset.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-for">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Från gammalt till nytt värde</h3></div>
+    <div class="ctrl">
+      <label class="fld">Tidigare (förr)<input class="in" id="fo-a" inputmode="decimal" value="400"></label><span class="eq">→</span>
+      <label class="fld">Nu<input class="in" id="fo-b" inputmode="decimal" value="300"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="fo-big"></div><ol class="steps eq" id="fo-steps"></ol><svg id="fo-svg" viewBox="0 0 560 90" role="img" aria-label="Staplar för förr och nu"></svg></div>
+  </div>
+</section>
+
+<!-- JÄMFÖR MED PROCENT -->
+<section class="sec" id="jamforp" data-title="Jämför med procent">
+  <div><span class="kicker">Procent <i>· uppgift 81–84 · s. 96</i></span><h2>Jämför med procent</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Billigare</b><div>Burken kostar 8 kr hos Willes och 10 kr hos Åkes livs. Hur mycket billigare hos Willes?</div><div class="eq"><span class="frac"><span>2</span><span>10</span></span> = 0,2 = 20 %</div><div class="small">Jämför med Åkes livs → dela med 10.</div></div>
+    <div class="ex"><b>Dyrare</b><div>Hur mycket dyrare hos Åkes livs än hos Willes?</div><div class="eq"><span class="frac"><span>2</span><span>8</span></span> = 0,25 = 25 %</div><div class="small">Jämför med Willes → dela med 8.</div></div>
+  </div>
+  <div class="tip"><b>Nyckeln:</b> dividera skillnaden med det du <b>jämför med</b> – det som står efter ”än” eller ”jämfört med”.</div>
+  <div class="tool" id="t-jmf">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Jämför två värden</h3></div>
+    <div class="ctrl">
+      <label class="fld">Värde A (namn)<input class="in" id="jm-an" value="Willes"></label>
+      <label class="fld">A<input class="in s" id="jm-a" inputmode="decimal" value="24"></label>
+      <label class="fld">Värde B (namn)<input class="in" id="jm-bn" value="Åkes livs"></label>
+      <label class="fld">B<input class="in s" id="jm-b" inputmode="decimal" value="18"></label>
+    </div>
+    <div class="out" aria-live="polite"><div id="jm-out" class="rows"></div></div>
+  </div>
+</section>
+
+<!-- DET HELA -->
+<section class="sec" id="hela" data-title="Det hela, 100 %">
+  <div><span class="kicker">Procent <i>· uppgift 85–90 · s. 97</i></span><h2>Beräkna det hela, 100 %</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Exempel</b><div>180 åskådare hade fribiljett. Det är 9 % av alla. Hur många var det?</div><div class="eq">9 % är 180 st</div><div class="eq">1 % är <span class="frac"><span>180</span><span>9</span></span> = 20 st</div><div class="eq">100 % är 100 · 20 = 2 000 st</div></div>
+    <div class="box">
+      <div class="tip"><b>Via 1 %:</b> dela med procenttalet, gånger 100.</div>
+      <div class="ok"><b>Kontroll:</b> svaret ska vara större än delen (om procenten är under 100).</div>
+      <div class="tip"><b>Uppgift 89:</b> man kan inte plantera en del av ett frö – avrunda uppåt.</div>
+      <div class="tip"><b>Uppgift 90:</b> ta fram alla röster, dra sedan bort de 87.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-hela">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Från procent till det hela</h3></div>
+    <div class="ctrl">
+      <label class="fld">Procent<input class="in s" id="he-p" inputmode="decimal" value="9"></label><span class="eq">% är</span>
+      <label class="fld">Värdet<input class="in" id="he-v" inputmode="decimal" value="180"></label>
+      <label class="fld">Enhet<input class="in s" id="he-u" value="st"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="he-big"></div><div id="he-why" class="eq"></div><svg id="he-svg" viewBox="0 0 560 70" role="img" aria-label="Delen av en stapel som är 100 %"></svg></div>
+  </div>
+</section>
+
+<!-- DELEN MED PROCENT -->
+<section class="sec" id="delenp" data-title="Delen med procent">
+  <div><span class="kicker">Procent <i>· uppgift 91–105 · s. 98–99</i></span><h2>Beräkna delen med procent</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Metod 1 – via 1 %</b><div class="eq">1 % av 700 kr = <span class="frac"><span>700</span><span>100</span></span> = 7 kr</div><div class="eq">9 % av 700 kr = 9 · 7 = 63 kr</div></div>
+    <div class="ex"><b>Metod 2 – decimalform</b><div class="eq">9 % = <span class="frac"><span>9</span><span>100</span></span> = 0,09</div><div class="eq">0,09 · 700 kr = 63 kr</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Rabatt:</b> räkna rabatten och dra bort den. 35 % av 2 400 = 840 kr, nytt pris 2 400 − 840 = 1 560 kr.</div>
+    <div class="tip"><b>Höjning:</b> räkna höjningen och lägg till den.</div>
+    <div class="ok"><b>Huvudräkning:</b> 10 % = dela med 10, 5 % = hälften av 10 %. 35 % = 3 · 10 % + 5 %.</div>
+    <div class="warn"><b>Över 100 %:</b> 150 % = 1,5. Svaret blir större än det hela.</div>
+  </div>
+  <div class="tool" id="t-delenp">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Procent av ett värde</h3></div>
+    <div class="ctrl">
+      <label class="fld">Procent<input class="in s" id="dp-p" inputmode="decimal" value="35"></label><span class="eq">% av</span>
+      <label class="fld">Det hela<input class="in" id="dp-x" inputmode="decimal" value="2400"></label>
+      <label class="fld">Enhet<input class="in s" id="dp-u" value="kr"></label>
+      <div class="seg" role="radiogroup" aria-label="Vad ska räknas ut">
+        <label><input type="radio" name="dp-m" value="del" ><span>Bara delen</span></label>
+        <label><input type="radio" name="dp-m" value="minus" checked><span>Rabatt (−)</span></label>
+        <label><input type="radio" name="dp-m" value="plus"><span>Höjning (+)</span></label>
+      </div>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="dp-big"></div><div class="cols"><div><b>Metod 1</b><div id="dp-m1" class="eq"></div></div><div><b>Metod 2</b><div id="dp-m2" class="eq"></div></div></div><div id="dp-new" class="eq"></div></div>
+  </div>
+</section>
+
+<!-- FÖRÄNDRINGSFAKTOR -->
+<section class="sec" id="faktor" data-title="Förändringsfaktor">
+  <div><span class="kicker">Procent <i>· uppgift 106–115 · s. 100–101</i></span><h2>Förändringsfaktor</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Med förändringsfaktorn räknar du ut det nya värdet i ett steg: <b>nytt värde = förändringsfaktor · ursprungsvärdet</b>.</p>
+  <div class="cols">
+    <div class="ex"><b>Ökning med 14 %</b><div class="eq">100 % + 14 % = 114 % = <b class="r">1,14</b></div><div class="eq">1,14 · 350 kr = 399 kr</div></div>
+    <div class="ex"><b>Minskning med 14 %</b><div class="eq">100 % − 14 % = 86 % = <b class="r">0,86</b></div><div class="eq">0,86 · 450 kr = 387 kr</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Läsa en faktor:</b> över 1 = ökning, under 1 = minskning. 1,45 → +45 %. 0,65 → −35 %. 1,4 → +40 %.</div>
+    <div class="ok"><b>Rabatt 30 %</b> betyder att du betalar 70 %: faktor 0,70.</div>
+    <div class="warn"><b>Två förändringar i rad:</b> multiplicera faktorerna. +5 % och sedan −10 % blir 1,05 · 0,90 = 0,945, alltså −5,5 % – inte −5 %.</div>
+  </div>
+  <div class="tool" id="t-fak">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räkna med förändringsfaktor</h3></div>
+    <div class="ctrl">
+      <label class="fld">Ursprungsvärde<input class="in" id="fa-x" inputmode="decimal" value="350"></label>
+      <label class="fld">Förändring 1 (%)<input class="in s" id="fa-1" inputmode="decimal" value="14"></label>
+      <div class="seg" role="radiogroup" aria-label="Förändring 1"><label><input type="radio" name="fa-d1" value="1" checked><span>ökning</span></label><label><input type="radio" name="fa-d1" value="-1"><span>minskning</span></label></div>
+      <label class="fld">Förändring 2 (%), valfri<input class="in s" id="fa-2" inputmode="decimal" value=""></label>
+      <div class="seg" role="radiogroup" aria-label="Förändring 2"><label><input type="radio" name="fa-d2" value="1"><span>ökning</span></label><label><input type="radio" name="fa-d2" value="-1" checked><span>minskning</span></label></div>
+    </div>
+    <div class="out" aria-live="polite"><div class="big" id="fa-big"></div><ol class="steps eq" id="fa-steps"></ol></div>
+    <div class="ctrl"><label class="fld">Tolka en förändringsfaktor<input class="in s" id="fa-f" inputmode="decimal" value="0,95"></label><div id="fa-read" class="eq"></div></div>
+  </div>
+</section>
+
+<!-- RÄNTA -->
+<section class="sec" id="ranta" data-title="Ränta">
+  <div><span class="kicker">Procent <i>· uppgift 116–122 · s. 102–103</i></span><h2>Ränta och effektiv ränta</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="box">
+      <p>Om du lånar pengar betalar du <b>ränta</b>. Hur stor räntan blir beror på</p>
+      <ul style="margin:0;padding-left:22px"><li>hur stort lånet är (kr)</li><li>vilken <b>räntesats</b> som gäller (%)</li><li>hur länge du har lånet – ofta 1 år, <b>årsränta</b></li></ul>
+    </div>
+    <div class="ex"><b>Exempel</b><div>Du lånar 12 000 kr till 8 % ränta.</div><div class="eq">0,08 · 12 000 kr = 960 kr per år</div><div class="eq">Per månad: 960 / 12 = 80 kr</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>”Totalt betala tillbaka”:</b> lånet + räntan. Eller direkt med faktor: 1,08 · 12 000.</div>
+    <div class="tip"><b>Effektiv ränta:</b> avgifter på ett ”räntefritt” lån räknade om till ränta. Räkna precis som med vanlig ränta.</div>
+    <div class="warn"><b>Läs frågan:</b> ”hur mycket dyrare” = bara räntan. ”Hur mycket totalt” = lån + ränta.</div>
+  </div>
+  <div class="tool" id="t-ranta">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räntekalkylatorn</h3></div>
+    <div class="ctrl">
+      <label class="fld">Lån (kr)<input class="in" id="ra-l" inputmode="decimal" value="12000"></label>
+      <label class="fld">Räntesats (%)<input class="in s" id="ra-p" inputmode="decimal" value="8"></label>
+      <label class="fld">Tid (månader)<input class="in s" id="ra-t" inputmode="numeric" value="12"></label>
+    </div>
+    <div class="out" aria-live="polite"><div id="ra-out" class="rows"></div></div>
+  </div>
+</section>
+
+<!-- BLANDAT -->
+<section class="sec" id="blandat" data-title="Tester och blandat">
+  <div><span class="kicker">Repetera <i>· s. 91, 94, 103–107</i></span><h2>Minitester, kapiteltest och blandade uppgifter</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Klicka på en uppgift. Stödkortet öppnas i det avsnitt där metoden förklaras.</p>
+  <div class="extra" id="extra"></div>
+</section>
+
+<!-- SAMMANFATTNING -->
+<section class="sec" id="sammanfattning" data-title="Sammanfattning">
+  <div><span class="kicker">Repetera <i>· s. 108–109</i></span><h2>Sammanfattning – formelkort</h2></div>
+  <div class="formula">
+    <div><b>Förlänga</b><span class="eq"><span class="frac"><span>3</span><span>4</span></span> = <span class="frac"><span>3 · 5</span><span>4 · 5</span></span> = <span class="frac"><span>15</span><span>20</span></span></span><span class="small">Täljare och nämnare gånger samma tal.</span></div>
+    <div><b>Förkorta</b><span class="eq"><span class="frac"><span>9</span><span>12</span></span> = <span class="frac"><span>9 / 3</span><span>12 / 3</span></span> = <span class="frac"><span>3</span><span>4</span></span></span><span class="small">Täljare och nämnare delat med samma tal.</span></div>
+    <div><b>Addition och subtraktion</b><span class="eq"><span class="frac"><span>1</span><span>3</span></span> + <span class="frac"><span>1</span><span>4</span></span> = <span class="frac"><span>4</span><span>12</span></span> + <span class="frac"><span>3</span><span>12</span></span> = <span class="frac"><span>7</span><span>12</span></span></span><span class="small">Skriv först bråken med samma nämnare.</span></div>
+    <div><b>Multiplikation</b><span class="eq">3 · <span class="frac"><span>2</span><span>5</span></span> = <span class="frac"><span>3 · 2</span><span>5</span></span> = <span class="frac"><span>6</span><span>5</span></span></span><span class="small">Multiplicera heltalet med täljaren.</span></div>
+    <div><b>Procent</b><span class="eq">1 % = <span class="frac"><span>1</span><span>100</span></span> = 0,01</span><span class="small">Procent betyder hundradel.</span></div>
+    <div><b>Andelen</b><span class="eq">Andel = <span class="frac"><span>delen</span><span>det hela</span></span></span><span class="small">14 av 52 = <span class="frac"><span>14</span><span>52</span></span> ≈ 0,27 = 27 %</span></div>
+    <div><b>Det hela</b><span class="eq">43 % är 258 kr → 1 % är 6 kr → 100 % är 600 kr</span><span class="small">Gå via 1 %.</span></div>
+    <div><b>Delen</b><span class="eq">32 % av 250 kr = 0,32 · 250 = 80 kr</span><span class="small">Eller 32 · 2,50 kr via 1 %.</span></div>
+    <div><b>Förändringsfaktor</b><span class="eq">+12 % → 1,12 &nbsp; −12 % → 0,88</span><span class="small">Nytt värde = förändringsfaktor · ursprungsvärdet</span></div>
+    <div><b>Ränta</b><span class="eq">0,09 · 5 000 kr = 450 kr</span><span class="small">Lån 5 000 kr, räntesats 9 %, tid 1 år.</span></div>
+  </div>
+</section>
+
+<footer class="foot">Byggd på kapitel 3 <i>Bråk och procent</i> i läroboken Bryggan och dess facit. Uppgifterna är sammanfattade med egna ord – se boken för bilder och full text. <a href="#start">↑ Till början</a></footer>
+</main>
+</div>
+<script>
+/* Uppgiftsdata: [nyckel, avsnitt, sida, uppgift (egna ord), ledtråd, facit, verktyg] — [a/b] ritas som bråk */
+const TASKS=[
+["1","andel",82,"Skriv i bråkform: a) en sjundedel b) en femtedel c) en elftedel","Täljaren är 1 eftersom det är <b>en</b> del. Nämnaren är vilken sorts del: sjundedel → 7.","a) [1/7] &nbsp; b) [1/5] &nbsp; c) [1/11]",["andel",1,7]],
+["2","andel",82,"Skriv i bråkform: a) tre fjärdedelar b) fem åttondelar c) fyra femtedelar","Första ordet är täljaren (hur många), andra ordet är nämnaren (vilken sorts delar).","a) [3/4] &nbsp; b) [5/8] &nbsp; c) [4/5]",["andel",3,4]],
+["3","andel",82,"Hur stor andel av Hollands flagga är a) röd b) inte röd?","Flaggan har tre lika breda ränder. Räkna röda ränder av alla ränder. Det som inte är rött är resten.","a) [1/3] &nbsp; b) [2/3]",["andel",1,3]],
+["4","andel",82,"Hur stor andel av figurerna a–c är röd, gul respektive vit?","Dela in figuren i lika stora delar. En bit som är dubbelt så stor räknas som två delar. Färgade delar = täljare, alla delar = nämnare.","a) [1/4] vit, [1/4] gul, [2/4] röd (= [1/2] röd) &nbsp; b) samma som a) &nbsp; c) samma som a)",["andel",2,4]],
+["5","andel",82,"a) Vilken av bilderna X, Y, Z visar inte bråket [2/3]? b) Förklara varför.","Ett bråk kräver att delarna är <b>lika stora</b>. Titta om de tre delarna är lika stora i varje bild.","a) X &nbsp; b) I figuren X är inte delarna lika stora.",["andel",2,3]],
+["6","jamfor",83,"Vilket bråk är störst? a) [7/12] eller [9/12] b) [6/11] eller [6/9] c) [17/32] eller [17/29]","Lika nämnare: störst täljare är störst. Lika täljare: minst nämnare är störst – färre delar ger större bitar.","a) [9/12] &nbsp; b) [6/9] &nbsp; c) [17/29]",["cmp","6/11","6/9"]],
+["7","jamfor",83,"Vilka av bråken [3/4], [11/9], [9/8], [5/6], [17/17] är a) mindre än 1 b) lika med 1 c) större än 1?","Jämför täljaren med nämnaren. Mindre täljare → under 1. Lika → exakt 1. Större täljare → över 1.","a) [3/4], [5/6] &nbsp; b) [17/17] &nbsp; c) [11/9], [9/8]",["cmp","11/9","1"]],
+["8","jamfor",83,"Vilka av bråken [13/25], [9/20], [5/10], [5/12], [4/7] är a) mindre än [1/2] b) lika med [1/2] c) större än [1/2]?","Dubbla täljaren och jämför med nämnaren. [5/12]: 2 · 5 = 10, mindre än 12 → mindre än en halv.","a) [9/20], [5/12] &nbsp; b) [5/10] &nbsp; c) [13/25], [4/7]",["cmp","13/25","1/2"]],
+["9","jamfor",83,"Ordna bråken [5/4], [2/9], [4/8], [1/12], [10/11] i storleksordning med det minsta först.","Sortera i grupper: under en halv, exakt en halv, mellan en halv och 1, över 1. Jämför sedan inom gruppen.","[1/12], [2/9], [4/8], [10/11], [5/4]",["cmp","1/12","2/9"]],
+["10","jamfor",83,"a) Vilka summor är större än 1: [1/2]+[1/3], [6/11]+[1/2], [2/3]+[1/4], [3/7]+[2/11]? b) Motivera.","Jämför varje term med en halv. En halv plus något som är större än en halv blir mer än 1.","a) [6/11] + [1/2] &nbsp; b) [6/11] är större än en halv. En halv adderat med ett tal större än en halv ger en summa större än 1.",["cmp","6/11","1/2"]],
+["11","samma",84,"Hur stor andel av figurerna A–E är färgad? Skriv två bråk till varje figur.","Räkna färgade delar av alla delar. Förkorta sedan för att få ett andra bråk med samma värde.","A [2/4] = [1/2] &nbsp; B [4/6] = [2/3] &nbsp; C [6/8] = [3/4] &nbsp; D [4/8] = [1/2] &nbsp; E [3/6] = [1/2]",["ff","4/6",2]],
+["12","samma",84,"I [1/4] är nämnaren fyra gånger så stor som täljaren. Vilka av [2/8], [5/16], [3/12], [4/11], [5/20] har samma värde som [1/4]?","Kontrollera för varje bråk: är nämnaren exakt 4 · täljaren?","[2/8], [3/12] och [5/20]",["ff","5/20",5]],
+["13","samma",84,"Vilka av bilderna A–C är färgade till [1/3]?","Räkna färgade rutor och alla rutor. Antalet rutor ska vara 3 gånger antalet färgade.","A och C",["ff","2/6",2]],
+["14","samma",84,"Vilket tal ska stå i rutan? a) [1/2] = [□/4] b) [3/4] = [□/8] c) [2/5] = [□/10]","Vad har nämnaren multiplicerats med? Gör samma sak med täljaren (förlängning).","a) 2 &nbsp; b) 6 &nbsp; c) 4",["ff","3/4",2]],
+["15","samma",84,"Vilket tal ska stå i rutan? a) [6/10] = [□/5] b) [6/8] = [□/4] c) [2/4] = [□/2]","Nämnaren har delats. Dela täljaren med samma tal (förkortning).","a) 3 &nbsp; b) 3 &nbsp; c) 1",["ff","6/10",2]],
+["16","samma",84,"Vilka av figurerna A–D är färgade till [2/3]?","Räkna färgade rutor av alla rutor och förkorta. Det ska bli [2/3].","B, C och D",["ff","6/9",3]],
+["17","forkorta",85,"Förkorta bråket med 4: a) [4/12] b) [16/20] c) [8/100]","Dela både täljaren och nämnaren med 4.","a) [1/3] &nbsp; b) [4/5] &nbsp; c) [2/25]",["ff","16/20",4]],
+["18","forkorta",85,"Vilket tal är bråket förkortat med? a) [3/9] = [1/3] b) [12/20] = [3/5] c) [18/27] = [2/3]","Jämför täljarna: vilket tal har man delat med? Kontrollera med nämnarna.","a) 3 &nbsp; b) 4 &nbsp; c) 9",["ff","18/27",9]],
+["19","forkorta",85,"Förkorta och svara med så liten nämnare som möjligt: a) [2/12] b) [8/20] c) [18/24]","Hitta det största tal som går jämnt upp i både täljare och nämnare – eller förkorta i flera steg tills det inte går längre.","a) [1/6] &nbsp; b) [2/5] &nbsp; c) [3/4]",["ff","18/24",6]],
+["20","forkorta",85,"Förläng bråket med 2: a) [3/5] b) [5/7] c) [4/9]","Multiplicera både täljaren och nämnaren med 2.","a) [6/10] &nbsp; b) [10/14] &nbsp; c) [8/18]",["ff","5/7",2]],
+["21","forkorta",85,"Vilket tal är bråket förlängt med? a) [3/4] = [15/20] b) [2/9] = [6/27] c) [2/3] = [14/21]","Hur många gånger större är den nya nämnaren? 20 / 4 = …","a) 5 &nbsp; b) 3 &nbsp; c) 7",["ff","3/4",5]],
+["22","forkorta",85,"Vilket av bråken [9/21], [3/7], [24/56], [6/14] är störst? Motivera.","Förkorta alla bråken så långt det går och jämför.","Alla bråken har samma värde. Förkortade blir de [3/7].",["ff","24/56",8]],
+["23","addera",86,"Beräkna: a) [4/7] + [2/7] b) [7/15] − [4/15] c) [1/8] + [3/8]","Lika nämnare: räkna bara med täljarna. Förkorta svaret om det går.","a) [6/7] &nbsp; b) [3/15] = [1/5] &nbsp; c) [4/8] = [1/2]",["add","7/15","-","4/15"]],
+["24","addera",86,"Beräkna: a) [1/2] + [1/4] b) [1/2] + [3/10] c) [7/10] − [1/5] d) [7/8] + [3/4]","Förläng bråket med den minsta nämnaren så att nämnarna blir lika. [1/2] = [2/4], [1/5] = [2/10].","a) [3/4] &nbsp; b) [8/10] = [4/5] &nbsp; c) [5/10] = [1/2] &nbsp; d) [13/8]",["add","7/10","-","1/5"]],
+["25","addera",86,"Beräkna: a) [2/5] + [3/10] b) [7/12] − [1/4] c) [1/3] + [1/5] d) [1/6] − [1/9]","Hitta minsta gemensamma nämnare. c) 3 och 5 → 15. d) 6 och 9 → 18. Förläng båda bråken.","a) [7/10] &nbsp; b) [4/12] = [1/3] &nbsp; c) [8/15] &nbsp; d) [1/18]",["add","1/6","-","1/9"]],
+["26","addera",86,"Edwin och Anna räknar [3/4] + [2/4]. Edwin får [5/8], Anna får [5/4]. a) Vem har rätt? b) Hur har de räknat?","Vid lika nämnare adderas bara täljarna. Nämnaren talar om sorten – fjärdedelar.","a) Anna &nbsp; b) Anna har räknat rätt och bara adderat täljarna. Edwin har adderat både täljare och nämnare, vilket är fel.",["add","3/4","+","2/4"]],
+["27","addera",86,"Johan åt [1/3] av chipsen, Noah [1/4] och Ellen [2/5], men chipsen tog inte slut. Visa med beräkning att det stämmer.","Addera de tre bråken. Gemensam nämnare för 3, 4 och 5 är 60. Visa att summan är mindre än [60/60] = 1.","[20/60] + [15/60] + [24/60] = [59/60], vilket är mindre än 1.",["add","1/3","+","1/4","2/5"]],
+["28","multi",87,"En förpackning innehåller [1/5] liter juice. Hur mycket finns i tre förpackningar?","3 · [1/5]: multiplicera heltalet med täljaren, behåll nämnaren.","[3/5] liter",["mul",3,"1/5"]],
+["29","multi",87,"En flaska innehåller [2/3] liter saft. Hur mycket finns i a) 2 flaskor b) 4 flaskor?","Heltal · täljare. Blir täljaren större än nämnaren kan du skriva svaret i blandad form.","a) [4/3] liter &nbsp; b) [8/3] liter",["mul",4,"2/3"]],
+["30","multi",87,"Beräkna: a) 5 · [2/3] b) 4 · [3/5] c) 6 · [4/5]","Multiplicera heltalet med täljaren. Nämnaren ändras inte.","a) [10/3] &nbsp; b) [12/5] &nbsp; c) [24/5]",["mul",5,"2/3"]],
+["31","multi",87,"Beräkna: a) 6 · [2/3] b) 10 · [3/8] c) 6 · [8/9]","Heltal · täljare. Förkorta om det går: [12/3] = 4.","a) [12/3] &nbsp; b) [30/8] &nbsp; c) [48/9]",["mul",6,"2/3"]],
+["32","multi",87,"Beräkna: a) 7 · [5/6] b) 12 · [3/4] c) 8 · [2/3]","Heltal · täljare, behåll nämnaren. Gör gärna om till blandad form.","a) [35/6] &nbsp; b) [36/4] (= 9) &nbsp; c) [16/3]",["mul",7,"5/6"]],
+["33","multi",87,"Ett pajrecept: [3/4] dl mjöl till 2 personer. Hur mycket till a) 4 b) 8 c) 10 personer?","Hur många gånger fler personer är det? 4 personer = 2 gånger så mycket: 2 · [3/4]. 10 personer = 5 gånger.","a) [6/4] dl &nbsp; b) [12/4] = 3 dl &nbsp; c) [15/4] dl",["mul",5,"3/4"]],
+["34","delbrak",88,"Hur mycket är a) [1/4] av 20 st b) [2/4] av 20 st c) [3/4] av 20 st?","Räkna först en fjärdedel: 20 / 4. Multiplicera sedan med täljaren.","a) 5 st &nbsp; b) 10 st &nbsp; c) 15 st",["del","3/4",20,"st"]],
+["35","delbrak",88,"Hur mycket är a) [2/5] av 100 cl b) [2/5] av 15 dl c) [3/5] av 20 liter?","Dela med nämnaren (en femtedel), multiplicera med täljaren.","a) 40 cl &nbsp; b) 6 dl &nbsp; c) 12 liter",["del","2/5",15,"dl"]],
+["36","delbrak",88,"Du får välja mellan [1/3] av 90 kr eller [1/4] av 100 kr. Vad väljer du?","Räkna ut båda och jämför.","[1/3] av 90 kr = 30 kr (mer än [1/4] av 100 kr = 25 kr)",["del","1/3",90,"kr"]],
+["37","delbrak",88,"En tårta med 8 bitar kostar 240 kr. Vad kostar 5 bitar?","5 bitar är [5/8] av tårtan. En bit kostar 240 / 8.","150 kr",["del","5/8",240,"kr"]],
+["38","delbrak",88,"I en kö står 30 personer. a) Var sjätte lyssnar på musik b) Två av tre talar i mobilen. Hur många?","Var sjätte = [1/6]. Två av tre = [2/3].","a) 5 st &nbsp; b) 20 st",["del","2/3",30,"st"]],
+["39","delbrak",88,"En boxare tackade nej till [1/3] av inkomsterna och ville ha minst [1/4]. Förklara varför han tänkte fel.","Större nämnare = helheten delas i fler bitar = varje bit blir mindre.","[1/3] är en större del än [1/4]. Ibland tänker man att 4 är större än 3.",["cmp","1/3","1/4"]],
+["40","tid",89,"Hur många månader är a) [1/3] b) [1/6] c) [1/12] av ett år?","1 år = 12 månader. Dela 12 med nämnaren.","a) 4 månader &nbsp; b) 2 månader &nbsp; c) 1 månad",["tid","1/3","ar"]],
+["41","tid",89,"Hur många månader är a) [2/3] b) [3/4] c) [5/6] av ett år?","En del = 12 / nämnaren. Multiplicera med täljaren.","a) 8 månader &nbsp; b) 9 månader &nbsp; c) 10 månader",["tid","5/6","ar"]],
+["42","tid",89,"Hur många timmar är a) [1/2] b) [1/4] c) [5/6] av ett dygn?","1 dygn = 24 h. 24 / 6 · 5 = …","a) 12 h &nbsp; b) 6 h &nbsp; c) 20 h",["tid","5/6","dygn"]],
+["43","tid",89,"José är vaken [2/3] av ett dygn. Hur många timmar är det?","24 / 3 · 2.","16 h",["tid","2/3","dygn"]],
+["44","tid",89,"Hur många minuter är a) [1/3] b) [1/4] c) [3/4] av en timme?","1 h = 60 min. Dela med nämnaren, gånger täljaren.","a) 20 min &nbsp; b) 15 min &nbsp; c) 45 min",["tid","3/4","h"]],
+["45","tid",89,"Hur många minuter är a) [5/6] h b) [3/10] h c) [4/5] h?","60 / 6 · 5 och så vidare.","a) 50 min &nbsp; b) 18 min &nbsp; c) 48 min",["tid","3/10","h"]],
+["46","tid",89,"Hur stor andel av en timme är a) 1 minut b) 40 minuter?","Andel = delen / det hela = minuter / 60. Förkorta.","a) [1/60] &nbsp; b) [40/60] = [2/3]",["tidx",40,"h"]],
+["47","decimal",90,"Skriv i decimalform: a) [1/2] b) [3/4] c) [3/10]","Täljare ÷ nämnare. Eller förläng till tiondelar eller hundradelar.","a) 0,5 &nbsp; b) 0,75 &nbsp; c) 0,3",["dec","3/4"]],
+["48","decimal",90,"Skriv i decimalform: a) [2/5] b) [4/5] c) [8/10]","[1/5] = 0,2. Förläng till tiondelar: [2/5] = [4/10] = 0,4.","a) 0,4 &nbsp; b) 0,8 &nbsp; c) 0,8",["dec","2/5"]],
+["49","decimal",90,"Till varje decimaltal hör två bråk ur rutan ([1/4], [3/5], [2/8], [2/10], [1/2], [1/5], [5/10], [6/10]). a) 0,5 b) 0,25 c) 0,2 d) 0,6","Gör om varje bråk i rutan till decimalform och para ihop.","a) [1/2], [5/10] &nbsp; b) [1/4], [2/8] &nbsp; c) [1/5], [2/10] &nbsp; d) [3/5], [6/10]",["dec","2/8"]],
+["50","decimal",90,"Skriv i decimalform: a) [1/20] b) [3/25] c) [7/50]","Förläng till hundradelar: [1/20] = [5/100] = 0,05.","a) 0,05 &nbsp; b) 0,12 &nbsp; c) 0,14",["dec","3/25"]],
+["51","decimal",90,"Skriv i decimalform: a) [6/5] b) [10/8] c) [13/4]","Täljaren är större än nämnaren – svaret blir större än 1.","a) 1,2 &nbsp; b) 1,25 &nbsp; c) 3,25",["dec","13/4"]],
+["52","decimal",90,"Skriv i decimalform och avrunda till två decimaler: a) [1/3] b) [4/9] c) [5/6]","Räkna på räknaren. Titta på tredje decimalen när du avrundar.","a) 0,33 &nbsp; b) 0,44 &nbsp; c) 0,83",["dec","5/6"]],
+["53","decimal",91,"Vilket bråk är störst? a) [5/8] eller [3/5] b) [7/12] eller [8/13] c) [3/17] eller [5/28]","Gör om båda bråken till decimalform och jämför.","a) [5/8] &nbsp; b) [8/13] &nbsp; c) [5/28]",["cmp","7/12","8/13"]],
+["54","decimal",91,"Vilken förpackning rymmer mest? (se bilderna i boken)","Gör om bråket till decimalform (liter) och jämför med decimaltalet.","a) [1/4] liter &nbsp; b) 0,15 liter",["dec","1/4"]],
+["55","decimal",91,"Vilka vikter har samma värde som a) 400 g b) 50 g? Välj bland [1/5] hg, 0,4 kg, [2/5] kg, [1/2] hg, 0,5 hg, [1/4] kg.","1 kg = 1 000 g och 1 hg = 100 g. Gör om alla vikter till gram.","a) 0,4 kg och [2/5] kg &nbsp; b) [1/2] hg och 0,5 hg",["dec","2/5"]],
+["56","decimal",91,"Beräkna och svara i decimalform: a) 0,2 + [1/2] b) 0,5 − [1/5]","Gör om bråket till decimalform först.","a) 0,7 &nbsp; b) 0,3",["dec","1/5"]],
+["57","decimal",91,"Glasen rymmer [2/5] l, 0,05 l, 0,25 l, [3/10] l och 0,15 l. a) Får allt plats i en 1-literskanna? b) Välj glas som tillsammans blir 0,5 l.","Gör om allt till decimalform: [2/5] = 0,4 och [3/10] = 0,3. Addera.","a) Nej, det blir 1,15 l. &nbsp; b) T.ex. 0,05 + [3/10] + 0,15 l",["dec","3/10"]],
+["58","procent",92,"Hur många procent av figurerna a–c är vita?","Hel = 100 %, halva = 50 %, en fjärdedel = 25 %.","a) 75 % &nbsp; b) 50 % &nbsp; c) 25 %",["hund",75]],
+["59","procent",92,"Hur mycket är 50 % av a) 300 kr b) 90 kr c) 160 kr?","50 % = hälften. Dela med 2.","a) 150 kr &nbsp; b) 45 kr &nbsp; c) 80 kr",["delenp",50,90,"kr","del"]],
+["60","procent",92,"Hur mycket är 25 % av a) 400 m b) 80 m c) 48 m?","25 % = [1/4]. Dela med 4.","a) 100 m &nbsp; b) 20 m &nbsp; c) 12 m",["delenp",25,48,"m","del"]],
+["61","procent",92,"Hur många minuter är a) 50 % b) 25 % c) 75 % av en timme?","60 min / 2, 60 min / 4. 75 % = 3 · 25 %.","a) 30 min &nbsp; b) 15 min &nbsp; c) 45 min",["tid","3/4","h"]],
+["62","procent",92,"Figurerna a–c är 25 %. Hur kan hela figuren se ut? Mät och rita.","25 % = [1/4]. Hela figuren består av fyra sådana delar – rita fyra likadana bredvid eller ovanpå varandra.","Inget facitsvar – rita själv. Hela figuren = fyra likadana delar.",["hund",25]],
+["63","procent",92,"Välj rätt procent (97 %, 24 %, 50 %, 26 %, 60 %, 33 %): a) varannan b) nästan allt c) knappt var fjärde d) drygt var fjärde","Var fjärde = 25 %. Knappt = lite mindre, drygt = lite mer.","a) 50 % &nbsp; b) 97 % &nbsp; c) 24 % &nbsp; d) 26 %",["hund",24]],
+["64","procent",92,"Hur mycket är 100 %, om 180 kr är 75 %?","75 % = 3 · 25 %. Så 25 % = 180 / 3. Hela = 4 · 25 %.","240 kr",["hela",75,180,"kr"]],
+["65","former",93,"Hur stor andel av figurerna a–c är färgad? Svara i bråk-, decimal- och procentform.","Räkna färgade rutor av 100. Hundradelar blir decimaltal med två decimaler och procent direkt.","a) [30/100] = 0,30 = 30 % &nbsp; b) [65/100] = 0,65 = 65 % &nbsp; c) [50/100] = 0,50 = 50 %",["conv","65/100"]],
+["66","former",93,"Hur många procent är a) [37/100] b) [6/100] c) [70/100] d) [100/100]?","Hundradelar är procent: [37/100] = 37 %.","a) 37 % &nbsp; b) 6 % &nbsp; c) 70 % &nbsp; d) 100 %",["conv","6/100"]],
+["67","former",93,"Hur många procent är a) 0,15 b) 0,54 c) 0,04 d) 0,465?","Gånger 100: flytta kommat två steg åt höger.","a) 15 % &nbsp; b) 54 % &nbsp; c) 4 % &nbsp; d) 46,5 %",["conv","0,465"]],
+["68","former",93,"Salthalten i Döda havet är 30 %. Skriv den i a) bråkform b) decimalform.","30 % = [30/100]. Förkorta gärna. Decimalform: dela med 100.","a) [3/10] &nbsp; b) 0,3",["conv","30 %"]],
+["69","former",93,"Välj ett bråk, ett decimaltal och ett procenttal till a) varannan b) en av fyra c) en av fem d) två av hundra.","”En av fyra” = [1/4]. Gör om varje bråk till decimal- och procentform.","a) [1/2], 0,5, 50 % &nbsp; b) [1/4], 0,25, 25 % &nbsp; c) [1/5], 0,2, 20 % &nbsp; d) [2/100], 0,02, 2 %",["conv","1/5"]],
+["70","andelp",94,"Hur många procent är a) 1 av 2 b) 1 av 4 c) 7 av 10?","Andelen = delen / det hela. Gör om till procent.","a) 50 % &nbsp; b) 25 % &nbsp; c) 70 %",["andelp",7,10]],
+["71","andelp",94,"Hur många procent är a) 2 av 5 b) 3 av 4 c) 4 av 8?","Delen / det hela, sedan gånger 100.","a) 40 % &nbsp; b) 75 % &nbsp; c) 50 %",["andelp",2,5]],
+["72","andelp",94,"Hur många procent rabatt får du? a) Köp 5 par strumpor, betala för 4 b) Den tionde pocketboken gratis","Hur många får du gratis av alla du får? a) 1 av 5. b) 1 av 10.","a) 20 % &nbsp; b) 10 %",["andelp",1,5]],
+["73","andelp",94,"En munkjacka som kostat 500 kr säljs med 200 kr rabatt. Hur många procent är det?","Rabatten / ursprungliga priset.","40 %",["andelp",200,500]],
+["74","andelp",94,"500 g ketchup innehåller 90 g socker. Hur många procent socker?","90 / 500.","18 %",["andelp",90,500]],
+["75","forandring",95,"Alla jeans säljs med 100 kr rabatt. Jeansen kostade förr 500 kr. Hur många procent billigare blir de?","Prissänkning / tidigare pris = 100 / 500.","20 %",["for",500,400]],
+["76","forandring",95,"Tröjan kostade förr 250 kr, nu 200 kr. a) Hur många kronor billigare? b) Hur många procent?","Räkna sänkningen i kronor. Dela med det tidigare priset 250.","a) 50 kr &nbsp; b) 20 %",["for",250,200]],
+["77","forandring",95,"Jackan kostade förr 400 kr, nu 300 kr. a) Hur många kronor billigare? b) Hur många procent?","Sänkning / tidigare pris.","a) 100 kr &nbsp; b) 25 %",["for",400,300]],
+["78","forandring",95,"Solglasögonen kostade förr 425 kr, nu 300 kr. Hur många procent billigare?","125 / 425 ≈ 0,294. Avrunda till hela procent.","29 %",["for",425,300]],
+["79","forandring",95,"Med hur många procent ökar priset från a) 120 kr till 150 kr b) 80 kr till 120 kr?","Räkna ut höjningen först. Dela med det gamla priset.","a) 25 % &nbsp; b) 50 %",["for",120,150]],
+["80","forandring",95,"Lias mamma hade 23 500 kr i lön. Nya lönen är 26 700 kr. Hur många procent har lönen ökat? Svara i hela procent.","Ökning: 26 700 − 23 500. Dela med 23 500.","14 %",["for",23500,26700]],
+["81","jamforp",96,"Äpplen kostar 24 kr/kg hos Willes och 18 kr/kg hos Åkes livs. a) Hur många procent billigare hos Åkes livs än hos Willes? b) Hur många procent dyrare hos Willes än hos Åkes livs?","Dividera skillnaden (6 kr) med det du jämför med: a) Willes 24 kr b) Åkes livs 18 kr.","a) 25 % &nbsp; b) 33 %",["jmf","Willes",24,"Åkes livs",18]],
+["82","jamforp",96,"Hur många procent billigare är a) osten (Willes 85 kr, Åkes 109 kr) b) riskakorna (Willes 15 kr, Åkes 19 kr) hos Willes än hos Åkes livs?","Jämför med Åkes livs: skillnaden / Åkes pris.","a) 22 % &nbsp; b) 21 %",["jmf","Willes",85,"Åkes livs",109]],
+["83","jamforp",96,"Medium har 25 kanaler och Large 29. Hur många procent fler kanaler får man med Large än med Medium?","Jämför med Medium: 4 / 25.","16 %",["jmf","Large",29,"Medium",25]],
+["84","jamforp",96,"Nina fick 12 sms och Lovisa 17. Hur många procent fler fick Lovisa jämfört med Nina?","Jämför med Nina: 5 / 12.","42 %",["jmf","Lovisa",17,"Nina",12]],
+["85","hela",97,"Hur mycket är 100 % om 3 % är a) 9 kr b) 30 kr c) 120 kr?","1 % = värdet / 3. 100 % = 100 · 1 %.","a) 300 kr &nbsp; b) 1 000 kr &nbsp; c) 4 000 kr",["hela",3,30,"kr"]],
+["86","hela",97,"Hur många är 100 % om 8 % motsvarar a) 88 st b) 72 st c) 216 st?","Dela med 8 för att få 1 %, gånger 100.","a) 1 100 st &nbsp; b) 900 st &nbsp; c) 2 700 st",["hela",8,216,"st"]],
+["87","hela",97,"Hur mycket är 100 % om 15 % motsvarar a) 30 b) 105 c) 39?","1 % = värdet / 15.","a) 200 &nbsp; b) 700 &nbsp; c) 260",["hela",15,39,""]],
+["88","hela",97,"Shiar fick 15 % rabatt på en cykel. Rabatten var 552 kr. Vad kostade cykeln från början?","Rabatten är delen och motsvarar 15 %. Ta fram 100 %.","3 680 kr",["hela",15,552,"kr"]],
+["89","hela",97,"85 % av fröna gror. Sabina vill ha 25 solrosor. Hur många frön bör hon plantera?","25 plantor = 85 %. Räkna ut 100 %. Avrunda uppåt.","30 frön",["hela",85,25,"frön"]],
+["90","hela",97,"Förslaget Lunch och brunch fick 62 % = 87 röster. Hur många röstade på det andra förslaget?","Räkna ut alla röster (100 %) och dra bort 87. Eller räkna 38 % direkt.","53 personer",["hela",62,87,"röster"]],
+["91","delenp",98,"Beräkna 1 % av a) 400 kr b) 150 kr c) 50 kr","1 % = dela med 100.","a) 4 kr &nbsp; b) 1,50 kr &nbsp; c) 0,50 kr",["delenp",1,150,"kr","del"]],
+["92","delenp",98,"Beräkna a) 1 % b) 2 % c) 3 % av 300 kr","1 % = 3 kr. Sedan gånger procenttalet.","a) 3 kr &nbsp; b) 6 kr &nbsp; c) 9 kr",["delenp",3,300,"kr","del"]],
+["93","delenp",98,"Beräkna a) 10 % av 600 kr b) 12 % av 3 000 kr c) 85 % av 900 kr","Metod 1: ta fram 1 % och multiplicera med procenttalet.","a) 60 kr &nbsp; b) 360 kr &nbsp; c) 765 kr",["delenp",85,900,"kr","del"]],
+["94","delenp",98,"Med metod 2: a) 12 % av 500 kg b) 13 % av 80 kg c) 24 % av 4 kg","Skriv procenten i decimalform (12 % = 0,12) och multiplicera.","a) 60 kg &nbsp; b) 10,4 kg &nbsp; c) 0,96 kg",["delenp",13,80,"kg","del"]],
+["95","delenp",98,"Med metod 2: a) 6 % av 750 kr b) 65 % av 120 kr c) 2,5 % av 350 kr","6 % = 0,06 och 2,5 % = 0,025.","a) 45 kr &nbsp; b) 78 kr &nbsp; c) 8,75 kr",["delenp",2.5,350,"kr","del"]],
+["96","delenp",98,"Med metod 2: a) 75 % av 96 m b) 150 % av 60 m c) 125 % av 80 m","Över 100 %: 150 % = 1,5. Svaret blir större än det hela.","a) 72 m &nbsp; b) 90 m &nbsp; c) 100 m",["delenp",150,60,"m","del"]],
+["97","delenp",98,"Hamid fick 5 % rabatt på hörlurar som kostat 580 kr. Hur stor blev rabatten i kronor?","Rabatten är delen: 5 % av 580 kr.","29 kr",["delenp",5,580,"kr","del"]],
+["98","delenp",98,"”Vad är 25 % av 400 kr?” Fyra personer A–D räknade olika. Vilka gjorde rätt?","25 % = 0,25 = [1/4]. Kontrollera varje uträkning – blir det 100 kr?","B, C och D",["delenp",25,400,"kr","del"]],
+["99","delenp",99,"Hörlurar som kostat 900 kr säljs med 35 % rabatt. Beräkna det nya priset.","Rabatt = 0,35 · 900. Nytt pris = 900 − rabatten.","585 kr",["delenp",35,900,"kr","minus"]],
+["100","delenp",99,"En dator kostar 4 900 kr och säljs med 15 % rabatt. Nya priset?","Räkna rabatten och dra bort den.","4 165 kr",["delenp",15,4900,"kr","minus"]],
+["101","delenp",99,"8 % rabatt på en skrivare som kostat 950 kr. Nya priset?","Rabatt 8 % av 950, dra bort.","874 kr",["delenp",8,950,"kr","minus"]],
+["102","delenp",99,"Ett årskort på gymmet kostar 2 500 kr och höjs med 6 %. Nya priset?","Höjningen läggs till: 2 500 + 6 % av 2 500.","2 650 kr",["delenp",6,2500,"kr","plus"]],
+["103","delenp",99,"6 475 besökare i januari. I februari ökade antalet med 12 %. Hur många besökare i februari?","Räkna ökningen och lägg till.","7 252 personer",["delenp",12,6475,"st","plus"]],
+["104","delenp",99,"Jasmine gjorde 120 poäng förra säsongen och har ökat med 35 %. Hur många poäng nu?","35 % av 120, lägg till.","162 poäng",["delenp",35,120,"poäng","plus"]],
+["105","delenp",99,"Hur räknar du ut 35 % rabatt på 2 400 kr med huvudräkning?","Dela upp: 35 % = 3 · 10 % + 5 %. 10 % av 2 400 = 240 och 5 % är hälften av det.","T.ex. 3 · 10 % + 5 % = 3 · 240 kr + 120 kr = 840 kr. 2 400 kr − 840 kr = 1 560 kr.",["delenp",35,2400,"kr","minus"]],
+["106","faktor",100,"Skriv i decimalform: a) 102 % b) 125 % c) 160 %","Dela med 100.","a) 1,02 &nbsp; b) 1,25 &nbsp; c) 1,60",["fakf","1,25"]],
+["107","faktor",100,"Hur har priset ändrats om det räknas a) 1,05 · 500 kr b) 1,45 · 500 kr c) 1,4 · 500 kr?","Faktor över 1 = ökning. 1,05 = 105 % → ökat med 5 %.","a) ökat med 5 % &nbsp; b) ökat med 45 % &nbsp; c) ökat med 40 %",["fakf","1,4"]],
+["108","faktor",100,"Förr 270 g, nu 26 % mer. a) Vilket tal multiplicerar du 270 med? b) Beräkna nya vikten.","100 % + 26 % = 126 %.","a) 1,26 &nbsp; b) 340,2 ≈ 340 g",["fak",270,26,1]],
+["109","faktor",100,"Ett träningspass kostar 78 kr och höjs med 15 %. Nya priset?","Förändringsfaktor 1,15.","89,7 ≈ 90 kr",["fak",78,15,1]],
+["110","faktor",100,"En klänning kostade 680 kr. Ny modell är 18 % dyrare. Nya priset?","1,18 · 680.","802,4 ≈ 802 kr",["fak",680,18,1]],
+["111","faktor",101,"Hur många procent av priset betalar du vid rabatten a) 7 % b) 12 % c) 43 %?","100 % minus rabatten.","a) 93 % &nbsp; b) 88 % &nbsp; c) 57 %",["fak",100,43,-1]],
+["112","faktor",101,"Shorts för 500 kr. Hur har priset ändrats om det räknas a) 0,95 · 500 b) 0,65 · 500 c) 0,8 · 500?","Faktor under 1 = minskning. 0,95 = 95 % → 5 % billigare.","a) 5 % billigare &nbsp; b) 35 % billigare &nbsp; c) 20 % billigare",["fakf","0,65"]],
+["113","faktor",101,"En T-shirt kostar 150 kr. Rea med 30 % rabatt. a) Hur många procent av priset betalar man? b) Vad kostar den?","Du betalar 70 % → faktor 0,70.","a) 70 % &nbsp; b) 105 kr",["fak",150,30,-1]],
+["114","faktor",101,"17 500 besökare förra året, i år 18 % färre. Hur många i år?","Faktor 0,82.","14 350 personer",["fak",17500,18,-1]],
+["115","faktor",101,"En tvådagarsbiljett kostar 600 kr. Endagsbiljetten är 35 % billigare. Vad kostar den?","Faktor 0,65.","390 kr",["fak",600,35,-1]],
+["116","ranta",102,"Årsränta på 5 000 kr med räntesatsen a) 6 % b) 9 % c) 20 %?","Ränta = räntesats i decimalform · lånet.","a) 300 kr &nbsp; b) 450 kr &nbsp; c) 1 000 kr",["ranta",5000,9,12]],
+["117","ranta",102,"Lån på 1 300 000 kr till 6 % ränta. Ränta a) per år b) per månad?","Per månad: dela årsräntan med 12.","a) 78 000 kr &nbsp; b) 6 500 kr",["ranta",1300000,6,12]],
+["118","ranta",102,"Lån på 1 100 000 kr till 5,4 % ränta. Ränta a) per år b) per månad?","0,054 · 1 100 000. Per månad: / 12.","a) 59 400 kr &nbsp; b) 4 950 kr",["ranta",1100000,5.4,12]],
+["119","ranta",102,"Lån på 25 000 kr till 8 % ränta, lån + ränta betalas efter ett år. Vad kostar möblerna totalt?","Lånet + räntan, eller 1,08 · 25 000.","27 000 kr",["ranta",25000,8,12]],
+["120","ranta",103,"Ett ”räntefritt” lån har avgifter som motsvarar 15 % av lånesumman. Vad kostar det att låna 5 000 kr i ett år?","Kostnaden är avgifterna: 15 % av 5 000.","750 kr",["ranta",5000,15,12]],
+["121","ranta",103,"Sms-lån på 2 000 kr med 22,5 % effektiv ränta. Hur mycket ska man totalt betala tillbaka?","Lånet + 22,5 % av 2 000. Eller 1,225 · 2 000.","2 450 kr",["ranta",2000,22.5,12]],
+["122","ranta",103,"En tv kostar 8 900 kr kontant. Avbetalning motsvarar 21 % effektiv ränta. Hur mycket dyrare blir det?","”Hur mycket dyrare” = bara räntan: 21 % av 8 900.","1 869 kr",["ranta",8900,21,12]],
+
+["3A-1","andel",91,"Minitest 3A uppgift 1: Skriv bråket tre femtedelar med siffror.","Tre = täljare, femtedelar = nämnare.","[3/5]",["andel",3,5]],
+["3A-2","jamfor",91,"Minitest 3A uppgift 2: Vilket är störst? a) [3/8] eller [3/5] b) [3/8] eller [5/8]","a) Lika täljare – minst nämnare störst. b) Lika nämnare – störst täljare.","a) [3/5] &nbsp; b) [5/8]",["cmp","3/8","3/5"]],
+["3A-3","forkorta",91,"Minitest 3A uppgift 3: Förkorta [15/20] så långt det går.","Vilket tal går jämnt upp i både 15 och 20?","[3/4]",["ff","15/20",5]],
+["3A-4","addera",91,"Minitest 3A uppgift 4: Beräkna a) [3/11] + [5/11] b) [7/8] − [1/4] c) 2 · [3/4] d) [1/5] av 200 kr","b) [1/4] = [2/8]. c) heltal · täljare. d) 200 / 5.","a) [8/11] &nbsp; b) [5/8] &nbsp; c) [6/4] = [3/2] &nbsp; d) 40 kr",["add","7/8","-","1/4"]],
+["3A-5","decimal",91,"Minitest 3A uppgift 5: Vilket är störst? a) 0,3 eller [1/3] b) 0,4 eller [1/4]","Gör om bråket till decimalform.","a) [1/3] &nbsp; b) 0,4",["dec","1/3"]],
+["3B-1","procent",94,"Minitest 3B uppgift 1: Hur mycket är a) 50 % av 240 kr b) 25 % av 120 kr?","50 % = hälften, 25 % = en fjärdedel.","a) 120 kr &nbsp; b) 30 kr",["delenp",25,120,"kr","del"]],
+["3B-2","former",94,"Minitest 3B uppgift 2: Hur många procent är a) 0,14 b) [3/4] c) 4 av 12?","Gör om till hundradelar. c) 4 / 12 ≈ 0,33.","a) 14 % &nbsp; b) 75 % &nbsp; c) 33 %",["conv","4/12"]],
+["3B-3","forandring",94,"Minitest 3B uppgift 3: En bussbiljett som kostat 25 kr höjs med 2 kr. Med hur många procent?","Höjning / tidigare pris = 2 / 25.","8 %",["for",25,27]],
+["3C-1","forandring",103,"Minitest 3C uppgift 1: Cykelhjälmen kostade förr 300 kr, nu 240 kr. Hur många procent rabatt?","Sänkning 60 kr / tidigare 300 kr.","20 %",["for",300,240]],
+["3C-2","hela",103,"Minitest 3C uppgift 2: Hur mycket är 100 % om 12 % är 60 kr?","1 % = 60 / 12.","500 kr",["hela",12,60,"kr"]],
+["3C-3","delenp",103,"Minitest 3C uppgift 3: Jordnötter innehåller 48 % fett. Hur mycket väger fettet i 250 g?","0,48 · 250.","120 g",["delenp",48,250,"g","del"]],
+["3C-4","faktor",103,"Minitest 3C uppgift 4: Dvd-filmer säljs med 80 % rabatt. Vad kostar en film som kostat 139 kr?","Du betalar 20 % → faktor 0,20.","27,8 ≈ 28 kr",["fak",139,80,-1]],
+["3C-5","faktor",103,"Minitest 3C uppgift 5: En kamera kostade 2 495 kr. Hur har priset ändrats om det räknas a) 0,85 · 2 495 b) 1,2 · 2 495?","Under 1: minskning. Över 1: ökning.","a) 15 % billigare &nbsp; b) 20 % dyrare",["fakf","0,85"]],
+["3C-6","ranta",103,"Minitest 3C uppgift 6: Isak lånar 4 000 kr med ett sms-lån. Räntesatsen är 81 % på ett år. Hur mycket måste han betala tillbaka?","Lånet + 81 % av lånet, eller 1,81 · 4 000.","7 240 kr",["ranta",4000,81,12]],
+
+["AT-A1","jamforp",104,"Arbeta tillsammans A1: Hörlurar kostar 200 kr i butik A och 250 kr i B. Vilket stämmer: a) B är 20 % dyrare än A b) B är 25 % dyrare än A?","Jämför med A (200 kr): 50 / 200.","b) är rätt",["jmf","B",250,"A",200]],
+["AT-A2","jamforp",104,"Arbeta tillsammans A2: Vilket stämmer: a) A är 20 % billigare än B b) A är 25 % billigare än B?","Jämför med B (250 kr): 50 / 250.","a) är rätt",["jmf","A",200,"B",250]],
+["AT-A3","jamforp",104,"Arbeta tillsammans A3: Varför blir det inte samma procent i 1 och 2?","Vad delar du med i 1 och i 2?","Man jämför med olika priser.",["jmf","B",250,"A",200]],
+["AT-A4","faktor",104,"Arbeta tillsammans A4: A höjer priset med 50 % till 300 kr. Med hur många procent måste de sänka för att det ska bli 200 kr igen?","Sänkningen 100 kr ska jämföras med det nya priset 300 kr.","100 kr / 300 kr = [1/3] ≈ 33 %",["for",300,200]],
+["AT-B1","andelp",104,"Arbeta tillsammans B1: 10 % i åk 8 gillar rock. Sant eller falskt: ”Var tionde elev i åk 8 gillar rock.”","10 % = [10/100] = [1/10].","Sant",["conv","10 %"]],
+["AT-B2","andelp",104,"Arbeta tillsammans B2: 10 % i åk 8 och 20 % i åk 9 gillar rock. ”30 % av eleverna i åk 8 och 9 gillar rock.”","Kan man addera procent som räknas på olika helheter?","Falskt. Man kan inte addera procentsatser.",["andelp",30,200]],
+["AT-B3","andelp",104,"Arbeta tillsammans B3: ”Det är dubbelt så många elever i åk 9 som i åk 8 som gillar rock.”","20 % är dubbelt så mycket som 10 % – men av vad?","Det beror på hur många elever som går i åk 8 och åk 9. Sant om det finns lika många elever i åk 8 och åk 9.",["andelp",20,100]],
+["AT-B4","delenp",104,"Arbeta tillsammans B4: ”I varje skolklass i åk 9 är det ungefär 6 elever som gillar rock.”","20 % av hur många elever blir 6?","Sant om det finns 30 elever i varje klass.",["delenp",20,30,"elever","del"]],
+
+["SF-1","andel",104,"Sant eller falskt 1: I bråket [5/8] är täljaren 5.","Täljaren står överst.","Sant",["andel",5,8]],
+["SF-2","decimal",104,"Sant eller falskt 2: 0,2 är större än [10/100].","[10/100] = 0,1.","Sant",["dec","10/100"]],
+["SF-3","samma",104,"Sant eller falskt 3: Det finns oändligt många bråk som betyder detsamma som [1/3].","Du kan förlänga med vilket tal som helst.","Sant",["ff","1/3",7]],
+["SF-4","jamfor",104,"Sant eller falskt 4: [3/7] är större än [3/5].","Lika täljare – vilken nämnare ger störst bitar?","Falskt",["cmp","3/7","3/5"]],
+["SF-5","delbrak",104,"Sant eller falskt 5: 0,25 är en tredjedel av [3/4].","[3/4] = 0,75. Vad är 0,75 / 3?","Sant",["del","1/3",0.75,""]],
+["SF-6","former",104,"Sant eller falskt 6: En av fyra är detsamma som 25 %.","[1/4] = 0,25.","Sant",["conv","1/4"]],
+["SF-7","former",104,"Sant eller falskt 7: En femtedel är detsamma som 5 %.","[1/5] = [20/100].","Falskt",["conv","1/5"]],
+["SF-8","procent",104,"Sant eller falskt 8: Att betala halva priset betyder att få 50 % rabatt.","Halva = 50 %.","Sant",["hund",50]],
+["SF-9","former",104,"Sant eller falskt 9: 6 % skrivs som 0,6 i decimalform.","6 % = [6/100].","Falskt (6 % = 0,06)",["conv","6 %"]],
+["SF-10","forandring",104,"Sant eller falskt 10: Om priset ökar från 10 kr till 15 kr har det ökat med 5 %.","Ökningen 5 kr jämförs med 10 kr.","Falskt (det har ökat med 50 %)",["for",10,15]],
+["SF-11","multi",104,"Sant eller falskt 11: En halv fjärdedel är en åttondel.","Hälften av [1/4] – dela varje fjärdedel i två.","Sant",["ff","1/4",2]],
+["SF-12","faktor",104,"Sant eller falskt 12: En vara blir gratis om priset sänks med 50 % två gånger.","0,5 · 0,5 = ?","Falskt (den kostar 25 % av priset)",["fak",100,50,-1,50,-1]],
+["SF-13","andelp",104,"Sant eller falskt 13: [15/31] är mindre än 50 %.","Dubbla täljaren: 30 jämfört med 31.","Sant",["andelp",15,31]],
+["SF-14","samma",104,"Sant eller falskt 14: Två av fem är detsamma som 8 av 20.","Förläng [2/5] med 4.","Sant",["ff","2/5",4]],
+
+["KT-1","andel",105,"Kapiteltest 1: Skriv ett bråk med täljaren 5 och nämnaren 7.","Täljaren överst, nämnaren nederst.","[5/7]",["andel",5,7]],
+["KT-2","jamfor",105,"Kapiteltest 2: Skriv [17/18], [7/15], [11/9], [9/17] i storleksordning.","Jämför med en halv och med 1 först.","[7/15], [9/17], [17/18], [11/9]",["cmp","7/15","9/17"]],
+["KT-3","forkorta",105,"Kapiteltest 3: Skriv bråken med nämnaren 18: a) [5/6] b) [24/36]","a) förläng med 3. b) förkorta med 2.","a) [15/18] &nbsp; b) [12/18]",["ff","5/6",3]],
+["KT-4","addera",105,"Kapiteltest 4: Beräkna a) [4/8] + [3/8] b) [3/8] + [1/4] c) [3/5] av 25 d) 3 · [2/3]","b) [1/4] = [2/8]. c) 25 / 5 · 3. d) heltal · täljare.","a) [7/8] &nbsp; b) [5/8] &nbsp; c) 15 &nbsp; d) [6/3] = 2",["add","3/8","+","1/4"]],
+["KT-5","former",105,"Kapiteltest 5: Skriv som procent: a) [1/4] b) [7/100] c) 0,26 d) 0,04","Gör om till hundradelar.","a) 25 % &nbsp; b) 7 % &nbsp; c) 26 % &nbsp; d) 4 %",["conv","0,04"]],
+["KT-6","andelp",105,"Kapiteltest 6: Hur många procent är 3 st av 75 st?","3 / 75.","4 %",["andelp",3,75]],
+["KT-7","hela",105,"Kapiteltest 7: Hur mycket är det hela om 8 % är 100 kg?","1 % = 100 / 8.","1 250 kg",["hela",8,100,"kg"]],
+["KT-8","delenp",105,"Kapiteltest 8: Beräkna a) 12 % av 450 kr b) 1,5 % av 3 200 kr","Metod 2: 0,12 · 450 och 0,015 · 3 200.","a) 54 kr &nbsp; b) 48 kr",["delenp",1.5,3200,"kr","del"]],
+["KT-9","faktor",105,"Kapiteltest 9: En konsertbiljett kostar 350 kr och sänks med 15 %. Räkna med förändringsfaktor.","Faktor 0,85.","297,50 kr",["fak",350,15,-1]],
+["KT-10","ranta",105,"Kapiteltest 10: Alex satte in 20 000 kr på ett sparkonto med 3,75 % ränta. Hur mycket fanns efter ett år?","Sparkonto fungerar som ett lån åt andra hållet: insättningen + räntan.","20 750 kr",["ranta",20000,3.75,12]],
+
+["UP-A","delbrak",106,"Uppslaget A: En fjärdedel av medlemmarna fick biljetter. Man ville välja en fjärdedel av männen och en fjärdedel av kvinnorna, men det gick inte. a) Varför? b) Hur kan fördelningen se ut?","Man kan inte dela en person. Antalet män och antalet kvinnor måste gå att dela med 4.","a) Antalet män respektive kvinnor är inte delbart med 4. &nbsp; b) T.ex. 12 män och 16 kvinnor, eller 8 kvinnor och 20 män.",["del","1/4",16,"kvinnor"]],
+["UP-B","hela",106,"Uppslaget B: En målvakt hade 90 % räddningsprocent. Föreslå hur många skott han räddade och släppte in under 55 matcher.","Han släppte in 10 % av skotten. Om han släpper in 2 mål per match – hur många skott är då 100 %?","T.ex. 2 insläppta mål per match = 10 % → 20 skott per match. På 55 matcher: 990 räddade och 110 insläppta.",["hela",10,2,"mål"]],
+["UP-C","delenp",106,"Uppslaget C: Stina tjänar 20 000 kr/mån och får välja 1 000 kr mer eller +4 %. a) Vad ska hon välja? b) För Ricardo spelar det ingen roll. Hur stor är hans lön?","a) Räkna 4 % av 20 000. b) 4 % motsvarar 1 000 kr – ta fram 100 %.","a) 1 000 kr mer (4 % = 800 kr). &nbsp; b) 25 000 kr",["hela",4,1000,"kr"]],
+["UP-D","addera",106,"Uppslaget D: En pappersremsa är [2/3] m lång. Kan du göra en remsa som är en halv meter utan hjälpmedel? Visa.","[2/3] = [4/6] och [1/2] = [3/6]. Vik remsan så att den delas i fyra lika delar.","Ja. [2/3] m = [4/6] m. Vik remsan på mitten två gånger – nu är den delad i sjättedelar. Vik in en del: kvar är [3/6] = [1/2] m.",["add","2/3","-","1/2"]],
+["UP-E","samma",106,"Uppslaget E: Hur stor andel av figuren är färgad? (se bilden i boken)","Dela in hela figuren i lika stora små rutor, sextondelar.","[5/16]",["andel",5,16]],
+["UP-F","hela",106,"Uppslaget F: En melon väger 5 kg och är 95 % vatten. Efter solen är vattenhalten 90 %. Hur mycket väger den nu?","Fruktköttet ändras inte: 5 % av 5 kg = 250 g. Nu är fruktköttet 10 % av vikten.","2,5 kg",["hela",10,250,"g"]],
+
+["BU-A","faktor",107,"Bedömningsuppgift Rea eller inte? A: Tröjan kostar 200 kr. Butik 1: +5 % och sedan −10 %. Butik 2: −10 % och sedan +5 %. Vad kostar tröjan i butikerna?","Räkna med förändringsfaktorer i två steg: 200 · 1,05 · 0,90 och 200 · 0,90 · 1,05.","Bedömningsuppgift – inget facit i boken. Kontrollera med verktyget.",["fak",200,5,1,10,-1]],
+["BU-B","faktor",107,"Bedömningsuppgift Rea eller inte? B: Hur många procent har priset förändrats i butik 1 och butik 2?","Multiplicera faktorerna. Den totala faktorn visar den totala förändringen.","Bedömningsuppgift – inget facit i boken. Kontrollera med verktyget.",["fak",200,10,-1,5,1]],
+["BU-C","faktor",107,"Bedömningsuppgift Rea eller inte? C: Vilken slutsats kan du dra? Använd begreppet förändringsfaktor.","Spelar ordningen någon roll när man multiplicerar? Och blir +5 % och −10 % samma sak som −5 %?","Bedömningsuppgift – inget facit i boken.",["fak",200,5,1,10,-1]],
+
+["PL-A","jamfor",107,"Problemlösning A: Inez har ätit [1/3] av sin chokladkaka och Armina [2/5] av sin – de har ätit lika mycket. Vem hade störst kaka?","Om [1/3] av Inez kaka är lika mycket som [2/5] av Arminas – vems bit är då en mindre andel av kakan?","Inez",["cmp","1/3","2/5"]],
+["PL-B","andelp",107,"Problemlösning B: 100 bilar och mopeder har tillsammans 356 hjul. Vad är förhållandet mellan bilar och mopeder?","Om alla vore mopeder blir det 200 hjul. Varje bil ger 2 hjul extra.","D: 78 bilar och 22 mopeder → [78/22] = [39/11]",["ff","78/22",2]],
+["PL-C","addera",107,"Problemlösning C: Vilket tal ligger mitt emellan [1/8] och [7/12]?","Gör om till gemensam nämnare, t.ex. 48-delar. Mitt emellan = medelvärdet.","e) [17/48]",["add","1/8","+","7/12"]]
+];
+
+const SECS={andel:"Andel i bråkform",jamfor:"Jämföra bråk",samma:"Olika bråk men samma värde",forkorta:"Förkorta och förlänga bråk",addera:"Addera och subtrahera bråk",multi:"Multiplicera bråk med ett heltal",delbrak:"Beräkna delen med bråk",tid:"Bråkdelar av tid",decimal:"Andel i decimalform",procent:"Procent",former:"Bråk-, decimal- och procentform",andelp:"Beräkna andelen i procentform",forandring:"Procentuell ökning och minskning",jamforp:"Jämför med procent",hela:"Beräkna det hela, 100 %",delenp:"Beräkna delen med procent",faktor:"Förändringsfaktor",ranta:"Ränta och effektiv ränta"};
+const GROUPS=[["3A","Minitest 3A","s. 91"],["3B","Minitest 3B","s. 94"],["3C","Minitest 3C","s. 103"],["AT","Arbeta tillsammans","s. 104"],["SF","Sant eller falskt","s. 104"],["KT","Kapiteltest","s. 105"],["UP","Uppslaget","s. 106"],["BU","Bedömningsuppgift: Rea eller inte?","s. 107"],["PL","Problemlösning","s. 107"]];
+
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg";
+function S(tag,a,parent,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;if(parent)parent.appendChild(e);return e}
+function clear(el){while(el.firstChild)el.removeChild(el.firstChild)}
+const C=v=>`var(--${v})`;
+const NFc={};function nf(x,d=4){if(!isFinite(x))return"–";if(Math.abs(x)<1e-12)x=0;NFc[d]=NFc[d]||new Intl.NumberFormat("sv-SE",{maximumFractionDigits:d});return NFc[d].format(x).replace(/−/g,"−")}
+function nf2(x){return new Intl.NumberFormat("sv-SE",{minimumFractionDigits:2,maximumFractionDigits:2}).format(x)}
+function num(s){if(s==null)return NaN;const t=String(s).replace(/[\s  %]/g,"").replace(",",".").replace(/[−–]/g,"-");if(t===""||t==="-"||t===".")return NaN;return Number(t)}
+function seg(name){const r=$(`input[name="${name}"]:checked`);return r?r.value:null}
+function setSeg(name,v){const r=$(`input[name="${name}"][value="${v}"]`);if(r)r.checked=true}
+function on(els,ev,fn){(Array.isArray(els)?els:[els]).forEach(e=>e&&e.addEventListener(ev,fn))}
+function safe(name,fn){try{fn()}catch(e){console.error(name,e)}}
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+const lcm=(a,b)=>a/gcd(a,b)*b;
+const F=(n,d,cls="")=>d===1?`<span class="${cls}">${n}</span>`:`<span class="frac ${cls}"><span>${n}</span><span>${d}</span></span>`;
+function simp(f){const g=gcd(f.n,f.d);return{n:f.n/g,d:f.d/g}}
+/* tolka bråk: "3/4", "1 1/2", "2", "0,25" */
+function pf(s){if(s==null)return null;s=String(s).trim().replace(/[−–]/g,"-");let m;
+  if(m=s.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/)){const w=+m[1],n=+m[2],d=+m[3];if(!d)return null;return{n:(Math.abs(w)*d+n)*(w<0?-1:1),d}}
+  if(m=s.match(/^(-?\d+)\s*\/\s*(\d+)$/)){if(!+m[2])return null;return{n:+m[1],d:+m[2]}}
+  if(m=s.match(/^(-?\d+)(?:[.,](\d{1,6}))?$/)){if(!m[2])return{n:+m[1],d:1};const d=Math.pow(10,m[2].length);return simp({n:Math.round(Number(m[1]+"."+m[2])*d),d})}
+  return null}
+function mixed(n,d){if(d===1)return String(n);const w=Math.trunc(n/d),r=Math.abs(n%d);if(!w)return F(n,d);if(!r)return String(w);return `${w} ${F(r,d)}`}
+function tx(s){return String(s).replace(/\[(\d+|□)\/(\d+)\]/g,(m,a,b)=>F(a,+b))}
+const SMALL=["noll","en","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv","tretton","fjorton","femton","sexton","sjutton","arton","nitton","tjugo"];
+const DEN={3:"tredjedel",4:"fjärdedel",5:"femtedel",6:"sjättedel",7:"sjundedel",8:"åttondel",9:"niondel",10:"tiondel",11:"elftedel",12:"tolftedel",13:"trettondel",14:"fjortondel",15:"femtondel",16:"sextondel",17:"sjuttondel",18:"artondel",19:"nittondel",20:"tjugondel",24:"tjugofjärdedel",25:"tjugofemtedel",30:"trettiondel",50:"femtiondel",60:"sextiondel",100:"hundradel",1000:"tusendel"};
+function words(n,d){const tn=n<=20?SMALL[n]:String(n);if(d===1)return null;if(d===2)return n===1?"en halv":`${tn} halvor`;const w=DEN[d];if(!w)return null;return n===1?`en ${w}`:`${tn} ${w}ar`}
+
+/* stapelbild för bråk */
+function bars(svg,list,opt={}){ // list:[{n,d,color,label}]
+  clear(svg);const W=540,x0=opt.x0||20,bh=opt.bh||30,gap=opt.gap||12,G=8;let y=6;
+  const wh=it=>Math.min(8,Math.max(1,Math.ceil(it.n/it.d-1e-9)));const maxW=Math.max(1,...list.map(wh));
+  const per=(W-x0-(maxW-1)*G)/maxW;
+  list.forEach(it=>{const wholes=wh(it),segs=it.d;
+    if(it.label)S("text",{x:x0-8,y:y+bh/2+5,"text-anchor":"end","font-size":14,"font-weight":700,style:`fill:${C(it.color==="gold"?"ink":it.color||"ink")}`},svg,it.label);
+    for(let k=0;k<wholes;k++){const bx=x0+k*(per+G),fillCount=Math.max(0,Math.min(segs,it.n-k*segs)),sw=per/segs;
+      if(segs<=60){for(let i=0;i<segs;i++)S("rect",{x:bx+i*sw,y:y,width:sw,height:bh,style:`fill:${i<fillCount?C(it.color||"red"):C("paper")};stroke:${C("ink")};stroke-width:${segs>30?.4:1}`},svg)}
+      else{S("rect",{x:bx,y:y,width:per,height:bh,style:`fill:${C("paper")};stroke:${C("ink")}`},svg);S("rect",{x:bx,y:y,width:per*fillCount/segs,height:bh,style:`fill:${C(it.color||"red")}`},svg)}}
+    y+=bh+gap});
+  svg.setAttribute("viewBox",`0 0 ${W+4} ${y}`);
+}
+
+/* ---------- tema & nav ---------- */
+safe("tema",()=>{const root=document.documentElement;try{const t=localStorage.getItem("lh-theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+  $("#themeBtn").addEventListener("click",()=>{const cur=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");const nx=cur==="dark"?"light":"dark";root.setAttribute("data-theme",nx);try{localStorage.setItem("lh-theme",nx)}catch(e){}})});
+safe("nav",()=>{const side=$("#side"),btn=$("#menuBtn");
+  btn.addEventListener("click",()=>{const o=side.classList.toggle("open");btn.setAttribute("aria-expanded",o)});
+  $$("#side a").forEach(a=>a.addEventListener("click",()=>{side.classList.remove("open");btn.setAttribute("aria-expanded","false")}));
+  const links=new Map($$("#side a").map(a=>[a.getAttribute("href").slice(1),a]));
+  function setCur(id){links.forEach((a,k)=>a.setAttribute("aria-current",k===id?"true":"false"))}
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setCur(e.target.id)})},{rootMargin:"-35% 0px -60% 0px"});$$(".sec").forEach(s=>io.observe(s))}
+});
+
+/* ================= VERKTYG ================= */
+const TOOL={};
+
+/* andel */
+safe("andel",()=>{function upd(){const n=Math.round(num($("#an-n").value)),d=Math.round(num($("#an-d").value)),svg=$("#an-svg");
+  if(!(n>=0&&d>=1&&d<=100&&n<=4*d)){$("#an-big").innerHTML='<span class="err">Välj nämnare 1–100 och en täljare som inte är för stor.</span>';$("#an-say").textContent="";clear(svg);return}
+  $("#an-big").innerHTML=`${F(n,d)} ${n>d?`= ${mixed(n,d)}`:""}`;const w=words(n,d);
+  $("#an-say").innerHTML=`${w?`Läses <b>”${w}”</b>. `:""}<b class="r">${n}</b> delar av sorten <b class="b">${d===1?"hela":(DEN[d]?DEN[d]+"ar":d+"-delar")}</b>. ${n<d?`Det som inte är färgat: ${F(d-n,d)}.`:n===d?"Hela är färgad – bråket är 1.":"Mer än en hel."}`;
+  if(seg("an-s")==="pie"&&n<=d){clear(svg);const cx=70,cy=70,R=62;svg.setAttribute("viewBox","0 0 560 145");
+    for(let i=0;i<d;i++){const a0=-Math.PI/2+i*2*Math.PI/d,a1=a0+2*Math.PI/d;const p=d===1?`M${cx} ${cy-R} A${R} ${R} 0 1 1 ${cx-0.01} ${cy-R} Z`:`M${cx} ${cy} L${cx+R*Math.cos(a0)} ${cy+R*Math.sin(a0)} A${R} ${R} 0 ${a1-a0>Math.PI?1:0} 1 ${cx+R*Math.cos(a1)} ${cy+R*Math.sin(a1)} Z`;
+      S("path",{d:p,style:`fill:${i<n?C("red"):C("paper")};stroke:${C("ink")};stroke-width:${d>40?.5:1.5}`},svg)}
+    S("text",{x:160,y:76,"font-size":16},svg,`${n} av ${d} lika stora delar`)}
+  else bars(svg,[{n,d,color:"red"}],{x0:20,max:Math.ceil(n/d)||1})}
+  on([$("#an-n"),$("#an-d")],"input",upd);$$('input[name="an-s"]').forEach(r=>r.addEventListener("change",upd));upd();
+  TOOL.andel=(n,d)=>{$("#an-n").value=n;$("#an-d").value=d;upd();return"#t-andel"}});
+
+/* jämför */
+safe("cmp",()=>{function upd(){const a=pf($("#cm-a").value),b=pf($("#cm-b").value),svg=$("#cm-svg");
+  if(!a||!b||a.d<=0||b.d<=0){$("#cm-big").innerHTML='<span class="err">Skriv två bråk, t.ex. 3/4.</span>';$("#cm-why").textContent="";clear(svg);return}
+  const va=a.n/a.d,vb=b.n/b.d,sg=Math.abs(va-vb)<1e-12?"=":va>vb?">":"<";
+  $("#cm-big").innerHTML=`${F(a.n,a.d)} <span class="r">${sg}</span> ${F(b.n,b.d)}`;
+  let why;if(a.d===b.d)why=`<b>Lika nämnare.</b> Jämför täljarna: ${a.n} ${sg} ${b.n}.`;
+  else if(a.n===b.n)why=`<b>Lika täljare.</b> Jämför nämnarna: ${a.d} delar ${a.d<b.d?"ger större":"ger mindre"} bitar än ${b.d} delar.`;
+  else{const L=lcm(a.d,b.d);why=L<=400?`<b>Gemensam nämnare ${L}:</b> ${F(a.n,a.d)} = ${F(a.n*L/a.d,L)} och ${F(b.n,b.d)} = ${F(b.n*L/b.d,L)}. Jämför ${a.n*L/a.d} och ${b.n*L/b.d}.`:""}
+  why+=`<div class="small">Decimalform: ${nf(va,4)} och ${nf(vb,4)}. ${[a,b].map(f=>{const v=f.n/f.d;return `${f.n}/${f.d} är ${Math.abs(v-.5)<1e-12?"lika med":v<.5?"mindre än":"större än"} en halv och ${Math.abs(v-1)<1e-12?"lika med":v<1?"mindre än":"större än"} 1`}).join(". ")}.</div>`;
+  $("#cm-why").innerHTML=why;const mx=Math.max(1,Math.ceil(Math.max(va,vb)-1e-9));
+  bars(svg,[{n:a.n,d:a.d,color:"red",label:"A"},{n:b.n,d:b.d,color:"blue",label:"B"}],{x0:40,max:Math.min(mx,4)})}
+  on([$("#cm-a"),$("#cm-b")],"input",upd);upd();TOOL.cmp=(a,b)=>{$("#cm-a").value=a;$("#cm-b").value=b;upd();return"#t-cmp"}});
+
+/* bråkvägg */
+safe("wall",()=>{const svg=$("#sv-wall");[1,2,3,4,6].forEach((d,r)=>{const w=540/d,fillTo=270;for(let i=0;i<d;i++){const x=10+i*w,on=(x+w)<=fillTo+10+0.1;
+  S("rect",{x,y:5+r*36,width:w,height:32,style:`fill:${on?C("gold-tint"):C("paper")};stroke:${C("ink")};stroke-width:1.2`},svg);
+  S("text",{x:x+w/2,y:5+r*36+21,"text-anchor":"middle","font-size":14},svg,d===1?"1":`1/${d}`)}});
+  S("line",{x1:280,y1:0,x2:280,y2:186,style:`stroke:${C("red")};stroke-width:2;stroke-dasharray:5 4`},svg)});
+
+/* förkorta/förläng */
+safe("ff",()=>{let msg="";function show(f,prev,k,op){const svg=$("#ff-svg");
+  if(!f){$("#ff-big").innerHTML='<span class="err">Skriv ett bråk, t.ex. 18/24.</span>';$("#ff-why").textContent="";clear(svg);return}
+  if(prev){$("#ff-big").innerHTML=`${F(prev.n,prev.d)} = ${F(`${prev.n} ${op} ${k}`,`${prev.d} ${op} ${k}`)} = ${F(f.n,f.d,"r")}`}
+  else $("#ff-big").innerHTML=F(f.n,f.d);
+  const g=gcd(f.n,f.d);const div=[];for(let i=2;i<=Math.min(f.n,f.d);i++)if(f.n%i===0&&f.d%i===0)div.push(i);
+  $("#ff-why").innerHTML=(msg?msg+"<br>":"")+(g>1?`Bråket kan förkortas med ${div.slice(0,8).join(", ")}${div.length>8?" …":""}. Största talet är <b>${g}</b> → ${F(f.n/g,f.d/g)}.`:`<b>${F(f.n,f.d)} går inte att förkorta mer</b> – inget tal utom 1 går jämnt upp i både ${f.n} och ${f.d}.`)+(f.n/f.d<=1?` <span class="small">Värde ≈ ${nf(f.n/f.d,4)}</span>`:"");
+  const list=[];if(prev)list.push({n:prev.n,d:prev.d,color:"blue",label:"före"});list.push({n:f.n,d:f.d,color:"red",label:prev?"efter":""});
+  bars(svg,list,{x0:prev?70:20,max:Math.max(1,Math.ceil(f.n/f.d-1e-9))})}
+  function cur(){return pf($("#ff-in").value)}
+  function step(op){const f=cur(),k=Math.round(num($("#ff-k").value));msg="";if(!f)return show(null);
+    if(!(k>=2)){msg='<span class="err">Välj ett tal som är 2 eller större.</span>';return show(f)}
+    if(op==="·"){const nf_={n:f.n*k,d:f.d*k};msg=`Förlängt med ${k}: värdet är detsamma men bitarna är ${k} gånger fler och mindre.`;$("#ff-in").value=`${nf_.n}/${nf_.d}`;show(nf_,f,k,"·")}
+    else{if(f.n%k||f.d%k){msg=`<span class="err">${k} går inte jämnt upp i både ${f.n} och ${f.d}.</span>`;return show(f)}const nf_={n:f.n/k,d:f.d/k};msg=`Förkortat med ${k}: färre, större bitar – samma värde.`;$("#ff-in").value=`${nf_.n}/${nf_.d}`;show(nf_,f,k,"/")}}
+  $("#ff-up").addEventListener("click",()=>step("·"));$("#ff-down").addEventListener("click",()=>step("/"));
+  $("#ff-max").addEventListener("click",()=>{const f=cur();if(!f)return show(null);const g=gcd(f.n,f.d);msg="";if(g===1){msg="Bråket är redan förkortat så långt det går.";return show(f)}$("#ff-k").value=g;step("/")});
+  $("#ff-in").addEventListener("input",()=>{msg="";show(cur())});show(cur());
+  TOOL.ff=(f,k)=>{$("#ff-in").value=f;$("#ff-k").value=k;msg="";show(cur());return"#t-ff"}});
+
+/* addera */
+safe("add",()=>{function upd(){const a=pf($("#ad-a").value),b=pf($("#ad-b").value),cs=$("#ad-c").value.trim(),c=cs?pf(cs):null,op=seg("ad-op"),ol=$("#ad-steps"),svg=$("#ad-svg");
+  if(!a||!b||(cs&&!c)){ol.innerHTML='<li class="err">Skriv bråk som 2/5.</li>';clear(svg);return}
+  const fs=[a,b].concat(c?[c]:[]),ops=[op].concat(c?["+"]:[]);
+  let L=fs.reduce((m,f)=>lcm(m,f.d),1);const st=[];
+  const expr=fs.map((f,i)=>(i?` ${ops[i-1]==="-"?"−":"+"} `:"")+F(f.n,f.d)).join("");
+  st.push(`${expr}`);
+  if(fs.every(f=>f.d===fs[0].d))st.push(`Samma nämnare – räkna med täljarna, nämnaren ${L} ändras inte.`);
+  else{st.push(`Gemensam nämnare: <b>${L}</b> (minsta tal som ${fs.map(f=>f.d).join(" och ")} går jämnt upp i).`);
+    st.push(fs.map((f,i)=>(i?` ${ops[i-1]==="-"?"−":"+"} `:"")+(f.d===L?F(f.n,f.d):`${F(`${f.n} · ${L/f.d}`,`${f.d} · ${L/f.d}`)}`)).join("")+" = "+fs.map((f,i)=>(i?` ${ops[i-1]==="-"?"−":"+"} `:"")+F(f.n*L/f.d,L)).join(""))}
+  let N=fs[0].n*L/fs[0].d;for(let i=1;i<fs.length;i++){const v=fs[i].n*L/fs[i].d;N=ops[i-1]==="-"?N-v:N+v}
+  st.push(`= ${F(`${fs.map((f,i)=>(i?(ops[i-1]==="-"?" − ":" + "):"")+f.n*L/f.d).join("")}`,L)} = ${F(N,L,"r")}`);
+  const s=simp({n:N,d:L});if(s.d!==L&&N!==0)st.push(`Förkorta med ${L/s.d}: ${F(N,L)} = <b class="r">${F(s.n,s.d)}</b>`);
+  if(Math.abs(s.n)>s.d&&s.d>1)st.push(`I blandad form: ${mixed(s.n,s.d)}`);
+  if(N<0)st.push('<span class="small">Svaret är negativt.</span>');
+  if(fs.length===3)st.push(`<span class="small">Jämfört med 1 = ${F(L,L)}: summan är ${N<L?"mindre än":N===L?"lika med":"större än"} 1.</span>`);
+  ol.innerHTML=st.map(t=>`<li>${t}</li>`).join("");
+  const cols=["red","blue","green"];bars(svg,fs.map((f,i)=>({n:f.n*L/f.d,d:L,color:cols[i],label:`${f.n}/${f.d}`})).concat(N>=0?[{n:N,d:L,color:"gold",label:"svar"}]:[]),{x0:70,max:Math.max(1,Math.ceil(Math.max(N,...fs.map(f=>f.n*L/f.d))/L-1e-9)),bh:24,gap:10})}
+  on([$("#ad-a"),$("#ad-b"),$("#ad-c")],"input",upd);$$('input[name="ad-op"]').forEach(r=>r.addEventListener("change",upd));upd();
+  TOOL.add=(a,op,b,c)=>{$("#ad-a").value=a;$("#ad-b").value=b;$("#ad-c").value=c||"";setSeg("ad-op",op);upd();return"#t-add"}});
+
+/* multiplicera */
+safe("mul",()=>{function upd(){const k=Math.round(num($("#mu-n").value)),f=pf($("#mu-f").value),svg=$("#mu-svg");
+  if(!(k>=0&&k<=20)||!f||f.n<0){$("#mu-big").innerHTML='<span class="err">Välj heltal 0–20 och ett bråk.</span>';$("#mu-why").textContent="";clear(svg);return}
+  const N=k*f.n,s=simp({n:N,d:f.d});
+  $("#mu-big").innerHTML=`${k} · ${F(f.n,f.d)} = ${F(`${k} · ${f.n}`,f.d)} = ${F(N,f.d,"r")}${s.d!==f.d?` = ${F(s.n,s.d)}`:""}${N>f.d&&N%f.d?` = ${mixed(s.n,s.d)}`:N%f.d===0&&f.d>1?` = ${N/f.d}`:""}`;
+  const w=words(f.n,f.d);$("#mu-why").innerHTML=`${k} gånger ${w?`<b>${w}</b>`:F(f.n,f.d)} är ${N} ${f.d===2?"halvor":DEN[f.d]?DEN[f.d]+"ar":f.d+"-delar"}. Nämnaren – sorten – ändras inte.${N>f.d?` Varje hel är ${F(f.d,f.d)}: ${Math.floor(N/f.d)} hela${N%f.d?` och ${F(N%f.d,f.d)} kvar`:""}.`:""}`;
+  const list=[];for(let i=0;i<Math.min(k,6);i++)list.push({n:f.n,d:f.d,color:"blue",label:i===0?`${k} st`:""});
+  list.push({n:N,d:f.d,color:"red",label:"tillsammans"});bars(svg,list,{x0:100,max:Math.max(1,Math.ceil(N/f.d-1e-9)),bh:20,gap:6});
+}
+  on([$("#mu-n"),$("#mu-f")],"input",upd);upd();TOOL.mul=(k,f)=>{$("#mu-n").value=k;$("#mu-f").value=f;upd();return"#t-mul"}});
+
+/* delen med bråk */
+safe("del",()=>{function upd(){const f=pf($("#de-f").value),x=num($("#de-x").value),u=$("#de-u").value.trim(),svg=$("#de-svg");clear(svg);
+  if(!f||!(x>=0)||f.d<1){$("#de-big").innerHTML='<span class="err">Skriv ett bråk och ett antal.</span>';$("#de-why").textContent="";return}
+  const one=x/f.d,res=one*f.n,U=u?" "+u:"";
+  $("#de-big").innerHTML=`${F(f.n,f.d)} av ${nf(x)}${U} = <span class="r">${nf(res,3)}${U}</span>`;
+  $("#de-why").innerHTML=`${F(1,f.d)} av ${nf(x)} = ${F(nf(x),f.d)} = ${nf(one,4)}${U}<br>${F(f.n,f.d)} av ${nf(x)} = ${f.n} · ${nf(one,4)} = <b class="r">${nf(res,3)}${U}</b>${Number.isInteger(x)&&x%f.d?'<div class="small">Det går inte jämnt ut – svaret blir inte ett heltal.</div>':""}`;
+  if(Number.isInteger(x)&&x>0&&x<=120&&x%f.d===0&&f.n<=f.d&&f.d<=12){const per=x/f.d;let gx=6;for(let g=0;g<f.d;g++){const cols=Math.min(per,6),rows=Math.ceil(per/cols),bw=cols*16+8,bh=rows*16+8;
+      S("rect",{x:gx,y:6,width:bw,height:bh,rx:6,style:`fill:${g<f.n?C("red-tint"):"none"};stroke:${C(g<f.n?"red":"line")};stroke-width:1.5`},svg);
+      for(let i=0;i<per;i++)S("circle",{cx:gx+12+(i%cols)*16,cy:18+Math.floor(i/cols)*16,r:6,style:`fill:${C(g<f.n?"red":"muted")}`},svg);gx+=bw+6}
+    S("text",{x:6,y:Math.ceil(per/Math.min(per,6))*16+34,"font-size":13,style:`fill:${C("muted")}`},svg,`${f.d} lika grupper med ${per} i varje – ${f.n} ${f.n===1?"grupp":"grupper"} markerade`);
+svg.setAttribute("viewBox",`0 0 ${Math.max(gx,420)} ${Math.ceil(per/Math.min(per,6))*16+44}`)}
+  else bars(svg,[{n:f.n,d:f.d,color:"red"}],{x0:20,max:Math.max(1,Math.ceil(f.n/f.d-1e-9))})}
+  on([$("#de-f"),$("#de-x"),$("#de-u")],"input",upd);upd();TOOL.del=(f,x,u)=>{$("#de-f").value=f;$("#de-x").value=String(x).replace(".",",");$("#de-u").value=u;upd();return"#t-del"}});
+
+/* tid */
+safe("tid",()=>{const U={ar:[12,"månader","år","ett år"],dygn:[24,"timmar","dygn","ett dygn"],h:[60,"minuter","timme","en timme"],min:[60,"sekunder","minut","en minut"]};
+  function clock(svg,n,d,tot){clear(svg);const cx=120,cy=120,R=105;S("circle",{cx,cy,r:R,style:`fill:${C("paper")};stroke:${C("ink")};stroke-width:2`},svg);
+    const k=Math.min(n,d);for(let i=0;i<d&&d<=60;i++){const a0=-Math.PI/2+i*2*Math.PI/d,a1=a0+2*Math.PI/d;if(i<k)S("path",{d:d===1?`M${cx} ${cy-R} A${R} ${R} 0 1 1 ${cx-.01} ${cy-R}Z`:`M${cx} ${cy} L${cx+R*Math.cos(a0)} ${cy+R*Math.sin(a0)} A${R} ${R} 0 ${a1-a0>Math.PI?1:0} 1 ${cx+R*Math.cos(a1)} ${cy+R*Math.sin(a1)} Z`,style:`fill:${C("red-tint")};stroke:${C("red")};stroke-width:1.5`},svg);
+      S("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a0),y2:cy+R*Math.sin(a0),style:`stroke:${C("ink")};stroke-width:1.2`},svg)}
+    const marks=tot===60?[0,15,30,45]:tot===24?[0,6,12,18]:[0,3,6,9];marks.forEach(m=>{const a=-Math.PI/2+m/tot*2*Math.PI;S("text",{x:cx+(R+0)*.82*Math.cos(a),y:cy+(R)*.82*Math.sin(a)+5,"text-anchor":"middle","font-size":13,"font-weight":700,style:`fill:${C("muted")}`},svg,m===0?String(tot):String(m))});
+    S("circle",{cx,cy,r:4,style:`fill:${C("ink")}`},svg)}
+  function upd(){const f=pf($("#ti-f").value),u=U[seg("ti-u")];$("#ti-xu").textContent=`${u[1]} av ${u[3]}?`;
+    if(!f||f.d<1||f.n<0){$("#ti-big").innerHTML='<span class="err">Skriv ett bråk.</span>';$("#ti-why").textContent="";clear($("#ti-svg"));back();return}
+    const one=u[0]/f.d,res=one*f.n;$("#ti-big").innerHTML=`${F(f.n,f.d)} ${u[2]} = <span class="r">${nf(res,2)} ${u[1]}</span>`;
+    $("#ti-why").innerHTML=`${u[3][0].toUpperCase()+u[3].slice(1)} = ${u[0]} ${u[1]}<br>${F(1,f.d)} = ${u[0]} / ${f.d} = ${nf(one,3)} ${u[1]}<br>${F(f.n,f.d)} = ${f.n} · ${nf(one,3)} = <b class="r">${nf(res,2)} ${u[1]}</b>`;
+    clock($("#ti-svg"),f.n,f.d,u[0]);back()}
+  function back(){const u=U[seg("ti-u")],x=num($("#ti-x").value);if(!(x>=0)){$("#ti-back").innerHTML="";return}const xi=Math.round(x*1000)/1000;
+    if(!Number.isInteger(xi)){$("#ti-back").innerHTML=`<div class="eq">${nf(x)} / ${u[0]} ≈ ${nf(x/u[0],3)}</div>`;return}const s=simp({n:xi,d:u[0]});
+    $("#ti-back").innerHTML=`<div class="eq">Andelen = ${F("delen","det hela")} = ${F(xi,u[0])}${s.d!==u[0]?` = <b class="r">${F(s.n,s.d)}</b>`:""} <span class="small">≈ ${nf(xi/u[0]*100,1)} %</span></div>`}
+  on([$("#ti-f"),$("#ti-x")],"input",upd);$$('input[name="ti-u"]').forEach(r=>r.addEventListener("change",upd));upd();
+  TOOL.tid=(f,u)=>{$("#ti-f").value=f;setSeg("ti-u",u);upd();return"#t-tid"};TOOL.tidx=(x,u)=>{$("#ti-x").value=x;setSeg("ti-u",u);upd();return"#t-tid"}});
+
+/* decimalform */
+safe("dec",()=>{function upd(){const f=pf($("#dc-f").value),svg=$("#dc-svg");clear(svg);
+  if(!f||f.d<1){$("#dc-big").innerHTML='<span class="err">Skriv ett bråk.</span>';$("#dc-why").textContent="";return}
+  const v=f.n/f.d;let d=f.d,two=0,five=0;while(d%2===0){d/=2;two++}while(d%5===0){d/=5;five++}const exact=d===1;
+  const r2=Math.round(v*100+1e-9)/100;
+  $("#dc-big").innerHTML=`${F(f.n,f.d)} = <span class="r">${exact?nf(v,6):nf(v,6)+" …"}</span>${exact?"":` ≈ ${nf2(r2)}`}`;
+  let w=`Räknaren: ${f.n} ÷ ${f.d} = ${nf(v,7)}${exact?"":"…"}`;
+  if(exact){const p=Math.max(two,five),T=Math.pow(10,p),k=T/f.d;if(p>0&&p<=3&&k>1)w=`Förläng med ${k}: ${F(f.n,f.d)} = ${F(f.n*k,T)} = ${nf(v,6)}<br>`+w}
+  else{const third=Math.floor(v*1000+1e-9)%10;w+=`<br>Avrundat till två decimaler: tredje decimalen är <b>${third}</b> → avrunda ${third>=5?"uppåt":"nedåt"} till <b>${nf2(r2)}</b>.`}
+  w+=`<br><span class="small">I procent: ${nf(v*100,2)} %</span>`;$("#dc-why").innerHTML=w;
+  const hi=Math.max(1,Math.ceil(v)),X=t=>20+t/hi*520;S("line",{x1:15,y1:40,x2:545,y2:40,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+  for(let i=0;i<=hi*10;i++){const t=i/10;S("line",{x1:X(t),y1:i%10?35:30,x2:X(t),y2:i%10?45:50,style:`stroke:${C("ink")}`},svg);if(i%(hi>2?10:5)===0)S("text",{x:X(t),y:68,"text-anchor":"middle","font-size":12,style:`fill:${C("muted")}`},svg,nf(t,1))}
+  S("circle",{cx:X(v),cy:40,r:7,style:`fill:${C("red")}`},svg);S("text",{x:X(v),y:20,"text-anchor":"middle","font-size":14,"font-weight":700,style:`fill:${C("red")}`},svg,nf(v,3))}
+  $("#dc-f").addEventListener("input",upd);upd();TOOL.dec=f=>{$("#dc-f").value=f;upd();return"#t-dec"}});
+
+/* hundraruta */
+safe("hund",()=>{const g=$("#hu-grid");const cells=[];let drag=false;
+  for(let i=0;i<100;i++){const b=document.createElement("button");b.type="button";b.setAttribute("aria-label",`${i+1} %`);
+    b.addEventListener("pointerdown",e=>{drag=true;set(i+1)});b.addEventListener("pointerenter",()=>{if(drag)set(i+1)});g.appendChild(b);cells.push(b)}
+  document.addEventListener("pointerup",()=>drag=false);
+  function set(p){$("#hu-r").value=p;upd()}
+  function upd(){const p=+$("#hu-r").value;$("#hu-v").textContent=p+" %";cells.forEach((c,i)=>c.classList.toggle("on",i<p));const s=simp({n:p,d:100});
+    $("#hu-big").innerHTML=`${p} % = ${F(p,100)}${s.d!==100?` = ${F(s.n,s.d)}`:""} = ${nf(p/100,2)}`;
+    const name={100:"en hel",50:"hälften",25:"en fjärdedel",75:"tre fjärdedelar",10:"en tiondel",20:"en femtedel",0:"ingenting"}[p];
+    $("#hu-why").innerHTML=`${p} av 100 rutor.${name?` Det är <b>${name}</b>.`:""} Ofärgat: ${100-p} %.`}
+  $("#hu-r").addEventListener("input",upd);upd();TOOL.hund=p=>{$("#hu-r").value=p;upd();return"#t-hund"}});
+
+/* omvandlare */
+safe("conv",()=>{["3/4","1/5","0,35","5 %","0,465","2/3","150 %"].forEach(e=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=e;b.addEventListener("click",()=>{$("#cv-in").value=e;upd()});$("#cv-chips").appendChild(b)});
+  function upd(){const s=$("#cv-in").value.trim(),tab=$("#cv-tab");let v,src,f=null;
+    if(/%\s*$/.test(s)){v=num(s)/100;src="p"}else if(/\//.test(s)){f=pf(s);v=f?f.n/f.d:NaN;src="f"}else{v=num(s);src="d"}
+    if(!isFinite(v)){tab.innerHTML="";$("#cv-why").innerHTML='<span class="err">Skriv t.ex. 3/4, 0,75 eller 75 %.</span>';return}
+    const h=Math.round(v*100*1e6)/1e6;let fr;if(f)fr=F(f.n,f.d)+(simp(f).d!==f.d?` = ${F(simp(f).n,simp(f).d)}`:"");else{const hund=pf(nf(h,6).replace(/\s/g,""));const t=hund?simp({n:hund.n,d:hund.d*100}):null;fr=Number.isInteger(h)?`${F(h,100)}${t&&t.d!==100?` = ${F(t.n,t.d)}`:""}`:(t?F(t.n,t.d):"–")}
+    tab.innerHTML=`<tr><th class="l">Bråkform</th><th class="l">Decimalform</th><th class="l">Procentform</th></tr><tr><td class="l eq">${fr}</td><td class="l eq">${nf(v,5)}${f&&Math.abs(v*1e5-Math.round(v*1e5))>1e-6?" …":""}</td><td class="l eq">${nf(v*100,3)} %</td></tr>`;
+    let w="";if(src==="p")w=`${nf(h,3)} % = ${F(nf(h,3),100)}: dela med 100 – flytta kommat två steg åt <b>vänster</b> → ${nf(v,5)}.`;
+    else if(src==="d")w=`${nf(v,5)} · 100 = ${nf(h,3)}: flytta kommat två steg åt <b>höger</b> → ${nf(h,3)} %.`;
+    else w=`${f.n} ÷ ${f.d} = ${nf(v,5)}. Gånger 100 → ${nf(v*100,2)} %.${Math.abs(v*100-Math.round(v*100))>1e-9?` Avrundat till hela procent: ${Math.round(v*100)} %.`:""}`;
+    $("#cv-why").innerHTML=w}
+  $("#cv-in").addEventListener("input",upd);upd();TOOL.conv=s=>{$("#cv-in").value=s;upd();return"#t-conv"}});
+
+/* andelen */
+function strip(svg,frac,col,lab){clear(svg);const W=520;S("rect",{x:20,y:12,width:W,height:30,rx:4,style:`fill:${C("paper")};stroke:${C("ink")}`},svg);
+  S("rect",{x:20,y:12,width:W*Math.max(0,Math.min(frac,1)),height:30,rx:4,style:`fill:${C(col)}`},svg);if(frac>1)S("text",{x:W+20,y:62,"text-anchor":"end","font-size":12,style:`fill:${C("muted")}`},svg,"mer än det hela");
+  S("text",{x:20,y:62,"font-size":13,style:`fill:${C("muted")}`},svg,lab||"")}
+safe("andelp",()=>{function upd(){const a=num($("#ap-a").value),b=num($("#ap-b").value);
+  if(!isFinite(a)||!(b>0)){$("#ap-big").innerHTML='<span class="err">Skriv delen och det hela.</span>';$("#ap-why").textContent="";clear($("#ap-svg"));return}
+  const v=a/b,r2=Math.round(v*100+1e-9)/100;$("#ap-big").innerHTML=`${nf(a)} av ${nf(b)} ${Math.abs(v*100-Math.round(v*100))<1e-9?"=":"≈"} <span class="r">${nf(Math.round(v*100*10)/10,1)} %</span>`;
+  $("#ap-why").innerHTML=`Andelen = ${F("delen","det hela")} = ${F(nf(a),nf(b))} = ${nf(v,4)}${Math.abs(v-r2)>1e-9?` ≈ ${nf2(r2)}`:""} = ${nf(r2*100,0)} %`;
+  strip($("#ap-svg"),v,"red",`${nf(a)} är ${nf(v*100,1)} % av ${nf(b)}`)}
+  on([$("#ap-a"),$("#ap-b")],"input",upd);upd();TOOL.andelp=(a,b)=>{$("#ap-a").value=a;$("#ap-b").value=b;upd();return"#t-andelp"}});
+
+/* förändring */
+safe("for",()=>{function upd(){const a=num($("#fo-a").value),b=num($("#fo-b").value),svg=$("#fo-svg");clear(svg);
+  if(!(a>0)||!isFinite(b)){$("#fo-big").innerHTML='<span class="err">Skriv tidigare och nytt värde.</span>';$("#fo-steps").innerHTML="";return}
+  const diff=b-a,p=Math.abs(diff)/a*100,up=diff>0,word=diff===0?"oförändrat":up?"ökning":"minskning";
+  $("#fo-big").innerHTML=diff===0?"Ingen förändring":`${up?"Ökning":"Minskning"} med <span class="r">${nf(Math.round(p*10)/10,1)} %</span>`;
+  $("#fo-steps").innerHTML=`<li>Förändring: ${nf(Math.max(a,b))} − ${nf(Math.min(a,b))} = <b>${nf(Math.abs(diff))}</b> (${word})</li><li>Dela med det <b>tidigare</b> värdet: ${F(nf(Math.abs(diff)),nf(a))} = ${nf(Math.abs(diff)/a,4)}</li><li>I procent: ≈ <b class="r">${nf(Math.round(p),0)} %</b> ${up?"dyrare / mer":"billigare / mindre"}</li><li class="small">Förändringsfaktor: ${nf(b,4)} / ${nf(a,4)} = ${nf(b/a,4)}</li>`;
+  const mx=Math.max(a,b),W=440;[[a,"förr","blue"],[b,"nu","red"]].forEach(([v,l,c],i)=>{S("text",{x:50,y:22+i*36,"text-anchor":"end","font-size":14,"font-weight":700},svg,l);S("rect",{x:60,y:6+i*36,width:Math.max(0,W*v/mx),height:26,rx:4,style:`fill:${C(c)}`},svg);S("text",{x:66+W*v/mx,y:24+i*36,"font-size":13},svg,nf(v))})}
+  on([$("#fo-a"),$("#fo-b")],"input",upd);upd();TOOL.for=(a,b)=>{$("#fo-a").value=a;$("#fo-b").value=b;upd();return"#t-for"}});
+
+/* jämför */
+safe("jmf",()=>{function upd(){const an=$("#jm-an").value||"A",bn=$("#jm-bn").value||"B",a=num($("#jm-a").value),b=num($("#jm-b").value),o=$("#jm-out");
+  if(!(a>0&&b>0)){o.innerHTML='<span class="err">Skriv två positiva värden.</span>';return}
+  const d=Math.abs(a-b);if(d===0){o.innerHTML="Värdena är lika.";return}
+  const hi=a>b?[an,a]:[bn,b],lo=a>b?[bn,b]:[an,a];const p1=d/lo[1]*100,p2=d/hi[1]*100;
+  o.innerHTML=`<div class="row"><span class="eq">Skillnad: ${nf(hi[1])} − ${nf(lo[1])} = <b>${nf(d)}</b></span></div>
+  <div class="row"><span class="eq"><b>${hi[0]}</b> är ${F(nf(d),nf(lo[1]))} ≈ <b class="r">${nf(Math.round(p1),0)} %</b> större/dyrare än <b>${lo[0]}</b></span><span class="why">jämför med ${lo[0]}</span></div>
+  <div class="row"><span class="eq"><b>${lo[0]}</b> är ${F(nf(d),nf(hi[1]))} ≈ <b class="b">${nf(Math.round(p2),0)} %</b> mindre/billigare än <b>${hi[0]}</b></span><span class="why">jämför med ${hi[0]}</span></div>
+  <div class="small">Samma skillnad, olika procent – för att du delar med olika tal.</div>`}
+  on($$("#t-jmf input"),"input",upd);upd();TOOL.jmf=(an,a,bn,b)=>{$("#jm-an").value=an;$("#jm-a").value=a;$("#jm-bn").value=bn;$("#jm-b").value=b;upd();return"#t-jmf"}});
+
+/* det hela */
+safe("hela",()=>{function upd(){const p=num($("#he-p").value),v=num($("#he-v").value),u=$("#he-u").value.trim(),U=u?" "+u:"";
+  if(!(p>0)||!isFinite(v)){$("#he-big").innerHTML='<span class="err">Skriv procent och värde.</span>';$("#he-why").textContent="";clear($("#he-svg"));return}
+  const one=v/p,all=one*100;$("#he-big").innerHTML=`100 % = <span class="r">${nf(all,2)}${U}</span>`;
+  $("#he-why").innerHTML=`${nf(p)} % är ${nf(v)}${U}<br>1 % är ${F(nf(v),nf(p))} = ${nf(one,4)}${U}<br>100 % är 100 · ${nf(one,4)} = <b class="r">${nf(all,2)}${U}</b>${Number.isInteger(Math.round(all*1000)/1000)?"":`<div class="small">Avrunda efter vad som är rimligt – t.ex. uppåt för frön, till hela kronor för pengar.</div>`}${p<100?`<div class="small">Resten, ${nf(100-p)} %, är ${nf(all-v,2)}${U}.</div>`:""}`;
+  strip($("#he-svg"),p/100,"red",`${nf(p)} % = ${nf(v)}${U} av totalt ${nf(all,2)}${U}`)}
+  on([$("#he-p"),$("#he-v"),$("#he-u")],"input",upd);upd();TOOL.hela=(p,v,u)=>{$("#he-p").value=String(p).replace(".",",");$("#he-v").value=v;$("#he-u").value=u;upd();return"#t-hela"}});
+
+/* delen med procent */
+safe("delenp",()=>{function upd(){const p=num($("#dp-p").value),x=num($("#dp-x").value),u=$("#dp-u").value.trim(),U=u?" "+u:"",m=seg("dp-m");
+  if(!isFinite(p)||!isFinite(x)){$("#dp-big").innerHTML='<span class="err">Skriv procent och det hela.</span>';["#dp-m1","#dp-m2","#dp-new"].forEach(s=>$(s).innerHTML="");return}
+  const one=x/100,part=one*p;$("#dp-big").innerHTML=`${nf(p)} % av ${nf(x)}${U} = <span class="r">${nf(part,2)}${U}</span>`;
+  $("#dp-m1").innerHTML=`1 % = ${F(nf(x),100)} = ${nf(one,4)}${U}<br>${nf(p)} % = ${nf(p)} · ${nf(one,4)} = ${nf(part,2)}${U}`;
+  $("#dp-m2").innerHTML=`${nf(p)} % = ${F(nf(p),100)} = ${nf(p/100,4)}<br>${nf(p/100,4)} · ${nf(x)} = ${nf(part,2)}${U}`;
+  if(m==="del"){$("#dp-new").innerHTML=p===10?'<span class="small">Huvudräkning: 10 % = dela med 10.</span>':""}
+  else{const nv=m==="minus"?x-part:x+part,f=m==="minus"?1-p/100:1+p/100;
+    $("#dp-new").innerHTML=`<b>${m==="minus"?"Nytt pris efter rabatt":"Nytt värde efter höjning"}:</b> ${nf(x)} ${m==="minus"?"−":"+"} ${nf(part,2)} = <b class="r">${nf(nv,2)}${U}</b><div class="small">Snabbare med förändringsfaktor: ${nf(f,4)} · ${nf(x)} = ${nf(nv,2)}${U}</div>`}}
+  on([$("#dp-p"),$("#dp-x"),$("#dp-u")],"input",upd);$$('input[name="dp-m"]').forEach(r=>r.addEventListener("change",upd));upd();
+  TOOL.delenp=(p,x,u,m)=>{$("#dp-p").value=String(p).replace(".",",");$("#dp-x").value=x;$("#dp-u").value=u;setSeg("dp-m",m||"del");upd();return"#t-delenp"}});
+
+/* förändringsfaktor */
+safe("fak",()=>{function upd(){const x=num($("#fa-x").value),p1=num($("#fa-1").value),p2s=$("#fa-2").value.trim(),p2=p2s?num(p2s):null,d1=+seg("fa-d1"),d2=+seg("fa-d2"),ol=$("#fa-steps");
+  if(!isFinite(x)||!isFinite(p1)||(p2s&&!isFinite(p2))){$("#fa-big").innerHTML='<span class="err">Skriv värde och förändring i procent.</span>';ol.innerHTML="";return}
+  const f1=1+d1*p1/100,v1=f1*x,st=[];const w=(d,p)=>d>0?`100 % + ${nf(p)} % = ${nf(100+p)} %`:`100 % − ${nf(p)} % = ${nf(100-p)} %`;
+  st.push(`${d1>0?"Ökning":"Minskning"} med ${nf(p1)} %: ${w(d1,p1)} → faktor <b class="r">${nf(f1,4)}</b>`);
+  st.push(`${nf(f1,4)} · ${nf(x)} = <b>${nf(v1,2)}</b>`);let fin=v1,tot=f1;
+  if(p2!=null){const f2=1+d2*p2/100;fin=v1*f2;tot=f1*f2;st.push(`Sedan ${d2>0?"ökning":"minskning"} med ${nf(p2)} %: faktor <b class="r">${nf(f2,4)}</b>`);st.push(`${nf(f2,4)} · ${nf(v1,2)} = <b>${nf(fin,2)}</b>`);
+    st.push(`Total faktor: ${nf(f1,4)} · ${nf(f2,4)} = <b>${nf(tot,4)}</b> → ${tot>=1?"ökning":"minskning"} med <b class="r">${nf(Math.abs(tot-1)*100,2)} %</b>`)}
+  ol.innerHTML=st.map(s=>`<li>${s}</li>`).join("");$("#fa-big").innerHTML=`Nytt värde: <span class="r">${nf(fin,2)}</span>${Math.abs(fin-Math.round(fin))>1e-9?` ≈ ${nf(Math.round(fin),0)}`:""}`}
+  function read(){const f=num($("#fa-f").value),o=$("#fa-read");if(!(f>=0)){o.innerHTML="";return}const p=Math.round(Math.abs(f-1)*1e6)/1e4;
+    o.innerHTML=f===1?"1 = 100 % → ingen förändring":`${nf(f,4)} = ${nf(f*100,2)} % → <b class="r">${f>1?"ökning":"minskning"} med ${nf(p,2)} %</b>`}
+  on($$("#t-fak input"),"input",()=>{upd();read()});$$('#t-fak input[type=radio]').forEach(r=>r.addEventListener("change",upd));upd();read();
+  TOOL.fak=(x,p1,d1,p2,d2)=>{$("#fa-x").value=x;$("#fa-1").value=p1;setSeg("fa-d1",d1);$("#fa-2").value=p2==null?"":p2;if(d2)setSeg("fa-d2",d2);upd();return"#t-fak"};
+  TOOL.fakf=f=>{$("#fa-f").value=f;read();return"#t-fak"}});
+
+/* ränta */
+safe("ranta",()=>{function upd(){const L=num($("#ra-l").value),p=num($("#ra-p").value),t=num($("#ra-t").value),o=$("#ra-out");
+  if(!(L>0)||!(p>=0)||!(t>=0)){o.innerHTML='<span class="err">Skriv lån, räntesats och tid.</span>';return}
+  const yr=L*p/100,mo=yr/12,tr=mo*t;
+  o.innerHTML=`<div class="row"><span class="eq">Årsränta: ${nf(p/100,4)} · ${nf(L)} kr = <b class="r">${nf(yr,2)} kr</b></span><span class="why">räntesats i decimalform · lånet</span></div>
+  <div class="row"><span class="eq">Per månad: ${nf(yr,2)} / 12 = <b>${nf(mo,2)} kr</b></span></div>
+  ${t!==12?`<div class="row"><span class="eq">Ränta för ${nf(t)} månader: ${nf(t)} · ${nf(mo,2)} = <b>${nf(tr,2)} kr</b></span></div>`:""}
+  <div class="row"><span class="eq">Totalt att betala tillbaka: ${nf(L)} + ${nf(tr,2)} = <b class="r">${nf(L+tr,2)} kr</b></span><span class="why">${t===12?`eller ${nf(1+p/100,4)} · ${nf(L)}`:""}</span></div>`}
+  on($$("#t-ranta input"),"input",upd);upd();TOOL.ranta=(L,p,t)=>{$("#ra-l").value=L;$("#ra-p").value=String(p).replace(".",",");$("#ra-t").value=t;upd();return"#t-ranta"}});
+
+/* ================= UPPGIFTSSTÖD ================= */
+const BY=new Map(TASKS.map((t,i)=>[t[0],i]));
+function label(k){if(/^\d+$/.test(k))return{num:k,title:`Uppgift ${k}`};const [g,n]=k.split("-");const G=GROUPS.find(x=>x[0]===g);return{num:n,title:`${G?G[1]:g} ${n}`}}
+let card=null,curIdx=-1;
+function openTask(i,opt={}){const t=TASKS[i];if(!t)return;curIdx=i;const [k,sec,page,q,h,a,tool]=t;const L=label(k);
+  if(card)card.remove();card=document.createElement("div");card.className="card";card.id="kort";card.setAttribute("role","region");card.setAttribute("aria-label",L.title);
+  card.innerHTML=`<div class="card-h"><span class="num">${L.num}</span><span class="meta"><b>${L.title}</b><span>${SECS[sec]} · sidan ${page}</span></span><button class="x" type="button" aria-label="Stäng stödkortet">×</button></div>
+   <div class="q">${tx(q)}</div>
+   <div><div class="lbl">Så kan du tänka</div><div class="hint">${tx(h)}</div></div>
+   <div class="answ" hidden><div class="lbl">Facit</div><div class="ans">${tx(a)}</div></div>
+   <div class="card-f">${tool?`<button class="btn" type="button" data-a="tool">Prova i verktyget ↓</button>`:""}<button class="btn ghost" type="button" data-a="ans">Visa facit</button><span class="sp"></span><button class="btn ghost" type="button" data-a="prev" ${i<=0?"disabled":""} aria-label="Föregående uppgift">‹ Föreg.</button><button class="btn ghost" type="button" data-a="next" ${i>=TASKS.length-1?"disabled":""} aria-label="Nästa uppgift">Nästa ›</button></div>`;
+  const slot=$(`#${sec} .slot`);slot.appendChild(card);
+  card.querySelector(".x").addEventListener("click",()=>{card.remove();card=null;history.replaceState(null,"",`#${sec}`)});
+  card.querySelector('[data-a="ans"]').addEventListener("click",e=>{const w=card.querySelector(".answ");w.hidden=!w.hidden;e.target.textContent=w.hidden?"Visa facit":"Dölj facit"});
+  card.querySelector('[data-a="prev"]').addEventListener("click",()=>openTask(i-1));card.querySelector('[data-a="next"]').addEventListener("click",()=>openTask(i+1));
+  if(tool)card.querySelector('[data-a="tool"]').addEventListener("click",()=>{const fn=TOOL[tool[0]];if(!fn)return;const id=fn(...tool.slice(1));const el=$(id);if(el){el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}});
+  if(tool&&TOOL[tool[0]])safe("prefill",()=>TOOL[tool[0]](...tool.slice(1)));
+  try{history.replaceState(null,"",`#u-${k}`)}catch(e){}
+  requestAnimationFrame(()=>{card.scrollIntoView({behavior:opt.instant?"auto":"smooth",block:"start"});if(opt.focus!==false)card.querySelector(".x").focus({preventScroll:true})});
+}
+
+/* sök */
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim();
+function parse(raw){let s=norm(raw).replace(/^(uppgift|uppg|upg|nr|tal)\.?\s*/,"");let m;
+  if(m=s.match(/^(\d{1,3})\s*[a-f]?\)?$/))return BY.has(m[1])?[m[1]]:[];
+  if(m=s.match(/^(?:minitest|mini|mt)\s*3?\s*([abc])?\s*[:.\-\s]?\s*(\d)?$/))return m[1]&&m[2]?[`3${m[1].toUpperCase()}-${m[2]}`]:TASKS.filter(t=>t[0].startsWith(m[1]?`3${m[1].toUpperCase()}-`:"3")).map(t=>t[0]);
+  if(m=s.match(/^3\s*([abc])\s*[:.\-\s]\s*(\d)$/))return[`3${m[1].toUpperCase()}-${m[2]}`];
+  if(m=s.match(/^(?:kapiteltest|kapitel test|kt|test)\s*(\d+)?$/))return m[1]?[`KT-${m[1]}`]:TASKS.filter(t=>t[0].startsWith("KT-")).map(t=>t[0]);
+  if(m=s.match(/^(?:sant eller falskt|sant|falskt|sf)\s*(\d+)?$/))return m[1]?[`SF-${m[1]}`]:TASKS.filter(t=>t[0].startsWith("SF-")).map(t=>t[0]);
+  if(m=s.match(/^(?:arbeta tillsammans|arbeta|at)(?:\s*([ab])\s*(\d)?)?$/))return m[1]&&m[2]?[`AT-${m[1].toUpperCase()}${m[2]}`]:TASKS.filter(t=>t[0].startsWith("AT-"+(m[1]?m[1].toUpperCase():""))).map(t=>t[0]);
+  if(m=s.match(/^(?:uppslaget|uppslag|us)\s*([a-f])?$/))return m[1]?[`UP-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("UP-")).map(t=>t[0]);
+  if(m=s.match(/^(?:problemlosning|problem|pl)\s*([abc])?$/))return m[1]?[`PL-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("PL-")).map(t=>t[0]);
+  if(m=s.match(/^(?:bedomning\w*|rea eller inte|rea|bu)\s*([abc])?$/))return m[1]?[`BU-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("BU-")).map(t=>t[0]);
+  if(s.length<2)return[];
+  const words=s.split(" ");return TASKS.filter(t=>{const hay=norm(`${label(t[0]).title} ${SECS[t[1]]} ${t[3]} ${t[4]}`.replace(/<[^>]+>/g,"").replace(/\[(\d+)\/(\d+)\]/g,"$1/$2"));return words.every(w=>hay.includes(w))}).slice(0,30).map(t=>t[0])}
+const plain=s=>s.replace(/<[^>]+>/g,"").replace(/\[(\d+|□)\/(\d+)\]/g,"$1/$2");
+safe("search",()=>{const q=$("#q"),box=$("#sugg");let res=[],act=0;
+  function render(){if(!q.value.trim()){box.hidden=true;q.setAttribute("aria-expanded","false");return}box.hidden=false;q.setAttribute("aria-expanded","true");
+    if(!res.length){box.innerHTML=`<div class="none">Ingen uppgift hittades. Prova ett nummer 1–122, ”minitest 3B 2”, ”kt 4”, ”sf 9” eller ett ord.</div>`;return}
+    box.innerHTML=res.map((k,i)=>{const t=TASKS[BY.get(k)],L=label(k);return `<button type="button" role="option" class="${i===act?"act":""}" data-k="${k}"><b>${L.title}</b><span>${SECS[t[1]]} · s. ${t[2]}</span><small>${plain(t[3]).slice(0,90)}${plain(t[3]).length>90?" …":""}</small></button>`}).join("");
+    $$("button",box).forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();go(b.dataset.k)}))}
+  function go(k){box.hidden=true;q.setAttribute("aria-expanded","false");q.blur();openTask(BY.get(k))}
+  q.addEventListener("input",()=>{res=parse(q.value);act=0;render()});
+  q.addEventListener("keydown",e=>{if(e.key==="ArrowDown"){act=Math.min(act+1,res.length-1);render();e.preventDefault()}else if(e.key==="ArrowUp"){act=Math.max(act-1,0);render();e.preventDefault()}
+    else if(e.key==="Enter"){if(res[act])go(res[act]);e.preventDefault()}else if(e.key==="Escape"){q.value="";res=[];render();q.blur()}});
+  q.addEventListener("blur",()=>setTimeout(()=>{box.hidden=true},150));q.addEventListener("focus",()=>{if(q.value.trim()){res=parse(q.value);render()}});
+  document.addEventListener("keydown",e=>{if(e.key==="/"&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();q.focus();q.select()}})});
+
+/* startsidan */
+safe("start",()=>{const g=$("#tgrid");TASKS.filter(t=>/^\d+$/.test(t[0])).forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t[0];b.className=+t[0]<=57?"f":"p";b.title=`${SECS[t[1]]}, s. ${t[2]}`;b.addEventListener("click",()=>openTask(BY.get(t[0])));g.appendChild(b)});
+  const ex=$("#extra");GROUPS.forEach(([p,name,pg])=>{const d=document.createElement("div");d.className="grp";d.innerHTML=`<b>${name} <span class="small">${pg}</span></b><div class="chips"></div>`;
+    TASKS.filter(t=>t[0].startsWith(p+"-")).forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t[0].split("-")[1];b.title=plain(t[3]);b.addEventListener("click",()=>openTask(BY.get(t[0])));d.querySelector(".chips").appendChild(b)});ex.appendChild(d)});
+  const qk=$("#quick");[["#forkorta","Förkorta bråk"],["#addera","Addera bråk"],["#former","Bråk ↔ procent"],["#delenp","Procent av"],["#hela","Det hela"],["#faktor","Förändringsfaktor"],["#ranta","Ränta"],["#blandat","Minitester"]].forEach(([h,t])=>{const a=document.createElement("a");a.href=h;a.className="chip";a.style.textDecoration="none";a.textContent=t;qk.appendChild(a)})});
+
+/* hash: #u-47 öppnar uppgift */
+function fromHash(){const h=decodeURIComponent(location.hash.slice(1));if(h.startsWith("u-")&&BY.has(h.slice(2)))openTask(BY.get(h.slice(2)),{instant:true,focus:false})}
+window.addEventListener("hashchange",fromHash);fromHash();
+})();
+</script>
+</body>
+</html>
