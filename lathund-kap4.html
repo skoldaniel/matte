@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<title>Lathunden kapitel 4 – Statistik och sannolikhet</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interaktiv genomgång av kapitel 4 Statistik och sannolikhet i Bryggan: teori, verktyg och stöd till varje uppgift.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Samma formspråk som Lathunden: rött = kapitlet, blått = så tänker du, grönt = knep. Uppgiftsstödet visas i ett gult kort överst i avsnittet. */
+:root{
+  --bg:#f3f4f8; --paper:#ffffff; --ink:#181a20; --muted:#5a6172; --line:#d3d7e0; --grid:#eceef4;
+  --red:#cf2a20; --red-tint:#fdeae8; --blue:#1d5bbd; --blue-tint:#e6eefc; --green:#1d7647; --green-tint:#e2f3e8;
+  --gold:#8a5a00; --gold-tint:#fff4d6; --on-accent:#ffffff;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Verdana","Segoe UI",system-ui,sans-serif;
+  --top-h:60px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --gold:#f2c35b; --gold-tint:#33290f; --on-accent:#14161b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101217; --paper:#191c23; --ink:#e9ebf1; --muted:#a2a9b8; --line:#363b47; --grid:#232731;
+  --red:#ff6c60; --red-tint:#3a201e; --blue:#88b4ff; --blue-tint:#1b2940; --green:#6dd29a; --green-tint:#16301f; --gold:#f2c35b; --gold-tint:#33290f; --on-accent:#14161b; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.12;text-wrap:balance}
+p{margin:0;max-width:68ch}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num,table{font-variant-numeric:tabular-nums}
+
+/* toppfält */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:25;background:var(--paper);border-bottom:1px solid var(--line)}
+.top-in{max-width:1260px;margin:0 auto;height:var(--top-h);display:flex;align-items:center;gap:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);flex:none}
+.brand b{background:#c4271d;color:#fff;font-family:var(--f-display);font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:4px;font-size:18px}
+.brand span{color:var(--muted);font-size:14px;white-space:nowrap}
+.search{position:relative;flex:1 1 auto;max-width:440px;margin-left:auto}
+.search input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px 8px 38px}
+.search input:focus{border-color:var(--red);outline:none;background:var(--paper)}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:12px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--paper);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgb(0 0 0/.18);max-height:min(60vh,420px);overflow:auto;padding:6px;z-index:40}
+.sugg button{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;width:100%;text-align:left;font:inherit;background:none;border:0;border-radius:8px;padding:8px 10px;color:var(--ink);cursor:pointer}
+.sugg button:hover,.sugg button.act{background:var(--grid)}
+.sugg b{font-family:var(--f-display);color:var(--red);white-space:nowrap}
+.sugg small{grid-column:2;color:var(--muted);font-size:13px}
+.sugg .none{padding:10px;color:var(--muted);font-size:14px}
+.menu-btn,.theme-btn{flex:none;font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
+.menu-btn{display:none;font-weight:700}
+
+/* skal */
+.shell{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 80px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--top-h) + 20px);align-self:start;max-height:calc(100vh - var(--top-h) - 40px);overflow:auto;padding-right:6px}
+.side h4{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 4px}
+.side h4:first-child{margin-top:0}
+.side a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--ink);padding:5px 10px;border-radius:6px;font-size:15px;border-left:3px solid transparent}
+.side a:hover{background:var(--grid)}
+.side a[aria-current="true"]{background:var(--red-tint);border-left-color:var(--red);font-weight:700}
+.side a small{color:var(--muted);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:400}
+main{min-width:0;display:grid;gap:64px}
+@media (max-width:920px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .menu-btn{display:inline-block}
+  .brand span,.search kbd{display:none}
+  .side{position:fixed;z-index:24;top:calc(env(safe-area-inset-top,0px) + var(--top-h));left:0;right:0;max-height:calc(100vh - var(--top-h) - env(safe-area-inset-top,0px));
+    background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 12px 30px rgb(0 0 0/.18);
+    padding:12px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:none;columns:2 220px}
+  .side.open{display:block}
+  .side h4{break-after:avoid}
+}
+@media (max-width:520px){.brand b{font-size:15px;padding:3px 7px}.theme-btn .tt{display:none}.top-in{gap:8px}}
+
+/* avsnitt */
+.sec{scroll-margin-top:calc(var(--top-h) + 20px);display:grid;gap:18px;min-width:0}
+.sec>*{min-width:0}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--red);font-weight:700}
+.kicker i{font-style:normal;color:var(--muted);font-weight:400;letter-spacing:.04em;text-transform:none}
+.sec h2{font-size:clamp(26px,3.4vw,34px);font-weight:800}
+.lead{color:var(--muted);font-size:17px}
+h3{font-size:19px;font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px 28px;align-items:start}
+.cols>*{min-width:0}
+.box{display:grid;gap:10px;align-content:start}
+.tip,.ok,.warn{padding:10px 14px;border-radius:0 8px 8px 0;font-size:15px;max-width:68ch}
+.tip{background:var(--blue-tint);border-left:4px solid var(--blue)}.tip b{color:var(--blue)}
+.ok{background:var(--green-tint);border-left:4px solid var(--green)}.ok b{color:var(--green)}
+.warn{background:var(--red-tint);border-left:4px solid var(--red)}.warn b{color:var(--red)}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:right;vertical-align:middle}
+th{background:var(--grid);font-weight:700;text-align:center}
+.l{text-align:left}
+.eq{font-size:18px;font-variant-numeric:tabular-nums;line-height:2}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 2px;font-variant-numeric:tabular-nums}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.r{color:var(--red)}.b{color:var(--blue)}.g{color:var(--green)}
+svg{max-width:100%;height:auto;display:block}
+svg text{font-family:var(--f-body);fill:var(--ink)}
+.rows{display:grid;gap:6px}
+.row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.row .why{font-size:14px;color:var(--muted);font-style:italic}
+.ex{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px}
+.ex>b:first-child{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+ol.steps{margin:0;padding-left:22px;display:grid;gap:4px}
+
+/* verktyg */
+.tool{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0;scroll-margin-top:calc(var(--top-h) + 20px)}
+.tool.flash{animation:tf 1.2s}
+@keyframes tf{0%{box-shadow:0 0 0 0 var(--red)}30%{box-shadow:0 0 0 5px var(--red)}100%{box-shadow:0 0 0 0 transparent}}
+.tool-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--on-accent);background:var(--blue);padding:3px 8px;border-radius:4px}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.fld{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.in,select.in{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;width:8em;max-width:100%}
+.in.s{width:5.5em}.in.wide{width:14em}
+select.in{width:auto}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:inline-block;padding:6px 13px;border:1.5px solid var(--line);border-radius:999px;font-size:15px;cursor:pointer;background:var(--paper);user-select:none}
+.seg input:checked+span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.btn{font:inherit;font-size:15px;font-weight:700;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1.5px dashed var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.chip:hover{border-color:var(--red)}
+.out{background:var(--grid);border-radius:10px;padding:14px;display:grid;gap:10px;min-width:0}
+.big{font-size:clamp(22px,3vw,30px);font-family:var(--f-display);font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.big .frac{font-family:var(--f-body);font-size:.8em}
+.small{font-size:14px;color:var(--muted)}
+.err{color:var(--red);font-weight:700}
+
+/* uppgiftskort */
+.card{background:var(--gold-tint);border:2px solid var(--gold);border-radius:14px;padding:18px 20px;display:grid;gap:12px;scroll-margin-top:calc(var(--top-h) + 16px);animation:pop .35s}
+@keyframes pop{from{transform:translateY(-6px);opacity:.3}to{transform:none;opacity:1}}
+.card-h{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap}
+.card-h .num{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--gold);line-height:1}
+.card-h .meta{display:grid;font-size:13px;color:var(--muted);line-height:1.35}
+.card-h .meta b{color:var(--ink);font-size:15px}
+.card-h .x{margin-left:auto;font:inherit;font-size:22px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px}
+.card-h .x:hover{background:var(--paper)}
+.card .q{font-size:17px;line-height:1.9}
+.card .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--gold)}
+.card .hint{background:var(--paper);border-radius:8px;padding:10px 14px;line-height:1.9}
+.card .ans{background:var(--paper);border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;line-height:1.9}
+.card-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.card-f .sp{flex:1}
+
+/* start */
+.hero{background:#c4271d;color:#fff;border-radius:14px;padding:clamp(22px,4vw,36px);display:grid;gap:10px}
+.hero h1{font-size:clamp(34px,6vw,62px);font-weight:800;color:#fff}
+.hero p{color:#fff;font-size:18px;opacity:.95}
+.hero .kick{font-size:13px;text-transform:uppercase;letter-spacing:.14em;font-weight:700;opacity:.9}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+.tgrid button{font:inherit;font-size:14px;font-variant-numeric:tabular-nums;font-weight:700;padding:7px 0;border-radius:6px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.tgrid button.f{background:var(--blue-tint);border-color:transparent}
+.tgrid button.p{background:var(--red-tint);border-color:transparent}
+.tgrid button:hover{border-color:var(--ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.extra{display:grid;gap:12px}
+.extra .grp{display:grid;gap:6px}
+.extra .grp>b{font-size:14px}
+.foot{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+.formula{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.formula>div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.formula>div b{font-family:var(--f-display);font-size:16px}
+.pgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:min(100%,260px);aspect-ratio:1}
+.pgrid button{border:0;padding:0;border-radius:2px;background:var(--paper);outline:1px solid var(--line);cursor:pointer}
+.pgrid button.on{background:var(--red)}
+@media print{.top,.side,.tool,.menu-btn,.card-f{display:none!important}.shell{display:block}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#start"><b>KAP 4</b><span>Statistik och sannolikhet</span></a>
+    <div class="search" role="search">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="7" cy="7" r="5" style="fill:none;stroke:var(--muted);stroke-width:1.8"/><path d="M11 11l3.5 3.5" style="stroke:var(--muted);stroke-width:1.8;stroke-linecap:round"/></svg>
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Sök uppgift, t.ex. 47" aria-label="Sök uppgift eller ord" aria-controls="sugg" aria-expanded="false">
+      <kbd>/</kbd>
+      <div class="sugg" id="sugg" role="listbox" hidden></div>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Byt mellan ljust och mörkt läge"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" style="display:inline-block;vertical-align:-3px"><circle cx="8" cy="8" r="6.5" style="fill:none;stroke:currentColor;stroke-width:1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" style="fill:currentColor"/></svg><span class="tt"> Tema</span></button>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="side">Innehåll</button>
+  </div>
+</header>
+
+<style>
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:5px;max-width:560px}
+.og button{font:inherit;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;padding:8px 0;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.og button.on{background:var(--red);color:var(--on-accent);border-color:var(--red)}
+.cg{display:grid;grid-template-columns:auto repeat(13,minmax(26px,1fr));gap:3px;min-width:470px}
+.cg>span{font-size:13px;color:var(--muted);align-self:center;padding-right:6px}
+.cg button{font:inherit;font-size:13px;font-weight:700;padding:6px 0;border-radius:5px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer}
+.cg button.rd{color:#c4271d}.cg button.bk{color:var(--ink)}
+.cg button.on{background:var(--gold-tint);border-color:var(--gold);outline:2px solid var(--gold)}
+.sum6{display:grid;grid-template-columns:repeat(7,minmax(34px,1fr));gap:3px;max-width:340px}
+.sum6>*{font:inherit;font-variant-numeric:tabular-nums;text-align:center;padding:6px 0;border-radius:5px;font-size:14px}
+.sum6 .hd{background:var(--grid);font-weight:800;color:var(--red)}
+.sum6 button{border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.sum6 button.on{background:var(--red);color:var(--on-accent);border-color:var(--red);font-weight:800}
+.tally{font-family:var(--f-display);letter-spacing:.06em;color:var(--blue)}
+.flow{display:grid;gap:8px}
+.flow .qq{font-weight:700}
+.balls{display:flex;flex-wrap:wrap;gap:6px}
+.balls span{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink)}
+.balls span.gone{opacity:.15}
+</style>
+<div class="shell">
+<nav class="side" id="side" aria-label="Innehåll">
+  <h4>Start</h4>
+  <a href="#start">Översikt och uppgifter</a>
+  <a href="#begrepp">Begrepp</a>
+  <h4>Statistik</h4>
+  <a href="#tabeller">Tabeller <small>1–4</small></a>
+  <a href="#diagram">Diagramtyper <small>5–10</small></a>
+  <a href="#lagesmatt">Lägesmått <small>11–19</small></a>
+  <a href="#vilseledande">Vilseledande diagram <small>20–25</small></a>
+  <h4>Sannolikhet</h4>
+  <a href="#sannolikhet">Sannolikhet <small>26–31</small></a>
+  <a href="#handelse">Sannolikhet för en händelse <small>32–38</small></a>
+  <a href="#rakna">Räkna med sannolikhet <small>39–47</small></a>
+  <a href="#kombinatorik">Kombinatorik <small>48–53</small></a>
+  <h4>Repetera</h4>
+  <a href="#blandat">Tester och blandat</a>
+  <a href="#sammanfattning">Sammanfattning</a>
+</nav>
+
+<main id="main">
+
+<section class="sec" id="start" data-title="Start">
+  <div class="slot"></div>
+  <div class="hero">
+    <span class="kick">Bryggan · kapitel 4</span>
+    <h1>Statistik och sannolikhet</h1>
+    <p>Slå upp metoden, pröva med egna tal och få stöd till varje uppgift i kapitlet.</p>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h3>Så använder du sidan</h3>
+      <p>Skriv ett <b>uppgiftsnummer</b> i sökrutan högst upp (tryck <b>/</b> för att hoppa dit). Då öppnas ett stödkort i rätt avsnitt med en ledtråd, en knapp som fyller i verktyget med uppgiftens tal och facit som du väljer att visa.</p>
+      <div class="tip"><b>Sökexempel:</b> <code>18</code>, <code>36</code>, <code>minitest 4B 2</code>, <code>kt 8</code>, <code>sf 10</code>, <code>uppslaget A</code> eller ett ord som <code>median</code>.</div>
+      <div class="ok"><b>Knep:</b> försök själv med ledtråden innan du öppnar facit.</div>
+    </div>
+    <div class="box">
+      <h3>Hoppa direkt till</h3>
+      <div class="chips" id="quick"></div>
+    </div>
+  </div>
+  <div class="box">
+    <h3>Alla uppgifter</h3>
+    <div class="legend"><span style="--c:var(--blue-tint)">Statistik, 1–25</span><span style="--c:var(--red-tint)">Sannolikhet och kombinatorik, 26–53</span></div>
+    <div class="tgrid" id="tgrid" aria-label="Välj en uppgift"></div>
+  </div>
+</section>
+
+<section class="sec" id="begrepp" data-title="Begrepp">
+  <div><span class="kicker">Start</span><h2>Begrepp i kapitlet</h2></div>
+  <div class="tw"><table>
+    <tr><th class="l">Ord</th><th class="l">Betyder</th><th class="l">Exempel</th></tr>
+    <tr><td class="l"><b>tabell</b></td><td class="l">sammanställning i rader och kolumner; rubrikerna kallas tabellhuvud</td><td class="l">Färg · Avprickning · Antal</td></tr>
+    <tr><td class="l"><b>stapeldiagram</b></td><td class="l">när det man undersöker <i>inte</i> är tal</td><td class="l">favoritfärg, bilmärke</td></tr>
+    <tr><td class="l"><b>stolpdiagram</b></td><td class="l">när det man undersöker <i>är</i> tal</td><td class="l">ålder, antal syskon</td></tr>
+    <tr><td class="l"><b>cirkeldiagram</b></td><td class="l">visar hur något fördelas – delarna av en helhet</td><td class="l">könsfördelning</td></tr>
+    <tr><td class="l"><b>linjediagram</b></td><td class="l">visar förändring under en tidsperiod</td><td class="l">temperatur en vecka</td></tr>
+    <tr><td class="l"><b>lägesmått</b></td><td class="l">ett tal som sammanfattar många värden</td><td class="l">medelvärde, median, typvärde</td></tr>
+    <tr><td class="l"><b>sannolikhet</b></td><td class="l">hur troligt något är, från 0 till 1</td><td class="l">0,5 = 50 % = fifty-fifty</td></tr>
+    <tr><td class="l"><b>chans · risk</b></td><td class="l">sannolikhet för något man hoppas på · inte vill ska hända</td><td class="l">chans att vinna, risk för nitlott</td></tr>
+    <tr><td class="l"><b>möjlig · gynnsam händelse</b></td><td class="l">allt som kan hända · det man är intresserad av</td><td class="l">tärning: 6 möjliga, ”femma” 1 gynnsam</td></tr>
+    <tr><td class="l"><b>kombinatorik</b></td><td class="l">räkna på hur många sätt man kan välja eller ordna något</td><td class="l">3 tröjor · 2 byxor = 6 sätt</td></tr>
+    <tr><td class="l"><b>multiplikationsprincipen</b></td><td class="l">multiplicera antalet möjligheter i varje steg</td><td class="l">3 · 2 · 1 = 6</td></tr>
+  </table></div>
+</section>
+
+<!-- TABELLER -->
+<section class="sec" id="tabeller" data-title="Tabeller">
+  <div><span class="kicker">Statistik <i>· uppgift 1–4 · s. 112–113</i></span><h2>Tabeller</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="box">
+      <p>En tabell sammanställer resultat från en undersökning. Varje svar prickas av med ett streck. Vart femte streck dras snett över de fyra första, så blir det lätt att räkna i femgrupper.</p>
+      <div class="tw"><table>
+        <tr><th class="l">Färg</th><th class="l">Avprickning</th><th>Antal</th></tr>
+        <tr><td class="l">grön</td><td class="l tally">|||</td><td>3</td></tr>
+        <tr><td class="l">blå</td><td class="l tally"><s>||||</s> ||</td><td>7</td></tr>
+        <tr><td class="l">gul</td><td class="l tally"><s>||||</s></td><td>5</td></tr>
+        <tr><td class="l">röd</td><td class="l tally"><s>||||</s> |</td><td>6</td></tr>
+        <tr><td class="l">lila</td><td class="l tally">|</td><td>1</td></tr>
+      </table></div>
+    </div>
+    <div class="box">
+      <div class="tip"><b>Tabellhuvud</b> = rubrikerna överst. <b>Rader</b> går åt sidan, <b>kolumner</b> uppåt–nedåt.</div>
+      <div class="ok"><b>Kontrollera:</b> summan av kolumnen Antal ska bli lika med antalet som svarade.</div>
+      <div class="tip"><b>Tidtabell (uppgift 4):</b> följ bussens rad åt höger. ”osv var 30:e minut” betyder att samma minuter upprepas varje halvtimme. Ett streck (–) betyder att bussen inte stannar där.</div>
+    </div>
+  </div>
+  <div class="tool" id="t-tab">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Från svar till tabell och diagram</h3></div>
+    <div class="ctrl">
+      <label class="fld" style="flex:1 1 320px">Skriv svaren med komma emellan – eller som namn:antal<input class="in" id="tb-in" style="width:100%" value="SVT, TV4, Eurosport, SVT, TV4, SVT, Canal, SVT, TV4, SVT, SVT, TV4, Viasat, SVT, Eurosport, SVT, TV4, TV4, Viasat, Viasat"></label>
+    </div>
+    <div class="ctrl">
+      <div class="seg" role="radiogroup" aria-label="Diagramtyp">
+        <label><input type="radio" name="tb-t" value="stapel" checked><span>Stapeldiagram</span></label>
+        <label><input type="radio" name="tb-t" value="stolp"><span>Stolpdiagram</span></label>
+        <label><input type="radio" name="tb-t" value="cirkel"><span>Cirkeldiagram</span></label>
+        <label><input type="radio" name="tb-t" value="linje"><span>Linjediagram</span></label>
+      </div>
+      <label class="fld"><span><input type="checkbox" id="tb-sort"> Sortera talen i storleksordning</span></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:start"><div class="tw"><table id="tb-tab"></table></div><div class="box"><svg id="tb-svg" viewBox="0 0 400 260" role="img" aria-label="Diagram över tabellen"></svg><div id="tb-why" class="small"></div></div></div></div>
+  </div>
+</section>
+
+<!-- DIAGRAM -->
+<section class="sec" id="diagram" data-title="Diagramtyper">
+  <div><span class="kicker">Statistik <i>· uppgift 5–10 · s. 114–115</i></span><h2>Diagramtyper</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Stapeldiagram</b><div>När det man undersöker <b>inte är tal</b>: färger, tv-kanaler, bilmärken. Staplarna står med mellanrum.</div></div>
+    <div class="ex"><b>Stolpdiagram</b><div>När det man undersöker <b>är tal</b>: ålder, antal syskon, antal mål. Talen står i ordning på den vågräta axeln.</div></div>
+    <div class="ex"><b>Cirkeldiagram</b><div>Visar <b>fördelningen</b> av något – hur stor andel varje del är av helheten. Hela cirkeln = 100 %.</div></div>
+    <div class="ex"><b>Linjediagram</b><div>Visar en <b>förändring under en tidsperiod</b>. Tiden står på den vågräta axeln.</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Läs av ett diagram:</b> börja med rubriken och axlarna. Vad står på den vågräta axeln (x-axeln)? Vad står på den lodräta (y-axeln)? Vilken gradering har den?</div>
+    <div class="tip"><b>Cirkeldiagram utan siffror:</b> halva cirkeln = 50 %, en fjärdedel = 25 %, en tiondel = 10 %.</div>
+    <div class="warn"><b>Sicksacklinje</b> på en axel betyder att graderingen inte börjar på noll.</div>
+  </div>
+  <div class="tool" id="t-val">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Vilket diagram ska jag välja?</h3></div>
+    <div class="flow" id="va-flow"></div>
+  </div>
+  <div class="tool" id="t-pie">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Cirkeldiagram: procent, antal och grader</h3></div>
+    <div class="ctrl">
+      <label class="fld" style="flex:1 1 320px">Delar som ”namn procent”, med komma emellan<input class="in" id="pi-in" style="width:100%" value="Disk 20, Tvätt 15, Mat och dryck 5, Personlig hygien 35, Övrigt 5, WC 20"></label>
+      <label class="fld">Helheten (100 %)<input class="in" id="pi-tot" inputmode="decimal" value="200"></label>
+      <label class="fld">Enhet<input class="in s" id="pi-u" value="liter"></label>
+    </div>
+    <div class="out" aria-live="polite"><div class="cols" style="align-items:center"><svg id="pi-svg" viewBox="0 0 240 240" role="img" aria-label="Cirkeldiagram" style="max-width:260px"></svg><div class="tw"><table id="pi-tab"></table></div></div><div id="pi-why" class="small"></div></div>
+  </div>
+</section>
+
+<!-- LÄGESMÅTT -->
+<section class="sec" id="lagesmatt" data-title="Lägesmått">
+  <div><span class="kicker">Statistik <i>· uppgift 11–19 · s. 116–117</i></span><h2>Lägesmått: medelvärde, median och typvärde</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Medelvärde</b><div>Summan av värdena delat med antalet värden. Kallas också genomsnitt eller medeltal.</div><div class="eq">2, 9, 4, 8, 4 → <span class="frac"><span>27</span><span>5</span></span> = 5,4</div></div>
+    <div class="ex"><b>Median</b><div>Mittenvärdet när värdena står i storleksordning. Jämnt antal: medelvärdet av de två i mitten.</div><div class="eq">2 4 <b class="r">4</b> 8 9 → median 4</div></div>
+    <div class="ex"><b>Typvärde</b><div>Det vanligaste värdet. Två lika vanliga → båda är typvärden. Inget värde vanligare → inget typvärde.</div><div class="eq">2, 4, 4, 8, 9 → typvärde 4</div></div>
+  </div>
+  <div class="cols">
+    <div class="warn"><b>Glöm inte nollorna:</b> en match med 0 mål räknas också (uppgift 14).</div>
+    <div class="tip"><b>Baklänges (uppgift 15):</b> medelvärde 21 för 5 personer → summan måste vara 5 · 21 = 105.</div>
+    <div class="ok"><b>Vilket mått är bäst?</b> Finns ett värde som sticker ut (en jättehög lön) drar det upp medelvärdet. Då beskriver medianen bäst.</div>
+    <div class="tip"><b>Från stolpdiagram:</b> skriv varje värde så många gånger som stolpen visar – eller skriv <i>värde:antal</i> i verktyget, t.ex. 21:5.</div>
+  </div>
+  <div class="tool" id="t-lm">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räkna ut lägesmåtten</h3></div>
+    <div class="ctrl"><label class="fld" style="flex:1 1 320px">Skriv värdena<input class="in" id="lm-in" style="width:100%" value="3; 0; 1; 0; 0; 2; 1; 2; 4; 1"></label></div>
+    <p class="small">Skilj värdena åt med <b>semikolon</b> om du har decimaltal, t.ex. 2,5; 3,1. Annars går komma eller mellanslag bra. Format <i>värde:antal</i> fungerar också.</p>
+    <div class="out" aria-live="polite"><div id="lm-out" class="rows"></div><svg id="lm-svg" viewBox="0 0 560 80" role="img" aria-label="Värdena på en tallinje"></svg></div>
+  </div>
+</section>
+
+<!-- VILSELEDANDE -->
+<section class="sec" id="vilseledande" data-title="Vilseledande diagram">
+  <div><span class="kicker">Statistik <i>· uppgift 20–25 · s. 118–119</i></span><h2>Vilseledande diagram</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="box">
+      <p>Samma siffror kan se helt olika ut beroende på hur diagrammet ritas. Den som gör diagrammet kan få skillnader att se större eller mindre ut än de är.</p>
+      <div class="warn"><b>Axeln börjar inte på noll:</b> små skillnader ser enorma ut. Titta efter sicksacklinjen och läs av siffrorna.</div>
+    </div>
+    <div class="box">
+      <div class="warn"><b>Bilder som växer åt två håll:</b> fördubblas både höjd och bredd blir bilden 4 gånger så stor, fast värdet bara fördubblats.</div>
+      <div class="tip"><b>Avstånd på x-axeln:</b> trycker man ihop åren ser kurvan brantare ut.</div>
+      <div class="ok"><b>Gör så här:</b> läs av de riktiga värdena och räkna själv – hur många gånger större? Hur stor är ökningen?</div>
+    </div>
+  </div>
+  <div class="tool" id="t-vill">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Flytta y-axelns startvärde</h3></div>
+    <div class="ctrl">
+      <label class="fld" style="flex:1 1 300px">Värden som namn:värde<input class="in" id="vi-in" style="width:100%" value="A:520, B:560, C:580"></label>
+      <div class="seg" role="radiogroup" aria-label="Diagramtyp"><label><input type="radio" name="vi-t" value="stapel" checked><span>Staplar</span></label><label><input type="radio" name="vi-t" value="linje"><span>Linje</span></label></div>
+      <label class="fld">Y-axeln börjar på: <b id="vi-v" style="color:var(--ink)">500</b><input type="range" id="vi-r" min="0" max="500" value="500" style="width:220px;accent-color:var(--red)"></label>
+    </div>
+    <div class="out" aria-live="polite"><svg id="vi-svg" viewBox="0 0 560 260" role="img" aria-label="Diagram med valbar start på y-axeln"></svg><div id="vi-why"></div></div>
+  </div>
+</section>
+
+<!-- SANNOLIKHET -->
+<section class="sec" id="sannolikhet" data-title="Sannolikhet">
+  <div><span class="kicker">Sannolikhet <i>· uppgift 26–31 · s. 120–121</i></span><h2>Sannolikhet</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Sannolikheten talar om hur troligt det är att något ska inträffa. Den skrivs som ett tal från 0 till 1 – i bråkform, decimalform eller procentform.</p>
+  <svg viewBox="0 0 600 96" role="img" aria-label="Sannolikhetslinjen från omöjligt till säkert">
+    <line x1="30" y1="40" x2="570" y2="40" style="stroke:var(--ink);stroke-width:2"/>
+    <g style="stroke:var(--ink);stroke-width:2"><line x1="30" y1="30" x2="30" y2="50"/><line x1="300" y1="30" x2="300" y2="50"/><line x1="570" y1="30" x2="570" y2="50"/></g>
+    <g font-size="14" text-anchor="middle" font-weight="700"><text x="30" y="20">omöjligt</text><text x="300" y="20">fifty-fifty</text><text x="570" y="20">säkert</text></g>
+    <g font-size="13" text-anchor="middle"><text x="30" y="70">0 = 0 %</text><text x="300" y="70">½ = 0,5 = 50 %</text><text x="570" y="70">1 = 100 %</text><text x="165" y="90" style="fill:var(--muted)">← mindre troligt</text><text x="435" y="90" style="fill:var(--muted)">mera troligt →</text></g>
+  </svg>
+  <div class="cols">
+    <div class="tip"><b>Chans</b> används när man hoppas att något ska hända. <b>Risk</b> när man inte vill att det ska hända.</div>
+    <div class="warn"><b>Kan inte vara en sannolikhet:</b> negativa tal och tal större än 1 (över 100 %). −0,6, 1,9 och 150 % går inte.</div>
+    <div class="ok"><b>Händelsen inträffar inte:</b> 1 − sannolikheten. Chans 0,1 att vinna → risk 0,9 att inte vinna.</div>
+  </div>
+  <div class="tool" id="t-sl">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Sannolikhetslinjen</h3></div>
+    <div class="ctrl">
+      <label class="fld">Skriv en sannolikhet (bråk, decimal eller procent)<input class="in wide" id="sl-in" value="3/4"></label>
+    </div>
+    <div class="chips" id="sl-chips"></div>
+    <div class="out" aria-live="polite"><svg id="sl-svg" viewBox="0 0 600 80" role="img" aria-label="Talet på sannolikhetslinjen"></svg><div id="sl-why"></div></div>
+  </div>
+</section>
+
+<!-- HÄNDELSE -->
+<section class="sec" id="handelse" data-title="Sannolikhet för en händelse">
+  <div><span class="kicker">Sannolikhet <i>· uppgift 32–38 · s. 122–123</i></span><h2>Sannolikhet för en händelse</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Formel</b><div class="eq">Sannolikheten = <span class="frac"><span>antalet gynnsamma händelser</span><span>antalet möjliga händelser</span></span></div></div>
+    <div class="ex"><b>Exempel</b><div>Sannolikheten att få en femma med en vanlig tärning:</div><div class="eq"><span class="frac"><span>1</span><span>6</span></span> – en femma av sex möjliga tal</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Fråga dig:</b> hur många möjligheter finns det? Hur många av dem är bra (gynnsamma)?</div>
+    <div class="ok"><b>Kortlek:</b> 52 kort, 4 färger (hjärter ♥, ruter ♦ röda; klöver ♣, spader ♠ svarta) med 13 kort i varje. 4 ess, 12 klädda kort (knekt, dam, kung).</div>
+    <div class="warn"><b>Alla utfall måste vara lika troliga.</b> Ett lyckohjul med olika stora fält går inte att räkna så.</div>
+  </div>
+  <div class="tool" id="t-dice">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Tärning eller hjul – klicka på de gynnsamma</h3></div>
+    <div class="ctrl">
+      <label class="fld">Antal sidor/fält<input class="in s" id="di-n" inputmode="numeric" value="6"></label>
+      <div class="chips" id="di-quick"></div>
+    </div>
+    <div class="og" id="di-grid" role="group" aria-label="Möjliga utfall"></div>
+    <div class="out" aria-live="polite"><div class="big" id="di-big"></div><div id="di-why"></div></div>
+  </div>
+  <div class="tool" id="t-card">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Kortleken – välj kort</h3></div>
+    <div class="chips" id="ca-quick"></div>
+    <div class="tw"><div class="cg" id="ca-grid"></div></div>
+    <div class="out" aria-live="polite"><div class="big" id="ca-big"></div><div id="ca-why"></div></div>
+  </div>
+  <div class="tool" id="t-sum">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Summan av två tärningar (Arbeta tillsammans)</h3></div>
+    <div class="cols" style="align-items:start">
+      <div class="sum6" id="su-grid"></div>
+      <div class="box"><div class="chips" id="su-btn"></div><div class="out" aria-live="polite"><div class="big" id="su-big"></div><div id="su-why"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RÄKNA MED SANNOLIKHET -->
+<section class="sec" id="rakna" data-title="Räkna med sannolikhet">
+  <div><span class="kicker">Sannolikhet <i>· uppgift 39–47 · s. 124–125</i></span><h2>Räkna med sannolikhet</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Chans och risk</b><div>5 lotter, 1 vinst. Chansen att vinna: <span class="frac"><span>1</span><span>5</span></span> = 0,2 = 20 %.</div><div>Risken för nitlott: <span class="frac"><span>4</span><span>5</span></span> = 0,8 = 80 % – eller 100 % − 20 %.</div></div>
+    <div class="ex"><b>Utan återläggning</b><div>2 röda och 3 vita kulor. P(röd) = <span class="frac"><span>2</span><span>5</span></span>.</div><div>Du tar en röd och lägger <i>inte</i> tillbaka den. Nu är P(röd) = <span class="frac"><span>1</span><span>4</span></span>.</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Chans + risk = 1</b> (100 %). Flera vinstsorter: risken att inte vinna något = 1 − alla vinstchanser.</div>
+    <div class="tip"><b>Hur många gånger?</b> Sannolikheten · antal försök. Chans 0,6 och 25 försök → 0,6 · 25 = 15 gånger.</div>
+    <div class="warn"><b>Efter en dragning:</b> räkna om både det som är kvar av sorten och det totala antalet kvar.</div>
+  </div>
+  <div class="tool" id="t-lott">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Lotteriet: chans, risk och förväntat antal</h3></div>
+    <div class="ctrl">
+      <label class="fld">Totalt antal (lotter, kort …)<input class="in" id="lo-t" inputmode="numeric" value="100"></label>
+      <label class="fld">Gynnsamma (vinster …)<input class="in" id="lo-g" inputmode="numeric" value="3"></label>
+      <label class="fld">Antal försök (valfritt)<input class="in" id="lo-n" inputmode="numeric" value=""></label>
+    </div>
+    <div class="out" aria-live="polite"><div id="lo-out" class="rows"></div><svg id="lo-svg" viewBox="0 0 560 50" role="img" aria-label="Andel vinster"></svg></div>
+  </div>
+  <div class="tool" id="t-urn">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Påsen – dra utan att lägga tillbaka</h3></div>
+    <div class="ctrl">
+      <label class="fld">Sort 1 (namn)<input class="in" id="ur-an" value="röd"></label><label class="fld">Antal<input class="in s" id="ur-a" inputmode="numeric" value="2"></label>
+      <label class="fld">Sort 2 (namn)<input class="in" id="ur-bn" value="vit"></label><label class="fld">Antal<input class="in s" id="ur-b" inputmode="numeric" value="3"></label>
+    </div>
+    <div class="ctrl"><button class="btn" type="button" id="ur-da">Dra en sort 1</button><button class="btn" type="button" id="ur-db">Dra en sort 2</button><button class="btn ghost" type="button" id="ur-reset">Börja om</button></div>
+    <div class="out" aria-live="polite"><div class="balls" id="ur-balls"></div><ol class="steps eq" id="ur-log"></ol><div id="ur-now" class="eq"></div></div>
+  </div>
+</section>
+
+<!-- KOMBINATORIK -->
+<section class="sec" id="kombinatorik" data-title="Kombinatorik">
+  <div><span class="kicker">Sannolikhet <i>· uppgift 48–53 · s. 126–127</i></span><h2>Kombinatorik</h2></div>
+  <div class="slot"></div>
+  <div class="cols">
+    <div class="ex"><b>Välja en av varje</b><div>Pia har 3 tröjor och 2 byxor: 3 · 2 = <b>6</b> kombinationer. Lägg till 3 jackor: 3 · 2 · 3 = 18.</div><div class="small">Detta kallas multiplikationsprincipen.</div></div>
+    <div class="ex"><b>Ställa i ordning (kö)</b><div>Anna, Bim och Cissi: första platsen 3 sätt, andra 2, tredje 1.</div><div class="eq">3 · 2 · 1 = 6 sätt</div><div class="small">ABC, ACB, BAC, BCA, CAB, CBA</div></div>
+  </div>
+  <div class="cols">
+    <div class="tip"><b>Baklänges (uppgift 50):</b> 24 varianter – vilka tre tal ger 24 när de multipliceras? 1 · 4 · 6 eller 3 · 2 · 4 …</div>
+    <div class="tip"><b>Siffror som får upprepas (uppgift 53 b):</b> varje plats har lika många val: 4 · 4 · 4 · 4.</div>
+    <div class="ok"><b>Rita träd</b> när det är få val – då ser du alla kombinationer.</div>
+  </div>
+  <div class="tool" id="t-komb">
+    <div class="tool-h"><span class="tag">Verktyg</span><h3>Räkna kombinationer</h3></div>
+    <div class="seg" role="radiogroup" aria-label="Typ">
+      <label><input type="radio" name="ko-m" value="val" checked><span>Välja en av varje</span></label>
+      <label><input type="radio" name="ko-m" value="ko"><span>Ställa i kö</span></label>
+      <label><input type="radio" name="ko-m" value="sif"><span>Bilda tal av siffror</span></label>
+    </div>
+    <div class="ctrl" id="ko-val"><label class="fld" style="flex:1 1 300px">Antal val i varje steg, med komma (t.ex. 3, 2, 3)<input class="in" id="ko-list" style="width:100%" value="3, 2"></label></div>
+    <div class="ctrl" id="ko-ko" hidden><label class="fld">Antal personer<input class="in s" id="ko-n" inputmode="numeric" value="3"></label></div>
+    <div class="ctrl" id="ko-sif" hidden><label class="fld">Antal olika siffror<input class="in s" id="ko-d" inputmode="numeric" value="4"></label><label class="fld">Siffror i talet<input class="in s" id="ko-l" inputmode="numeric" value="4"></label><div class="seg" role="radiogroup" aria-label="Upprepning"><label><input type="radio" name="ko-r" value="0" checked><span>alla olika</span></label><label><input type="radio" name="ko-r" value="1"><span>får vara lika</span></label></div></div>
+    <div class="out" aria-live="polite"><div class="big" id="ko-big"></div><div id="ko-why" class="eq"></div><svg id="ko-svg" viewBox="0 0 560 200" role="img" aria-label="Träddiagram"></svg></div>
+  </div>
+</section>
+
+<!-- BLANDAT -->
+<section class="sec" id="blandat" data-title="Tester och blandat">
+  <div><span class="kicker">Repetera <i>· s. 119, 127–131</i></span><h2>Minitester, kapiteltest och blandade uppgifter</h2></div>
+  <div class="slot"></div>
+  <p class="lead">Klicka på en uppgift. Stödkortet öppnas i det avsnitt där metoden förklaras.</p>
+  <div class="extra" id="extra"></div>
+</section>
+
+<!-- SAMMANFATTNING -->
+<section class="sec" id="sammanfattning" data-title="Sammanfattning">
+  <div><span class="kicker">Repetera <i>· s. 132–133</i></span><h2>Sammanfattning – formelkort</h2></div>
+  <div class="formula">
+    <div><b>Stapeldiagram</b><span>Det man undersöker är inte tal.</span></div>
+    <div><b>Stolpdiagram</b><span>Det man undersöker är tal.</span></div>
+    <div><b>Cirkeldiagram</b><span>Fördelningen av något.</span></div>
+    <div><b>Linjediagram</b><span>Förändring under en viss tidsperiod.</span></div>
+    <div><b>Medelvärde</b><span class="eq">2, 9, 4, 8, 4 → 27 / 5 = 5,4</span><span class="small">Summan delat med antalet värden.</span></div>
+    <div><b>Median</b><span class="eq">2 4 <b>4</b> 8 9 → 4</span><span class="small">Mittvärdet i storleksordning. Jämnt antal: medelvärdet av de två i mitten.</span></div>
+    <div><b>Typvärde</b><span class="eq">2, 4, 4, 8, 9 → 4</span><span class="small">Det vanligaste värdet.</span></div>
+    <div><b>Sannolikhet</b><span class="eq">P = <span class="frac"><span>gynnsamma</span><span>möjliga</span></span></span><span class="small">Femma eller sexa: 2/6 ≈ 0,33 = 33 %</span></div>
+    <div><b>Chans och risk</b><span class="eq">risk = 1 − chans</span><span class="small">Från 0 (omöjligt) till 1 (säkert).</span></div>
+    <div><b>Kombinatorik</b><span class="eq">5 · 6 · 3 = 90</span><span class="small">5 byxor, 6 tröjor och 3 kepsar. Kö med 3 personer: 3 · 2 · 1 = 6.</span></div>
+  </div>
+</section>
+
+<footer class="foot">Byggd på kapitel 4 <i>Statistik och sannolikhet</i> i läroboken Bryggan och dess facit. Uppgifterna är sammanfattade med egna ord – se boken för diagram, bilder och full text. <a href="#start">↑ Till början</a></footer>
+</main>
+</div>
+<script>
+/* Uppgiftsdata: [nyckel, avsnitt, sida, uppgift (egna ord), ledtråd, facit, verktyg] — [a/b] ritas som bråk */
+const TASKS=[
+["1","tabeller",112,"Använd tabellen i rutan (färg på logotypen): a) Vilken färg var mest populär? b) Minst populär? c) Hur många medlemmar svarade?","Titta i kolumnen Antal. c) Addera alla antal.","a) blå &nbsp; b) lila &nbsp; c) 22 medlemmar",["tab","grön:3, blå:7, gul:5, röd:6, lila:1","stapel"]],
+["2","tabeller",112,"Medlemmarna fick välja vilken tv-kanal som har bäst sportsändningar (20 svar). Gör en tabell och för in resultatet.","Gör en rad per kanal. Pricka av ett streck per svar och räkna. Kontrollera att summan blir 20.","SVT 8, TV4 6, Eurosport 2, Canal 1, Viasat 3",["tab","SVT, TV4, Eurosport, SVT, TV4, SVT, Canal, SVT, TV4, SVT, SVT, TV4, Viasat, SVT, Eurosport, SVT, TV4, TV4, Viasat, Viasat","stapel"]],
+["3","tabeller",112,"Tabellen visar de populäraste hundraserna 2010. Stämmer det att a) det finns fler än 4 500 retrievrar b) de fyra populäraste är fler än de övriga sex tillsammans c) en ras är dubbelt så populär som en annan?","a) Addera Labrador och Golden retriever. b) Addera ras 1–4 och ras 5–10 och jämför. c) Leta efter två tal där det ena är dubbelt så stort.","a) Nej (2 200 + 2 050 = 4 250) &nbsp; b) Ja (8 090 mot 6 760) &nbsp; c) Ja, schäfer (2 100) är dubbelt så populär som Cavalier King Charles (1 050).",["tab","Labrador:2200, Schäfer:2100, Golden:2050, Jämthund:1740, Cocker:1290, Korthårig chihuahua:1220, Långhårig chihuahua:1150, Rottweiler:1080, Cavalier:1050, Chinese crested:970","stapel"]],
+["4","tabeller",113,"Bussens tidtabell (lördag): a) Senast avgång från Gamla Uppsala för att vara vid Akademiska sjukhuset kl. 10.00? b) Restid Storvreta → Centralstationen? c) Nästa buss från Gamla Uppsala efter 12.00? d) Nästa buss från Storvreta efter 20.30? e) Första bussen söndag morgon från Storvreta?","Följ en rad åt höger för en och samma buss. ”osv var 30:e minut” betyder att minuterna upprepas varje halvtimme. a) Bussen måste vara framme senast 10.00 – leta upp den sista som kommer före. b) Ankomst minus avgång.","a) 09.12 &nbsp; b) 24 min, 26 min eller 28 min &nbsp; c) 12.23 &nbsp; d) 20.47 &nbsp; e) 00.17",null],
+["5","diagram",114,"Stolpdiagrammet visar åldern hos besökarna på en rockkonsert. a) Minst vanliga åldrar? b) Hur många var under 18? c) Hur många var 19 år eller äldre? d) Hur många tillfrågades?","Läs av höjden på varje stolpe. ”Under 18” = 15, 16 och 17 år. ”19 eller äldre” = 19 och 20 år.","a) 16 år och 20 år &nbsp; b) 50 besökare &nbsp; c) 25 besökare &nbsp; d) 100 besökare",["tab","15:15, 16:5, 17:30, 18:25, 19:20, 20:5","stolp"]],
+["6","diagram",114,"Cirkeldiagrammet visar svaren på om rätt film fick en Oscar. Hur många procent svarade a) ja b) nej c) vet ej?","Hela cirkeln = 100 %. Hur stor del av cirkeln är varje färg? Hälften = 50 %, en fjärdedel = 25 %, en tiondel = 10 %.","a) 60 % &nbsp; b) 30 % &nbsp; c) 10 %",["pie","Ja 60, Nej 30, Vet ej 10",100,"%"]],
+["7","diagram",115,"Linjediagrammet visar en akties kurs 2007–2012. Vad var aktien värd a) 1 januari 2007 b) 1 januari 2008? c) Mellan vilka månader ändrades inte kursen?","Läs av y-axeln där linjen startar vid varje år. c) Kursen ändras inte där linjen är vågrät (horisontell).","a) 150 kr &nbsp; b) 250 kr &nbsp; c) oktober 2011–april 2012. Linjen är horisontell mellan dessa punkter.",null],
+["8","diagram",115,"Axel noterade solskenstimmar en vecka i ett stapeldiagram. a) Vad visas på den vågräta axeln? b) På den lodräta? c) Hur många timmar sken solen totalt?","Läs axlarnas rubriker. c) Läs av varje stapel och addera.","a) Veckodagar &nbsp; b) Antal solskenstimmar &nbsp; c) 34 h",["tab","må:5, ti:3, on:9, to:0, fr:8, lö:6, sö:3","stapel"]],
+["9","diagram",115,"Vilken diagramtyp väljer du för a) könsfördelningen i en idrottsklubb b) mest populära bilmärke c) vattentemperaturen en sommarvecka d) löneutvecklingen under 5 år e) elevernas språkval f) vann rätt låt i melodifestivalen g) antal syskon i en klass?","Är det en förändring över tid? → linje. En fördelning av en helhet? → cirkel. Är det man undersöker tal? → stolp. Annars → stapel.","a) Cirkeldiagram &nbsp; b) Stapeldiagram &nbsp; c) Linjediagram &nbsp; d) Linjediagram &nbsp; e) Cirkeldiagram eller stapeldiagram &nbsp; f) Cirkeldiagram &nbsp; g) Stolpdiagram",["val"]],
+["10","diagram",115,"En person använder ca 200 liter vatten per dygn (cirkeldiagram). a) Hur många procent går till tvätt och personlig hygien? b) Hur många liter är 10 %? c) Hur många liter går till WC?","a) Addera procenten. b) 10 % av 200 liter. c) WC är 20 % av 200 liter.","a) 50 % &nbsp; b) 20 liter &nbsp; c) 40 liter",["pie","Disk 20, Tvätt 15, Mat och dryck 5, Personlig hygien 35, Övrigt 5, WC 20",200,"liter"]],
+["11","lagesmatt",116,"Fyra volleybollag har 11, 11, 12 och 14 spelare. Hur många spelare har lagen i genomsnitt?","Genomsnitt = medelvärde. Addera och dela med antalet lag.","12 spelare",["lm","11, 11, 12, 14"]],
+["12","lagesmatt",116,"Fem anställda tjänar 18 000, 17 300, 20 600, 16 700 och 17 900 kr. Beräkna medellönen.","Summan av lönerna delat med 5.","18 100 kr",["lm","18000, 17300, 20600, 16700, 17900"]],
+["13","lagesmatt",116,"Temperaturer under en vecka: 22, 19, 23, 26, 20, 21 och 23 °C. a) Medeltemperaturen? b) Typvärdet?","a) Summan / 7. b) Vilken temperatur förekommer flest gånger?","a) 22 °C &nbsp; b) 23 °C",["lm","22, 19, 23, 26, 20, 21, 23"]],
+["14","lagesmatt",117,"Laget gjorde 3, 0, 1, 0, 0, 2, 1, 2, 4, 1 mål på tio matcher. a) Mål per match i genomsnitt? b) Typvärdet?","Alla matcher räknas – även de med 0 mål. Dela summan med 10. b) Två värden kan vara lika vanliga.","a) 1,4 mål/match &nbsp; b) 0 och 1 mål",["lm","3, 0, 1, 0, 0, 2, 1, 2, 4, 1"]],
+["15","lagesmatt",117,"Medelåldern i Karins familj med fem personer är 21 år. Ge två exempel på hur gamla de kan vara.","Summan av åldrarna måste vara 5 · 21 = 105 år. Välj fem rimliga åldrar som blir 105 tillsammans.","T.ex. 38, 35, 14, 10 och 8 år – eller 42, 34, 19, 5 och 5 år.",["lm","38, 35, 14, 10, 8"]],
+["16","lagesmatt",117,"a) Tre män är 26, 22 och 27 år – medianålder? b) Fyra kvinnor är 21, 22, 29 och 24 år – medianålder? c) Medianåldern för alla sju?","Ordna i storleksordning först. b) Jämnt antal: medelvärdet av de två i mitten.","a) 26 år &nbsp; b) 23 år &nbsp; c) 24 år",["lm","26, 22, 27, 21, 22, 29, 24"]],
+["17","lagesmatt",117,"Beräkna medelvärdet för a) nederbörden (5, 14, 3, 11, 26, 2, 0 mm) b) temperaturen (−4, −8, 0, 2, 5, 3, 12 °C) under en vecka.","Glöm inte söndagens 0 mm. b) Minusgrader drar ner summan: −4 + (−8) = −12.","a) 8,7 mm &nbsp; b) 1,4 °C",["lm","-4, -8, 0, 2, 5, 3, 12"]],
+["18","lagesmatt",117,"11 personers månadslöner: 18 000, 14 000, 16 000, 23 000, 57 000, 18 000, 17 000, 16 000, 16 000, 18 000, 17 000 kr. a) Medelvärde, typvärde och median? b) Vilket mått beskriver lönerna bäst?","a) Ordna lönerna. Median = det 6:e värdet. b) En lön sticker ut (57 000) – vad händer med medelvärdet då?","a) medelvärde 20 909 kr, median 17 000 kr, typvärde 16 000 kr och 18 000 kr &nbsp; b) När fördelningen är sned, dvs. något värde avviker, är medianen det bästa lägesmåttet.",["lm","18000, 14000, 16000, 23000, 57000, 18000, 17000, 16000, 16000, 18000, 17000"]],
+["19","lagesmatt",117,"Stolpdiagrammet visar åldern på de antagna till en kurs i datateknik. a) Typvärdet? b) Medianåldern? c) Medelåldern?","Läs av hur många som har varje ålder. Skriv in dem i verktyget som <i>ålder:antal</i>, t.ex. 21:5. a) Högsta stolpen/stolparna.","a) 21 år och 24 år &nbsp; b) 22 år &nbsp; c) 22,32 år",null],
+["20","vilseledande",118,"En radiokanal vill säga 1) ”Vi har alltid många lyssnare!” 2) ”Vi har fått många fler lyssnare under hösten!” Vilket diagram (A eller B) väljer de till budskap 1 respektive 2?","Diagram A börjar på noll – linjen ser jämn och hög ut. Diagram B börjar på 158 000 – ökningen ser stor ut.","a) A &nbsp; b) B",["vill","jun:160, jul:159, aug:161, sep:162, okt:164, nov:166, dec:168",100,"linje"]],
+["21","vilseledande",118,"Axeln i diagram B börjar inte på noll. Hur gör det att A och B ser så olika ut fast de visar samma sak?","Prova att flytta y-axelns start i verktyget och se hur kurvan förändras.","Variationer i antalet lyssnare syns mycket tydligare i diagram B.",["vill","jun:160, jul:159, aug:161, sep:162, okt:164, nov:166, dec:168",158,"linje"]],
+["22","vilseledande",118,"Hur mycket har antalet lyssnare ökat från juli till december?","Läs av juli och december i diagram B (tusental) och subtrahera.","9 000 st",["vill","jun:160, jul:159, aug:161, sep:162, okt:164, nov:166, dec:168",158,"linje"]],
+["23","vilseledande",118,"En gymnasieskola vill visa att den är populär och växer. a) Vilket diagram väljer skolan? b) Varför ser diagrammen olika ut?","Titta på var y-axeln börjar och hur tätt åren står på x-axeln.","a) Troligtvis diagram B &nbsp; b) Diagram B har en y-axel som inte börjar på noll och kortare avstånd mellan årtalen på x-axeln.",null],
+["24","vilseledande",119,"Dvd-spelarens pris i butik A, B och C (diagram). a) Vilka påståenden är sanna: 1) C är 4 gånger så dyr som A 2) A är mindre än hälften av B 3) B är nästan lika som C? b) Vad gör att man kan luras?","Läs av de riktiga priserna (A 520, B 560, C 580 kr) och räkna – i stället för att jämföra staplarnas höjd.","a) Påstående 3 är sant. &nbsp; b) Diagrammet har en y-axel som inte börjar på noll.",["vill","A:520, B:560, C:580",500,"stapel"]],
+["25","vilseledande",119,"En fabrik fördubblade sin försäljning och visade det med två hus där det andra är dubbelt så högt och dubbelt så brett. Varför är bilden missvisande?","Hur många gånger större blir ytan om både höjd och bredd fördubblas?","Diagrammet är missvisande eftersom både höjden och bredden på huset är fördubblat år 2. Det gör bilden 4 gånger så stor.",null],
+["26","sannolikhet",120,"Rita sannolikhetslinjen och markera händelserna A–F (t.ex. att du kommer ner efter ett hopp, att ett flygplan kraschar, att ett tappat kort landar med baksidan upp).","Fråga dig för varje händelse: omöjligt, mindre troligt, fifty-fifty, mera troligt eller säkert?","Inget facitsvar – diskutera dina placeringar.",["sl","0,5"]],
+["27","sannolikhet",120,"Para ihop påståendena A–G med omöjligt, mindre troligt, fifty-fifty, troligt eller säkert (t.ex. A: ett barn föds i dag, D: en katt föder en hundvalp, G: klave när du singlar slant).","Vissa svar beror på dig själv (plugga i kväll, se på tv). Säkert och omöjligt är däremot samma för alla.","A – säkert, B – osannolikt, C – fifty-fifty (t.ex.), D – omöjligt, E – mindre troligt (t.ex.), F – troligt (t.ex.), G – fifty-fifty",["sl","1/2"]],
+["28","sannolikhet",121,"Para ihop A–G (ganska sannolikt, fifty-fifty, ganska osannolikt, helt säkert, mycket stor chans, omöjligt, mycket liten chans) med värdena 0,01; 50 %; 0; 0,2; [3/4]; 0,93; 1.","Placera värdena på linjen från 0 till 1. Omöjligt = 0, helt säkert = 1, fifty-fifty = 0,5.","A = [3/4], B = 50 %, C = 0,2, D = 1, E = 0,93, F = 0, G = 0,01",["sl","0,93"]],
+["29","sannolikhet",121,"Vilka av talen 0,7; −3; [3/4]; 0,99; 150 %; −0,6; 25; 25 %; 0,01 kan vara en sannolikhet?","En sannolikhet ligger mellan 0 och 1 (0 % och 100 %). Negativa tal och tal över 1 går inte.","0,7; [3/4]; 0,99; 25 %; 0,01",["sl","150 %"]],
+["30","sannolikhet",121,"Uppskatta i procent: a) chansen att en ny baby blir pojke b) risken för snö på midsommarafton c) risken att du köper något onödigt i dag d) chansen att du lyssnar på musik i kväll e) chansen att ditt telefonnummer slutar på 0.","e) Sista siffran kan vara 0–9 – tio möjligheter.","a) 50 % &nbsp; b) t.ex. 1 % &nbsp; c) t.ex. 20 % &nbsp; d) t.ex. 80 % &nbsp; e) 10 %",["sl","10 %"]],
+["31","sannolikhet",121,"Välj fem händelser från din vardag och markera sannolikheterna på en sannolikhetslinje.","Välj gärna en omöjlig, en säker och några där emellan.","Inget facitsvar – egna exempel.",["sl","0,8"]],
+["32","handelse",122,"En vanlig sexsidig tärning. Sannolikheten att få a) en tvåa b) en femma eller sexa c) sju prickar?","Hur många möjliga utfall? Hur många av dem är gynnsamma? c) Finns sju prickar på tärningen?","a) [1/6] &nbsp; b) [2/6] = [1/3] &nbsp; c) 0",["dice",6,[5,6]]],
+["33","handelse",122,"Tiosidig tärning (1–10). Sannolikheten att få a) en fyra b) ett jämnt tal c) ett tal mindre än 5?","Mindre än 5 = 1, 2, 3, 4.","a) [1/10] eller 10 % &nbsp; b) [1/2] eller 50 % &nbsp; c) [4/10] eller 40 %",["dice",10,[1,2,3,4]]],
+["34","handelse",122,"20-sidig tärning. Sannolikheten att få a) en trea eller en femma b) tio, elva eller tolv c) ett udda tal större än tio d) ett jämnt tal mindre än åtta?","Skriv upp de gynnsamma talen. c) 11, 13, 15, 17, 19. d) 2, 4, 6.","a) [2/20] eller 10 % &nbsp; b) [3/20] eller 15 % &nbsp; c) [5/20] eller 25 % &nbsp; d) [3/20] eller 15 %",["dice",20,[11,13,15,17,19]]],
+["35","handelse",123,"Sexsidig, åttasidig och tolvsidig tärning. Med vilken är det störst sannolikhet att få en femma?","Varje tärning har en femma. Ju färre sidor, desto … ?","Det är störst sannolikhet med den sexsidiga. Sannolikheten är [1/6].",["dice",8,[5]]],
+["36","handelse",123,"Du drar ett kort ur en blandad kortlek. Sannolikheten att det är a) klöver sju b) ett ess c) rött d) ett hjärter e) ett klätt kort (knekt, dam eller kung)?","52 kort. Räkna de gynnsamma: 4 ess, 26 röda, 13 hjärter, 3 · 4 = 12 klädda.","a) [1/52] &nbsp; b) [1/13] ([4/52]) &nbsp; c) [1/2] &nbsp; d) [1/4] &nbsp; e) [3/13] ([12/52])",["card","klad"]],
+["37","handelse",123,"Lotterihjulet har 24 lika stora fält. Chansen att det stannar på a) nr 12 b) ett jämnt tal c) gult d) udda tal på blå färg?","Räkna fälten på bilden i boken. Hur många av de 24 är gula? Finns det något udda tal på blått?","a) [1/24] &nbsp; b) [1/2] &nbsp; c) [1/4] &nbsp; d) 0",["dice",24,[12]]],
+["38","handelse",123,"Patiens: de fem första korten är 4, 5, 6, 7 och 10 i olika färger. Sannolikheten att nästa kort är en 3:a eller 8:a?","Hur många kort är kvar i leken (52 − 5)? Hur många treor och åttor finns kvar?","[8/47] ≈ 0,17",["lott",47,8,""]],
+["39","rakna",124,"100 lotter, 3 vinster. a) Chansen till vinst? b) Antal nitlotter? c) Risken för nitlott?","Chans = vinster / alla lotter. Risk = 1 − chansen.","a) 3 % &nbsp; b) 97 &nbsp; c) 97 %",["lott",100,3,""]],
+["40","rakna",124,"50 lotter (1–50). Vinst på tvåsiffriga tal med lika siffror (11, 22, 33, 44). a) Antal vinstnummer? b) Chansen? c) Risken för nitlott?","Räkna vinsterna, dela med 50.","a) 4 st &nbsp; b) 8 % &nbsp; c) 92 %",["lott",50,4,""]],
+["41","rakna",124,"Chansen till vinstlott är 0,1. Hur stor är risken för nitlott?","Risk = 1 − chans.","0,9",["sl","0,1"]],
+["42","rakna",124,"Chansen till högvinst är 0,1 och till en annan vinst 0,3. Risken att inte vinna något?","1 − 0,1 − 0,3.","0,6",["sl","0,4"]],
+["43","rakna",124,"Risken för röd gubbe är 0,4. a) Chansen för grön gubbe? b) Kalle passerar 25 gånger i veckan – hur många gånger grönt?","a) 1 − 0,4. b) Sannolikheten · antal gånger.","a) 0,6 &nbsp; b) 15 gånger",["lott",10,6,25]],
+["44","rakna",125,"10 kolor: 8 mint och 2 lakrits. Du tar och äter en mint. Sannolikheten att nästa är a) mint b) lakrits?","Efter första dragningen: 9 kolor kvar, varav 7 mint.","a) [7/9] &nbsp; b) [2/9]",["urn","mint",8,"lakrits",2,"a"]],
+["45","rakna",125,"100 lotter, 20 vinster. Efter 60 sålda lotter är 5 vinster kvar. a) Hur många lotter kvar? b) Chansen att vinna? c) Du tar en lott till – risken för nitlott om den förra inte var vinst?","a) 100 − 60. b) 5 av 40. c) Nu är 39 lotter kvar, varav 34 nitlotter.","a) 40 st &nbsp; b) [5/40] = [1/8] &nbsp; c) [34/39]",["urn","vinst",5,"nit",35,"b"]],
+["46","rakna",125,"Fyra vantar i lådan: två svarta och två bruna. Du tar en svart. Chansen att nästa också är svart?","3 vantar kvar, varav 1 svart.","[1/3]",["urn","svart",2,"brun",2,"a"]],
+["47","rakna",125,"Sex platser lottas bland 15 elever. Efter fem dragningar har Elias inte kommit upp. Chansen att han kommer med?","Det finns 10 lappar kvar och 1 plats kvar.","[1/10]",["lott",10,1,""]],
+["48","kombinatorik",126,"Pia har 3 tröjor, 2 byxor och 3 jackor. Hur många kombinationer finns det?","Multiplikationsprincipen: 3 · 2 · 3.","18",["komb","val","3, 2, 3"]],
+["49","kombinatorik",126,"Pizza: 3 tomatsåser, 4 ostar och 5 fyllningar. Hur många varianter?","3 · 4 · 5.","60",["komb","val","3, 4, 5"]],
+["50","kombinatorik",126,"Verner gillar 24 varianter av bröd, korv och tillbehör. Ge förslag på vad han gillar (se listan i boken).","Vilka tre tal ger 24 när de multipliceras? 1 · 4 · 6, 3 · 2 · 4 …","T.ex. 1 bröd, 4 olika korvsorter och alla tillbehör (1 · 4 · 6). Eller 3 bröd, 2 korvar och 4 tillbehör.",["komb","val","3, 2, 4"]],
+["51","kombinatorik",126,"8 schampon, 9 duschtvålar och 5 balsam. Hur många olika paket?","8 · 9 · 5.","360 st",["komb","val","8, 9, 5"]],
+["52","kombinatorik",127,"På hur många sätt kan man bilda en kö av a) 2 b) 4 c) 5 personer?","Första platsen n sätt, andra n − 1 … 4 · 3 · 2 · 1.","a) 2 &nbsp; b) 24 &nbsp; c) 120",["komb","ko",4]],
+["53","kombinatorik",127,"Fyrsiffriga tal av siffrorna 1, 2, 3 och 4 om a) alla siffror är olika b) siffrorna får vara lika?","a) 4 · 3 · 2 · 1. b) Varje plats kan vara vilken som helst av 4: 4 · 4 · 4 · 4.","a) 24 &nbsp; b) 256",["komb","sif",4,4,1]],
+
+["4A-1","diagram",119,"Minitest 4A uppgift 1: Stolpdiagram över datorspelsvanor (timmar/dag). a) Hur många spelade inte alls? b) Hur många spelade? c) Hur många svarade?","Stolpen vid 0 timmar = de som inte spelar. Addera de andra stolparna för b).","a) 10 elever &nbsp; b) 15 elever &nbsp; c) 25 elever",["tab","0:10, 1:8, 2:5, 3:2","stolp"]],
+["4A-2","diagram",119,"Minitest 4A uppgift 2: Cirkeldiagrammet visar pojkar och flickor. Ungefär hur stor andel var flickor?","Är flickornas del mindre än hälften? Ungefär hur mycket mindre?","Ca 40 %",["pie","Flickor 40, Pojkar 60",25,"elever"]],
+["4A-3","lagesmatt",119,"Minitest 4A uppgift 3: Bandet Waves: Jesper 16, Sara 18, Viktor 21, Carlos 18 och Elena 22 år. a) Medelålder? b) Median? c) Typvärde? d) Elena ersätts av Nina, 17 år – hur mycket sänks medelåldern?","d) Räkna den nya medelåldern och jämför. Eller: summan minskar med 5 år, fördelat på 5 personer.","a) 19 år &nbsp; b) 18 år &nbsp; c) 18 år &nbsp; d) 1 år",["lm","16, 18, 21, 18, 22"]],
+["4B-1","sannolikhet",127,"Minitest 4B uppgift 1: Vilka av [3/2], 0,008, 57 %, 1,9, 0,88, 102 % kan vara sannolikheter?","Mellan 0 och 1 – inte över 100 %.","0,008; 57 %; 0,88",["sl","3/2"]],
+["4B-2","handelse",127,"Minitest 4B uppgift 2: Sannolikheten att få minst tre med en tärning?","Minst tre = 3, 4, 5 eller 6.","[4/6] = [2/3]",["dice",6,[3,4,5,6]]],
+["4B-3","handelse",127,"Minitest 4B uppgift 3: Sannolikheten att dra en fyra ur en kortlek?","4 fyror av 52 kort.","[1/13]",["card","fyra"]],
+["4B-4","rakna",127,"Minitest 4B uppgift 4: Chansen att Linus hinner äta frukost är 0,4. Hur många av 180 skoldagar äter han sannolikt inte frukost?","Risken att inte hinna = 1 − 0,4 = 0,6. Gånger 180.","108",["lott",10,6,180]],
+["4B-5","kombinatorik",127,"Minitest 4B uppgift 5: Staffan väljer bland 6 T-tröjor och 5 byxor. På hur många sätt kan han kombinera?","6 · 5.","30",["komb","val","6, 5"]],
+
+["AT-1","handelse",128,"Arbeta tillsammans – Satsa på summan 1: Spelar det någon roll vilka summor du satsar på med två tärningar?","Gör en tabell med alla 36 kombinationer och räkna hur många som ger varje summa.","Ja, vissa summor har större chans än andra.",["sum",7]],
+["AT-2","handelse",128,"Satsa på summan 2: Finns det tal som är bättre än andra?","Vilken summa förekommer flest gånger i tabellen? Kan man få summan 1?","Ja, 7 har störst chans, därnäst 6 och 8. Man kan inte få 1.",["sum",6]],
+["AT-3","handelse",128,"Satsa på summan 3: Vilka tal bör du välja om du vill vinna? Motivera.","Satsa där sannolikheten är störst – men tänk på att du har 10 marker.","Flest 7:or. Det kan också vara bra att satsa några spelmarker på 6 och 8.",["sum",8]],
+
+["SF-1","diagram",128,"Sant eller falskt 1: I ett stapeldiagram måste den högsta stapeln alltid vara i mitten.","Spelar ordningen på kategorierna någon roll?","Falskt",["val"]],
+["SF-2","diagram",128,"Sant eller falskt 2: I ett stolpdiagram är den vågräta axeln markerad med tal.","Stolpdiagram används när det man undersöker är tal.","Sant",["val"]],
+["SF-3","diagram",128,"Sant eller falskt 3: Cirkeldiagram används när man vill visa en fördelning.","Hela cirkeln = helheten.","Sant",["val"]],
+["SF-4","lagesmatt",128,"Sant eller falskt 4: Du kan strunta i nollan när du räknar medelvärdet av 3, 0, 5, 1 och 4.","Nollan är ett värde – den påverkar antalet du delar med.","Falskt",["lm","3, 0, 5, 1, 4"]],
+["SF-5","sannolikhet",128,"Sant eller falskt 5: Om sannolikheten för vinst är 0,4 är risken att förlora större än att vinna.","Risken = 1 − 0,4.","Sant",["sl","0,4"]],
+["SF-6","sannolikhet",128,"Sant eller falskt 6: Att sannolikheten är ”fifty-fifty” betyder att den är 0,5.","Fifty-fifty = 50 %.","Sant",["sl","0,5"]],
+["SF-7","sannolikhet",128,"Sant eller falskt 7: En sannolikhet kan vara vilket tal som helst mindre än 10.","Vilka tal kan en sannolikhet vara?","Falskt",["sl","5"]],
+["SF-8","handelse",128,"Sant eller falskt 8: Det är lika stor sannolikhet att få en etta som en sexa med en sexsidig tärning.","Varje sida har sannolikheten [1/6].","Sant",["dice",6,[1]]],
+["SF-9","rakna",128,"Sant eller falskt 9: Om sannolikheten att vinna är 20 % betyder det att var femte lott är en vinstlott.","20 % = [1/5].","Sant",["lott",5,1,""]],
+["SF-10","lagesmatt",128,"Sant eller falskt 10: Talen 3, 6, 9 och 11 har inget medianvärde.","Jämnt antal – medelvärdet av de två i mitten.","Falskt (medianen är 7,5)",["lm","3, 6, 9, 11"]],
+["SF-11","lagesmatt",128,"Sant eller falskt 11: Medelvärdet och medianen är alltid lika.","Prova med 1, 2, 30.","Falskt",["lm","1, 2, 30"]],
+["SF-12","tabeller",128,"Sant eller falskt 12: Rubrikerna i en tabell kallas tabellhuvud.","Se exempelrutan om tabeller.","Sant",["tab","grön:3, blå:7, gul:5, röd:6, lila:1","stapel"]],
+["SF-13","lagesmatt",128,"Sant eller falskt 13: Typvärdet av 1, 2, 2, 3, 3, 4 är 2 och 3.","Två värden kan vara lika vanliga.","Sant",["lm","1, 2, 2, 3, 3, 4"]],
+["SF-14","lagesmatt",128,"Sant eller falskt 14: Medelvärdet är alltid större än medianvärdet.","Prova med 1, 9, 10.","Falskt",["lm","1, 9, 10"]],
+
+["KT-1","diagram",129,"Kapiteltest 1: Diagrammet visar åldern hos nya medlemmar. a) Vad kallas diagramtypen? b) Hur många var 17 år eller äldre?","Det man undersöker (ålder) är tal. b) Addera stolparna för 17, 18 och 19.","a) stolpdiagram &nbsp; b) 7 medlemmar",["val"]],
+["KT-2","diagram",129,"Kapiteltest 2: Linjediagram över antal medlemmar 2007–2012. a) Hur många från starten? b) År 2012? c) Hur många fler 2012 än 2009?","Läs av linjen vid rätt år på y-axeln. c) Subtrahera.","a) 5 medlemmar &nbsp; b) 56 medlemmar &nbsp; c) 26 medlemmar",null],
+["KT-3","lagesmatt",129,"Kapiteltest 3: Mål på 10 matcher: 3, 0, 1, 0, 0, 2, 1, 2, 4, 1. a) Typvärdet b) Medianen c) Medelvärdet","Ordna talen i storleksordning för medianen.","a) 0 och 1 mål &nbsp; b) 1 mål &nbsp; c) 1,4 mål/match",["lm","3, 0, 1, 0, 0, 2, 1, 2, 4, 1"]],
+["KT-4","rakna",129,"Kapiteltest 4: 100 lotter, 15 vinster. a) Chansen till vinst? b) Risken för nitlott?","Chans = 15 / 100. Risk = 1 − chans.","a) 15 % &nbsp; b) 85 %",["lott",100,15,""]],
+["KT-5","handelse",129,"Kapiteltest 5: Sannolikheten att få a) 4 prickar b) 5 eller 6 prickar med en tärning?","Gynnsamma av 6 möjliga.","a) [1/6] &nbsp; b) [2/6] = [1/3]",["dice",6,[5,6]]],
+["KT-6","rakna",129,"Kapiteltest 6: Karolina får rött ljus ungefär tre gånger av fem. Sannolikheten att hon slipper vänta?","1 − [3/5].","[2/5]",["sl","3/5"]],
+["KT-7","handelse",129,"Kapiteltest 7: Lyckohjulet har tre fält. Amid säger att sannolikheten för blått är [1/3]. Har han rätt?","Är de tre fälten lika stora?","Nej, fälten är inte lika stora.",["dice",3,[1]]],
+["KT-8","kombinatorik",129,"Kapiteltest 8: 3 förrätter, 6 huvudrätter och 4 desserter. Hur många olika trerättersmiddagar?","3 · 6 · 4.","72",["komb","val","3, 6, 4"]],
+
+["UP-A","lagesmatt",130,"Uppslaget A: Medelvärdet av fyra tal är 95. Talet 104 tas bort. Vad är medelvärdet av de tre som är kvar?","Summan av de fyra är 4 · 95. Dra bort 104 och dela med 3.","92. Summan av de fyra talen är 4 · 95 = 380. Talet 104 tas bort – då återstår 276, och 276 / 3 = 92.",["lm","92, 92, 92, 104"]],
+["UP-B","lagesmatt",130,"Uppslaget B: Ett diagram utan rubrik och axlar. a) Föreslå en undersökning och gör färdigt diagrammet b) gör tabellen c) beräkna medelvärde och median.","Läs av staplarnas höjder (t.ex. antal rätt på ett läxförhör). Skriv dem som <i>värde:antal</i>.","T.ex. resultat på läxförhör: 1 rätt 3 elever, 2 rätt 2, 3 rätt 5, 4 rätt 5, 5 rätt 3, 6 rätt 2. Medelvärdet = [69/20] = 3,45 ≈ 3,5. Medianen = 3,5.",["lm","1:3, 2:2, 3:5, 4:5, 5:3, 6:2"]],
+["UP-C","rakna",130,"Uppslaget C: Vinstchansen är 0,08. Ge två förslag på hur många lotter och vinster det kan finnas.","0,08 = [8/100]. Förläng eller förkorta.","T.ex. 100 lotter varav 8 vinster ([8/100] = 0,08), eller 500 lotter varav 40 vinster.",["lott",500,40,""]],
+["UP-D","handelse",130,"Uppslaget D: Ett chokladhjul. a) Rita hjulet om vinstchansen ska vara [2/5] b) om den ska vara 0,15 c) i vilket hjul är chansen störst om du satsar på 4 fält?","a) 5 lika stora fält, 2 vinst. b) 0,15 = [3/20]: 20 fält, 3 vinst.","a) Cirkel delad i 5 delar, 2 vinst &nbsp; b) [15/100] = [3/20]: cirkel delad i 20 delar, 3 vinst &nbsp; c) Hjul a",["dice",20,[1,2,3]]],
+["UP-E","rakna",130,"Uppslaget E: Klass 8c vill tjäna 3 000 kr på ett lotteri. a) Föreslå antal lotter, pris, vinster och vinstsumma b) Hur stor är vinstchansen?","Intäkt = antal lotter · pris. Intäkt − vinstsumma ska bli 3 000 kr.","T.ex. 600 lotter à 10 kr = 6 000 kr. Vinster: 1 · 1 000, 1 · 500, 5 · 100 och 20 · 50 kr = 3 000 kr. 27 vinster ger P(vinst) = [27/600] = 0,045 = 4,5 %.",["lott",600,27,""]],
+
+["BU-A","vilseledande",131,"Bedömningsuppgift Förhandla om lön A: Jennies lön 2007–2011 (15 000, 16 000, 16 000, 17 500, 20 000 kr). Gör ett linjediagram som visar att lönen bara ökat lite.","Låt y-axeln börja på 0 och använd stora steg.","Bedömningsuppgift – inget facit i boken.",["vill","2007:15000, 2008:16000, 2009:16000, 2010:17500, 2011:20000",0,"linje"]],
+["BU-B","vilseledande",131,"Förhandla om lön B: Gör ett linjediagram som arbetsgivaren kan använda för att visa att lönen ökat mycket. Beskriv hur du gjort.","Låt y-axeln börja nära det lägsta värdet, t.ex. 14 000 kr.","Bedömningsuppgift – inget facit i boken.",["vill","2007:15000, 2008:16000, 2009:16000, 2010:17500, 2011:20000",14500,"linje"]],
+
+["PL-A","kombinatorik",131,"Problemlösning A: Hur många ”ord” kan bildas av A, B, E, L om varannan bokstav ska vara konsonant och varannan vokal?","Första bokstaven kan väljas på 4 sätt. Vilken sort måste nästa vara – och hur många finns kvar av den?","8 (ABEL, ALEB, BALE, BELA, EBAL, ELAB, LABE, LEBA)",["komb","val","4, 2, 1, 1"]],
+["PL-B","tabeller",131,"Problemlösning B: Tio askar. Fem har pennor, fyra har suddgummin, två har båda. Hur många askar är tomma?","Rita en figur. Askar med något: 5 + 4 − 2.","3",null],
+["PL-C","rakna",131,"Problemlösning C: 20 röda, 40 blå, 60 gula, 80 vita och 100 svarta kulor. Minsta antal du måste ta upp för att säkert ha minst hälften av varje färg?","Tänk på värsta fallet: alla andra kulor kommer först. Vilken färg har minst kulor, och hur många av den behöver du?","E) 290 (100 + 80 + 60 + 40 + [20/2])",null]
+];
+
+const SECS={tabeller:"Tabeller",diagram:"Diagramtyper",lagesmatt:"Lägesmått",vilseledande:"Vilseledande diagram",sannolikhet:"Sannolikhet",handelse:"Sannolikhet för en händelse",rakna:"Räkna med sannolikhet",kombinatorik:"Kombinatorik"};
+const GROUPS=[["4A","Minitest 4A","s. 119"],["4B","Minitest 4B","s. 127"],["AT","Arbeta tillsammans: Satsa på summan","s. 128"],["SF","Sant eller falskt","s. 128"],["KT","Kapiteltest","s. 129"],["UP","Uppslaget","s. 130"],["BU","Bedömningsuppgift: Förhandla om lön","s. 131"],["PL","Problemlösning","s. 131"]];
+const CH=4;
+
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg";
+function S(tag,a,parent,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;if(parent)parent.appendChild(e);return e}
+function clear(el){while(el.firstChild)el.removeChild(el.firstChild)}
+const C=v=>`var(--${v})`;
+const NFc={};function nf(x,d=4){if(!isFinite(x))return"–";if(Math.abs(x)<1e-12)x=0;NFc[d]=NFc[d]||new Intl.NumberFormat("sv-SE",{maximumFractionDigits:d});return NFc[d].format(x).replace(/−/g,"−")}
+function nf2(x){return new Intl.NumberFormat("sv-SE",{minimumFractionDigits:2,maximumFractionDigits:2}).format(x)}
+function num(s){if(s==null)return NaN;const t=String(s).replace(/[\s  %]/g,"").replace(",",".").replace(/[−–]/g,"-");if(t===""||t==="-"||t===".")return NaN;return Number(t)}
+function seg(name){const r=$(`input[name="${name}"]:checked`);return r?r.value:null}
+function setSeg(name,v){const r=$(`input[name="${name}"][value="${v}"]`);if(r)r.checked=true}
+function on(els,ev,fn){(Array.isArray(els)?els:[els]).forEach(e=>e&&e.addEventListener(ev,fn))}
+function safe(name,fn){try{fn()}catch(e){console.error(name,e)}}
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+const lcm=(a,b)=>a/gcd(a,b)*b;
+const F=(n,d,cls="")=>d===1?`<span class="${cls}">${n}</span>`:`<span class="frac ${cls}"><span>${n}</span><span>${d}</span></span>`;
+function simp(f){const g=gcd(f.n,f.d);return{n:f.n/g,d:f.d/g}}
+/* tolka bråk: "3/4", "1 1/2", "2", "0,25" */
+function pf(s){if(s==null)return null;s=String(s).trim().replace(/[−–]/g,"-");let m;
+  if(m=s.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/)){const w=+m[1],n=+m[2],d=+m[3];if(!d)return null;return{n:(Math.abs(w)*d+n)*(w<0?-1:1),d}}
+  if(m=s.match(/^(-?\d+)\s*\/\s*(\d+)$/)){if(!+m[2])return null;return{n:+m[1],d:+m[2]}}
+  if(m=s.match(/^(-?\d+)(?:[.,](\d{1,6}))?$/)){if(!m[2])return{n:+m[1],d:1};const d=Math.pow(10,m[2].length);return simp({n:Math.round(Number(m[1]+"."+m[2])*d),d})}
+  return null}
+function mixed(n,d){if(d===1)return String(n);const w=Math.trunc(n/d),r=Math.abs(n%d);if(!w)return F(n,d);if(!r)return String(w);return `${w} ${F(r,d)}`}
+function tx(s){return String(s).replace(/\[(\d+|□)\/(\d+)\]/g,(m,a,b)=>F(a,+b))}
+const SMALL=["noll","en","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv","tretton","fjorton","femton","sexton","sjutton","arton","nitton","tjugo"];
+const DEN={3:"tredjedel",4:"fjärdedel",5:"femtedel",6:"sjättedel",7:"sjundedel",8:"åttondel",9:"niondel",10:"tiondel",11:"elftedel",12:"tolftedel",13:"trettondel",14:"fjortondel",15:"femtondel",16:"sextondel",17:"sjuttondel",18:"artondel",19:"nittondel",20:"tjugondel",24:"tjugofjärdedel",25:"tjugofemtedel",30:"trettiondel",50:"femtiondel",60:"sextiondel",100:"hundradel",1000:"tusendel"};
+function words(n,d){const tn=n<=20?SMALL[n]:String(n);if(d===1)return null;if(d===2)return n===1?"en halv":`${tn} halvor`;const w=DEN[d];if(!w)return null;return n===1?`en ${w}`:`${tn} ${w}ar`}
+
+/* stapelbild för bråk */
+function bars(svg,list,opt={}){ // list:[{n,d,color,label}]
+  clear(svg);const W=540,x0=opt.x0||20,bh=opt.bh||30,gap=opt.gap||12,G=8;let y=6;
+  const wh=it=>Math.min(8,Math.max(1,Math.ceil(it.n/it.d-1e-9)));const maxW=Math.max(1,...list.map(wh));
+  const per=(W-x0-(maxW-1)*G)/maxW;
+  list.forEach(it=>{const wholes=wh(it),segs=it.d;
+    if(it.label)S("text",{x:x0-8,y:y+bh/2+5,"text-anchor":"end","font-size":14,"font-weight":700,style:`fill:${C(it.color==="gold"?"ink":it.color||"ink")}`},svg,it.label);
+    for(let k=0;k<wholes;k++){const bx=x0+k*(per+G),fillCount=Math.max(0,Math.min(segs,it.n-k*segs)),sw=per/segs;
+      if(segs<=60){for(let i=0;i<segs;i++)S("rect",{x:bx+i*sw,y:y,width:sw,height:bh,style:`fill:${i<fillCount?C(it.color||"red"):C("paper")};stroke:${C("ink")};stroke-width:${segs>30?.4:1}`},svg)}
+      else{S("rect",{x:bx,y:y,width:per,height:bh,style:`fill:${C("paper")};stroke:${C("ink")}`},svg);S("rect",{x:bx,y:y,width:per*fillCount/segs,height:bh,style:`fill:${C(it.color||"red")}`},svg)}}
+    y+=bh+gap});
+  svg.setAttribute("viewBox",`0 0 ${W+4} ${y}`);
+}
+
+/* ---------- tema & nav ---------- */
+safe("tema",()=>{const root=document.documentElement;try{const t=localStorage.getItem("lh-theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+  $("#themeBtn").addEventListener("click",()=>{const cur=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");const nx=cur==="dark"?"light":"dark";root.setAttribute("data-theme",nx);try{localStorage.setItem("lh-theme",nx)}catch(e){}})});
+safe("nav",()=>{const side=$("#side"),btn=$("#menuBtn");
+  btn.addEventListener("click",()=>{const o=side.classList.toggle("open");btn.setAttribute("aria-expanded",o)});
+  $$("#side a").forEach(a=>a.addEventListener("click",()=>{side.classList.remove("open");btn.setAttribute("aria-expanded","false")}));
+  const links=new Map($$("#side a").map(a=>[a.getAttribute("href").slice(1),a]));
+  function setCur(id){links.forEach((a,k)=>a.setAttribute("aria-current",k===id?"true":"false"))}
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setCur(e.target.id)})},{rootMargin:"-35% 0px -60% 0px"});$$(".sec").forEach(s=>io.observe(s))}
+});
+
+
+/* ================= VERKTYG KAPITEL 4 ================= */
+const TOOL={};
+const PAL=["#cf2a20","#1d5bbd","#1d7647","#d08a00","#7b4bb7","#0f8a8a","#c2569b","#6b7280","#8a5a00","#3d7bd9"];
+const pcol=i=>PAL[i%PAL.length];
+function pairs(s){const items=String(s).split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+  if(items.some(x=>x.includes(":"))){return items.map(x=>{const i=x.lastIndexOf(":");return{name:x.slice(0,i).trim(),val:num(x.slice(i+1))}}).filter(r=>r.name&&isFinite(r.val))}
+  const m=new Map();items.forEach(x=>{const k=x.replace(/\s+/g," ");m.set(k,(m.get(k)||0)+1)});return[...m].map(([name,val])=>({name,val}))}
+function niceStep(span,target=5){const raw=span/target,p=Math.pow(10,Math.floor(Math.log10(raw||1))),m=raw/p;return p*(m<1.5?1:m<3.5?2:m<7.5?5:10)}
+function chart(svg,rows,type,y0=0){clear(svg);const W=560,H=270,L=58,B=46,T=14,R=14;const mx=Math.max(...rows.map(r=>r.val),y0+1);
+  const st=niceStep(mx-y0,5);const top=Math.ceil(mx/st)*st;const Y=v=>H-B-(v-y0)/(top-y0)*(H-B-T);
+  for(let v=y0;v<=top+1e-9;v+=st){S("line",{x1:L,y1:Y(v),x2:W-R,y2:Y(v),style:`stroke:${C("line")};stroke-width:1`},svg);S("text",{x:L-8,y:Y(v)+4,"text-anchor":"end","font-size":12,style:`fill:${C("muted")}`},svg,nf(v,2))}
+  S("line",{x1:L,y1:T-4,x2:L,y2:H-B,style:`stroke:${C("ink")};stroke-width:1.5`},svg);S("line",{x1:L,y1:H-B,x2:W-R,y2:H-B,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+  if(y0>0)S("path",{d:`M${L-7} ${H-B-6} l7 -6 l0 4 l7 -6`,style:`fill:none;stroke:${C("red")};stroke-width:2`},svg);
+  const n=rows.length,slot=(W-L-R)/Math.max(n,1);
+  rows.forEach((r,i)=>{const cx=L+slot*(i+.5),y=Y(Math.max(r.val,y0));
+    if(type==="stapel"){const bw=Math.min(54,slot*.62);S("rect",{x:cx-bw/2,y,width:bw,height:Math.max(0,H-B-y),style:`fill:${pcol(i)}`},svg)}
+    else if(type==="stolp"){S("line",{x1:cx,y1:H-B,x2:cx,y2:y,style:`stroke:${C("red")};stroke-width:5`},svg)}
+    S("text",{x:cx,y:H-B+18,"text-anchor":"middle","font-size":n>8?10:12},svg,r.name.length>11?r.name.slice(0,10)+"…":r.name)});
+  if(type==="linje"){const pts=rows.map((r,i)=>[L+slot*(i+.5),Y(Math.max(r.val,y0))]);S("polyline",{points:pts.map(p=>p.join(",")).join(" "),style:`fill:none;stroke:${C("blue")};stroke-width:3`},svg);pts.forEach(p=>S("circle",{cx:p[0],cy:p[1],r:4,style:`fill:${C("blue")}`},svg))}
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`)}
+function pie(svg,rows,lab){clear(svg);const tot=rows.reduce((s,r)=>s+r.val,0);if(!(tot>0))return;const cx=120,cy=120,R=105;let a=-Math.PI/2;
+  rows.forEach((r,i)=>{const f=r.val/tot,a1=a+f*2*Math.PI;if(f>=0.9999)S("circle",{cx,cy,r:R,style:`fill:${pcol(i)}`},svg);else if(f>0)S("path",{d:`M${cx} ${cy} L${cx+R*Math.cos(a)} ${cy+R*Math.sin(a)} A${R} ${R} 0 ${f>.5?1:0} 1 ${cx+R*Math.cos(a1)} ${cy+R*Math.sin(a1)} Z`,style:`fill:${pcol(i)};stroke:${C("paper")};stroke-width:2`},svg);
+    const m=(a+a1)/2;if(f>.06)S("text",{x:cx+R*.62*Math.cos(m),y:cy+R*.62*Math.sin(m)+5,"text-anchor":"middle","font-size":14,"font-weight":700,style:"fill:#fff"},svg,lab?lab(r,f):nf(f*100,0)+" %");a=a1});
+  svg.setAttribute("viewBox","0 0 240 240")}
+function tally(n){if(n>40)return"<span class='small'>(många)</span>";let s="";for(let i=0;i<Math.floor(n/5);i++)s+="<s>||||</s> ";return s+"|".repeat(n%5)}
+const dot=i=>`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:${pcol(i)};margin-right:6px;vertical-align:-1px"></span>`;
+
+/* tabell + diagram */
+safe("tab",()=>{function upd(){let rows=pairs($("#tb-in").value);const type=seg("tb-t"),svg=$("#tb-svg");
+  if(!rows.length){$("#tb-tab").innerHTML="";clear(svg);$("#tb-why").innerHTML='<span class="err">Skriv några svar.</span>';return}
+  const numeric=rows.every(r=>isFinite(num(r.name)));if($("#tb-sort").checked&&numeric)rows=rows.slice().sort((a,b)=>num(a.name)-num(b.name));
+  const tot=rows.reduce((s,r)=>s+r.val,0);
+  $("#tb-tab").innerHTML=`<tr><th class="l">Svar</th><th class="l">Avprickning</th><th>Antal</th><th>Andel</th></tr>`+rows.map((r,i)=>`<tr><td class="l">${type==="cirkel"||type==="stapel"?dot(i):""}${r.name}</td><td class="l tally">${Number.isInteger(r.val)?tally(r.val):""}</td><td>${nf(r.val)}</td><td>${nf(r.val/tot*100,1)} %</td></tr>`).join("")+`<tr><th class="l">Summa</th><th></th><th>${nf(tot)}</th><th>100 %</th></tr>`;
+  if(type==="cirkel")pie(svg,rows);else chart(svg,rows,type);
+  const mx=Math.max(...rows.map(r=>r.val)),mn=Math.min(...rows.map(r=>r.val));
+  $("#tb-why").innerHTML=`Vanligast: <b>${rows.filter(r=>r.val===mx).map(r=>r.name).join(" och ")}</b> (${nf(mx)}). Minst vanligt: <b>${rows.filter(r=>r.val===mn).map(r=>r.name).join(" och ")}</b> (${nf(mn)}).<br>`+
+   (numeric?"Svaren är <b>tal</b> → ett <b>stolpdiagram</b> passar. Bocka i sortering så hamnar talen i ordning.":"Svaren är <b>inte tal</b> → ett <b>stapeldiagram</b> passar. Vill du visa fördelningen passar ett <b>cirkeldiagram</b>.")+(type==="linje"?" Linjediagram används när det vågräta är tid.":"")}
+  on([$("#tb-in"),$("#tb-sort")],"input",upd);$$('input[name="tb-t"]').forEach(r=>r.addEventListener("change",upd));upd();
+  TOOL.tab=(s,t)=>{$("#tb-in").value=s;setSeg("tb-t",t||"stapel");$("#tb-sort").checked=true;upd();return"#t-tab"}});
+
+/* välj diagram */
+safe("val",()=>{const Q=[["Vill du visa hur något förändras under en tidsperiod (dagar, månader, år)?","Linjediagram","Tiden står på den vågräta axeln och linjen visar förändringen."],
+  ["Vill du visa hur en helhet fördelas – hur stor andel varje del är?","Cirkeldiagram","Hela cirkeln är 100 %. Ibland går ett stapeldiagram också bra."],
+  ["Är det du undersöker tal (ålder, antal syskon, antal mål)?","Stolpdiagram","Talen står i ordning på den vågräta axeln."]];
+  const box=$("#va-flow");function show(i,path){box.innerHTML=path.map(p=>`<div class="small">${p}</div>`).join("");
+    if(i>=Q.length){box.innerHTML+=`<div class="out"><div class="big">Stapeldiagram</div><div>Det du undersöker är inte tal – till exempel färger, märken eller ämnen.</div></div><div><button class="btn ghost" type="button" id="va-r">Börja om</button></div>`;$("#va-r").onclick=()=>show(0,[]);return}
+    const [q,ans,why]=Q[i];box.innerHTML+=`<div class="qq">${q}</div><div class="ctrl"><button class="btn" type="button" id="va-y">Ja</button><button class="btn ghost" type="button" id="va-n">Nej</button></div>`;
+    $("#va-y").onclick=()=>{box.innerHTML=path.map(p=>`<div class="small">${p}</div>`).join("")+`<div class="small">${q} <b>Ja</b></div><div class="out"><div class="big">${ans}</div><div>${why}</div></div><div><button class="btn ghost" type="button" id="va-r">Börja om</button></div>`;$("#va-r").onclick=()=>show(0,[])};
+    $("#va-n").onclick=()=>show(i+1,path.concat([`${q} <b>Nej</b>`]))}
+  show(0,[]);TOOL.val=()=>{show(0,[]);return"#t-val"}});
+
+/* cirkeldiagram procent */
+safe("pie",()=>{function upd(){const rows=$("#pi-in").value.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.*?)\s*(-?\d+(?:[.,]\d+)?)\s*%?$/);return m?{name:m[1]||"del",val:num(m[2])}:null}).filter(Boolean);
+  const tot=num($("#pi-tot").value),u=$("#pi-u").value.trim(),U=u?" "+u:"";
+  if(!rows.length){$("#pi-tab").innerHTML="";clear($("#pi-svg"));$("#pi-why").innerHTML='<span class="err">Skriv delar som ”namn procent”.</span>';return}
+  const sp=rows.reduce((s,r)=>s+r.val,0);pie($("#pi-svg"),rows);
+  $("#pi-tab").innerHTML=`<tr><th class="l">Del</th><th>Procent</th>${isFinite(tot)?`<th>Antal</th>`:""}<th>Grader</th></tr>`+rows.map((r,i)=>`<tr><td class="l">${dot(i)}${r.name}</td><td>${nf(r.val)} %</td>${isFinite(tot)?`<td>${nf(r.val/100*tot,2)}${U}</td>`:""}<td>${nf(r.val*3.6,1)}°</td></tr>`).join("")+`<tr><th class="l">Summa</th><th>${nf(sp)} %</th>${isFinite(tot)?`<th>${nf(sp/100*tot,2)}${U}</th>`:""}<th>${nf(sp*3.6,1)}°</th></tr>`;
+  $("#pi-why").innerHTML=(Math.abs(sp-100)>.01?`<span class="err">Procenten blir ${nf(sp)} % – i ett cirkeldiagram ska de bli 100 %.</span> `:"")+(isFinite(tot)?`Antal = procent av helheten, t.ex. ${nf(rows[0].val)} % av ${nf(tot)} = ${nf(rows[0].val/100,4)} · ${nf(tot)} = ${nf(rows[0].val/100*tot,2)}${U}. `:"")+"Hela cirkeln är 360°, så 1 % = 3,6°."}
+  on([$("#pi-in"),$("#pi-tot"),$("#pi-u")],"input",upd);upd();
+  TOOL.pie=(s,tot,u)=>{$("#pi-in").value=s;$("#pi-tot").value=tot;$("#pi-u").value=u;upd();return"#t-pie"}});
+
+/* lägesmått */
+function parseVals(s){s=String(s).trim();if(!s)return[];const toks=s.includes(";")?s.split(";"):s.split(/[\s,]+/);const out=[];
+  for(const t0 of toks){const t=t0.trim();if(!t)continue;if(t.includes(":")){const [v,k]=t.split(":");const V=num(v),K=Math.round(num(k));if(!isFinite(V)||!(K>=0))return null;for(let i=0;i<K;i++)out.push(V)}else{const V=num(t);if(!isFinite(V))return null;out.push(V)}}return out}
+safe("lm",()=>{function upd(){const v=parseVals($("#lm-in").value),o=$("#lm-out"),svg=$("#lm-svg");clear(svg);
+  if(!v||!v.length){o.innerHTML='<span class="err">Skriv värden, t.ex. 3, 0, 1, 4 – eller 21:5, 22:4.</span>';return}
+  const n=v.length,s=v.reduce((a,b)=>a+b,0),mean=s/n,srt=v.slice().sort((a,b)=>a-b),odd=n%2===1,mi=Math.floor((n-1)/2),med=odd?srt[mi]:(srt[mi]+srt[mi+1])/2;
+  const fr=new Map();srt.forEach(x=>fr.set(x,(fr.get(x)||0)+1));const mf=Math.max(...fr.values());const modes=[...fr].filter(([,k])=>k===mf).map(([x])=>x);
+  const noMode=mf===1||(modes.length===fr.size&&fr.size>1);
+  const list=srt.length<=40?srt.map((x,i)=>(i===mi||(!odd&&i===mi+1))?`<b class="r">${nf(x)}</b>`:nf(x)).join("&nbsp; "):`${srt.slice(0,6).map(x=>nf(x)).join(" ")} … ${srt.slice(-4).map(x=>nf(x)).join(" ")}`;
+  const sumTxt=n<=12?v.map((x,i)=>i&&x<0?`(${nf(x)})`:nf(x)).join(" + "):`summan av alla ${n} värden`;
+  o.innerHTML=`<div class="row"><span class="eq">I storleksordning: ${list}</span><span class="why">${n} värden</span></div>
+   <div class="row"><span class="eq"><b>Medelvärde</b> = ${F(sumTxt,n)} = ${F(nf(s,3),n)} = <b class="r">${nf(mean,3)}</b>${Math.abs(mean*100-Math.round(mean*100))>1e-9?` ≈ ${nf(mean,2)}`:""}</span></div>
+   <div class="row"><span class="eq"><b>Median</b> = ${odd?`värde nr ${mi+1} = <b class="r">${nf(med)}</b>`:`${F(`${nf(srt[mi])} + ${nf(srt[mi+1])}`,2)} = <b class="r">${nf(med,3)}</b>`}</span><span class="why">${odd?"udda antal – mittenvärdet":"jämnt antal – medelvärdet av de två i mitten"}</span></div>
+   <div class="row"><span class="eq"><b>Typvärde</b> = ${noMode?"<b class='r'>inget typvärde</b>":`<b class="r">${modes.map(x=>nf(x)).join(" och ")}</b>`}</span><span class="why">${noMode?"inget värde är vanligare än de andra":`förekommer ${mf} gånger`}</span></div>`+
+   (srt[n-1]>srt[0]&&Math.abs(mean-med)/(srt[n-1]-srt[0])>.15?`<div class="tip"><b>Lägg märke till:</b> medelvärdet (${nf(mean,1)}) och medianen (${nf(med,1)}) skiljer sig mycket. Något värde sticker ut – då beskriver medianen bäst.</div>`:"");
+  const lo=srt[0],hi=srt[n-1],sp=hi-lo||1,X=x=>30+(x-lo)/sp*500;const stack=new Map();let maxH=0;
+  srt.forEach(x=>{const k=stack.get(x)||0;stack.set(x,k+1);maxH=Math.max(maxH,k+1)});const r=Math.max(3,Math.min(7,60/maxH));stack.clear();
+  const base=Math.max(60,maxH*r*2+30);svg.setAttribute("viewBox",`0 0 560 ${base+40}`);
+  S("line",{x1:20,y1:base,x2:540,y2:base,style:`stroke:${C("ink")};stroke-width:1.5`},svg);
+  srt.forEach(x=>{const k=stack.get(x)||0;stack.set(x,k+1);S("circle",{cx:X(x),cy:base-r-1-k*r*2,r:r-.5,style:`fill:${C("muted")}`},svg)});
+  [...new Set(srt)].slice(0,30).forEach(x=>S("text",{x:X(x),y:base+16,"text-anchor":"middle","font-size":11,style:`fill:${C("muted")}`},svg,nf(x)));
+  [[mean,"medel","red",30],[med,"median","blue",38]].forEach(([x,l,c,dy])=>{S("line",{x1:X(x),y1:base-maxH*r*2-8,x2:X(x),y2:base+4,style:`stroke:${C(c)};stroke-width:2;stroke-dasharray:4 3`},svg);S("text",{x:X(x),y:base+dy,"text-anchor":"middle","font-size":12,"font-weight":700,style:`fill:${C(c)}`},svg,l)})}
+  $("#lm-in").addEventListener("input",upd);upd();TOOL.lm=s=>{$("#lm-in").value=s;upd();return"#t-lm"}});
+
+/* vilseledande */
+safe("vill",()=>{function upd(){const rows=pairs($("#vi-in").value),t=seg("vi-t"),r=$("#vi-r");
+  if(!rows.length){clear($("#vi-svg"));$("#vi-why").innerHTML='<span class="err">Skriv värden som namn:värde.</span>';return}
+  const mn=Math.min(...rows.map(x=>x.val)),mx=Math.max(...rows.map(x=>x.val));const cap=Math.max(0,Math.floor(mn*.999));r.max=cap;if(+r.value>cap)r.value=cap;r.step=cap>2000?100:cap>200?10:1;
+  const y0=+r.value;$("#vi-v").textContent=nf(y0);chart($("#vi-svg"),rows,t,y0);
+  const real=mn>0?mx/mn:Infinity,look=(mn-y0)>0?(mx-y0)/(mn-y0):Infinity;
+  $("#vi-why").innerHTML=`Största värdet är <b>${nf(real,2)}</b> gånger så stort som det minsta. I bilden ser det ut som <b class="r">${isFinite(look)?nf(look,1):"oändligt många"}</b> gånger.`+(y0>0?` <span class="r">Y-axeln börjar på ${nf(y0)} – skillnaderna ser större ut än de är.</span>`:" Y-axeln börjar på 0 – bilden visar storlekarna rättvist.")+` Skillnad mellan största och minsta: ${nf(mx-mn)}.`}
+  on([$("#vi-in"),$("#vi-r")],"input",upd);$$('input[name="vi-t"]').forEach(x=>x.addEventListener("change",upd));upd();
+  TOOL.vill=(s,y0,t)=>{$("#vi-in").value=s;setSeg("vi-t",t||"stapel");const rows=pairs(s);$("#vi-r").max=Math.max(0,Math.floor(Math.min(...rows.map(x=>x.val))*.999));$("#vi-r").value=y0;upd();return"#t-vill"}});
+
+/* sannolikhetslinje */
+function pprob(s){s=String(s).trim();if(/%\s*$/.test(s))return num(s)/100;if(s.includes("/")){const f=pf(s);return f?f.n/f.d:NaN}return num(s)}
+function ord(p){return p===0?"omöjligt":p===1?"säkert":p<.15?"mycket liten chans":p<.45?"mindre troligt":p<=.55?"fifty-fifty":p<.85?"troligt":"mycket stor chans"}
+safe("sl",()=>{["0,7","-3","3/4","0,99","150 %","-0,6","25","25 %","0,01"].forEach(e=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=e;b.addEventListener("click",()=>{$("#sl-in").value=e;upd()});$("#sl-chips").appendChild(b)});
+  function upd(){const raw=$("#sl-in").value,p=pprob(raw),svg=$("#sl-svg");clear(svg);const X=v=>30+v*540;
+    S("line",{x1:20,y1:40,x2:580,y2:40,style:`stroke:${C("ink")};stroke-width:2`},svg);[0,.25,.5,.75,1].forEach(v=>{S("line",{x1:X(v),y1:33,x2:X(v),y2:47,style:`stroke:${C("ink")}`},svg);S("text",{x:X(v),y:66,"text-anchor":"middle","font-size":12,style:`fill:${C("muted")}`},svg,nf(v,2))});
+    if(!isFinite(p)){$("#sl-why").innerHTML='<span class="err">Skriv t.ex. 3/4, 0,75 eller 75 %.</span>';return}
+    if(p<0||p>1){$("#sl-why").innerHTML=`<span class="err">${raw.trim()} kan inte vara en sannolikhet</span> – det är ${p<0?"mindre än 0":"större än 1 (100 %)"}. En sannolikhet ligger alltid mellan 0 och 1.`;S("text",{x:p<0?20:580,y:22,"text-anchor":p<0?"start":"end","font-size":13,"font-weight":700,style:`fill:${C("red")}`},svg,p<0?"← utanför linjen":"utanför linjen →");return}
+    S("circle",{cx:X(p),cy:40,r:8,style:`fill:${C("red")}`},svg);S("text",{x:X(p),y:20,"text-anchor":"middle","font-size":13,"font-weight":700,style:`fill:${C("red")}`},svg,ord(p));
+    const s=simp(pf(nf(p,6).replace(/\s/g,""))||{n:0,d:1});
+    $("#sl-why").innerHTML=`<div class="eq">${raw.includes("/")?F(pf(raw).n,pf(raw).d):s.d<=1000?F(s.n,s.d):""} = ${nf(p,4)} = ${nf(p*100,2)} % → <b>${ord(p)}</b></div><div>Att det <b>inte</b> händer: 1 − ${nf(p,4)} = <b class="r">${nf(1-p,4)}</b> = ${nf((1-p)*100,2)} %.</div>`}
+  $("#sl-in").addEventListener("input",upd);upd();TOOL.sl=s=>{$("#sl-in").value=s;upd();return"#t-sl"}});
+
+/* tärning */
+safe("dice",()=>{let n=6,sel=new Set();const g=$("#di-grid");
+  [["Jämna",x=>x%2===0],["Udda",x=>x%2===1],["Alla",()=>true],["Rensa",()=>false]].forEach(([l,f])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.addEventListener("click",()=>{sel=new Set();for(let i=1;i<=n;i++)if(f(i))sel.add(i);draw()});$("#di-quick").appendChild(b)});
+  function build(){const v=Math.round(num($("#di-n").value));n=v>=2&&v<=60?v:6;sel=new Set([...sel].filter(x=>x<=n));g.innerHTML="";for(let i=1;i<=n;i++){const b=document.createElement("button");b.type="button";b.textContent=i;b.setAttribute("aria-pressed","false");b.addEventListener("click",()=>{sel.has(i)?sel.delete(i):sel.add(i);draw()});g.appendChild(b)}draw()}
+  function draw(){[...g.children].forEach((b,i)=>{const on=sel.has(i+1);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});const k=sel.size,s=simp({n:k,d:n});
+    $("#di-big").innerHTML=`P = ${F(k,n)}${k&&s.d!==n?` = ${F(s.n,s.d)}`:""} ${k?`≈ ${nf(k/n,3)} = ${nf(k/n*100,1)} %`:"= 0"}`;
+    $("#di-why").innerHTML=k===0?"Inga gynnsamma utfall – händelsen är <b>omöjlig</b>. Klicka på talen som är gynnsamma.":k===n?"Alla utfall är gynnsamma – händelsen är <b>säker</b>.":`<b>${k}</b> gynnsamma (${[...sel].sort((a,b)=>a-b).join(", ")}) av <b>${n}</b> möjliga. Alla sidor/fält måste vara lika stora.`}
+  $("#di-n").addEventListener("input",build);build();TOOL.dice=(N,s)=>{$("#di-n").value=N;sel=new Set(s||[]);build();return"#t-dice"}});
+
+/* kortlek */
+safe("card",()=>{const SU=[["♥ hjärter","rd"],["♦ ruter","rd"],["♣ klöver","bk"],["♠ spader","bk"]],RK=["E","2","3","4","5","6","7","8","9","10","Kn","D","K"];let sel=new Set();const g=$("#ca-grid");
+  SU.forEach(([n,c],s)=>{const l=document.createElement("span");l.textContent=n;g.appendChild(l);RK.forEach((r,k)=>{const b=document.createElement("button");b.type="button";b.className=c;b.textContent=r;b.dataset.k=s*13+k;b.setAttribute("aria-label",`${n} ${r}`);b.addEventListener("click",()=>{const id=s*13+k;sel.has(id)?sel.delete(id):sel.add(id);draw()});g.appendChild(b)})});
+  const Qk={sju:["Klöver sju",i=>i===2*13+6],ess:["Ess",i=>i%13===0],rott:["Röda kort",i=>i<26],hjarter:["Hjärter",i=>i<13],klad:["Klädda kort",i=>i%13>=10],fyra:["Fyror",i=>i%13===3],rensa:["Rensa",()=>false]};
+  Object.entries(Qk).forEach(([k,[l,f]])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.addEventListener("click",()=>{sel=new Set();for(let i=0;i<52;i++)if(f(i))sel.add(i);draw()});$("#ca-quick").appendChild(b)});
+  function draw(){$$("button",g).forEach(b=>b.classList.toggle("on",sel.has(+b.dataset.k)));const k=sel.size,s=simp({n:k,d:52});
+    $("#ca-big").innerHTML=`P = ${F(k,52)}${k&&s.d!==52?` = ${F(s.n,s.d)}`:""} ${k?`≈ ${nf(k/52,3)} = ${nf(k/52*100,1)} %`:"= 0"}`;
+    $("#ca-why").innerHTML=`<b>${k}</b> gynnsamma kort av <b>52</b> möjliga. Klicka på kort eller välj en grupp ovan.`}
+  draw();TOOL.card=q=>{sel=new Set();const f=Qk[q];if(f)for(let i=0;i<52;i++)if(f[1](i))sel.add(i);draw();return"#t-card"}});
+
+/* summa två tärningar */
+safe("sum",()=>{const g=$("#su-grid");let cur=7;g.innerHTML='<div class="hd">+</div>'+[1,2,3,4,5,6].map(x=>`<div class="hd">${x}</div>`).join("");
+  for(let a=1;a<=6;a++){g.innerHTML+=`<div class="hd">${a}</div>`;for(let b=1;b<=6;b++)g.innerHTML+=`<button type="button" data-s="${a+b}" aria-label="${a} plus ${b} är ${a+b}">${a+b}</button>`}
+  $$("button",g).forEach(b=>b.addEventListener("click",()=>pick(+b.dataset.s)));
+  for(let s=2;s<=12;s++){const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s;b.addEventListener("click",()=>pick(s));$("#su-btn").appendChild(b)}
+  function pick(s){cur=s;let k=0;$$("button",g).forEach(b=>{const on=+b.dataset.s===s;b.classList.toggle("on",on);if(on)k++});const q=simp({n:k,d:36});
+    $("#su-big").innerHTML=`P(summa ${s}) = ${F(k,36)}${k&&q.d!==36?` = ${F(q.n,q.d)}`:""} ≈ ${nf(k/36*100,1)} %`;
+    $("#su-why").innerHTML=`${k} av 36 lika troliga kombinationer ger summan ${s}. Summan 7 har flest (6 st). Summan 1 är omöjlig.`}
+  pick(7);TOOL.sum=s=>{pick(s);return"#t-sum"}});
+
+/* lotteri */
+safe("lott",()=>{function upd(){const t=Math.round(num($("#lo-t").value)),g=Math.round(num($("#lo-g").value)),n=num($("#lo-n").value),o=$("#lo-out"),svg=$("#lo-svg");clear(svg);
+  if(!(t>0)||!(g>=0)||g>t){o.innerHTML='<span class="err">Gynnsamma måste vara mellan 0 och totalt antal.</span>';return}
+  const p=g/t,s=simp({n:g,d:t}),q=simp({n:t-g,d:t});
+  o.innerHTML=`<div class="row"><span class="eq"><b>Chans</b> = ${F(g,t)}${s.d!==t&&g?` = ${F(s.n,s.d)}`:""} = ${nf(p,4)} = <b class="r">${nf(p*100,2)} %</b></span><span class="why">gynnsamma / möjliga</span></div>
+  <div class="row"><span class="eq">Övriga (nitlotter): ${t} − ${g} = <b>${t-g}</b></span></div>
+  <div class="row"><span class="eq"><b>Risk</b> för motsatsen = ${F(t-g,t)}${q.d!==t&&t-g?` = ${F(q.n,q.d)}`:""} = ${nf(1-p,4)} = <b class="b">${nf((1-p)*100,2)} %</b></span><span class="why">eller 1 − ${nf(p,4)}</span></div>`+
+  (n>0?`<div class="row"><span class="eq">Väntat antal på ${nf(n)} försök: ${nf(p,4)} · ${nf(n)} = <b class="r">${nf(p*n,2)}</b></span><span class="why">sannolikhet · antal försök</span></div>`:"");
+  S("rect",{x:10,y:10,width:540,height:26,rx:4,style:`fill:${C("blue-tint")};stroke:${C("ink")}`},svg);S("rect",{x:10,y:10,width:540*p,height:26,rx:4,style:`fill:${C("red")}`},svg)}
+  on([$("#lo-t"),$("#lo-g"),$("#lo-n")],"input",upd);upd();TOOL.lott=(t,g,n)=>{$("#lo-t").value=t;$("#lo-g").value=g;$("#lo-n").value=n||"";upd();return"#t-lott"}});
+
+/* påse utan återläggning */
+safe("urn",()=>{let A=0,Bn=0,a0=0,b0=0,log=[];
+  function names(){return[$("#ur-an").value||"sort 1",$("#ur-bn").value||"sort 2"]}
+  function reset(){a0=A=Math.max(0,Math.min(200,Math.round(num($("#ur-a").value))||0));b0=Bn=Math.max(0,Math.min(200,Math.round(num($("#ur-b").value))||0));log=[];draw()}
+  function take(w){const [na,nb]=names(),T=A+Bn;if(!T)return;const k=w==="a"?A:Bn;if(!k){log.push(`<span class="err">Det finns ingen ${w==="a"?na:nb} kvar.</span>`);return draw()}
+    log.push(`P(${w==="a"?na:nb}) = ${F(k,T)}${simp({n:k,d:T}).d!==T?` = ${F(simp({n:k,d:T}).n,simp({n:k,d:T}).d)}`:""} – du drar en ${w==="a"?na:nb} och lägger <i>inte</i> tillbaka den.`);if(w==="a")A--;else Bn--;draw()}
+  function draw(){const [na,nb]=names(),T=A+Bn;$("#ur-da").textContent=`Dra en ${na}`;$("#ur-db").textContent=`Dra en ${nb}`;
+    let h="";for(let i=0;i<Math.min(a0,60);i++)h+=`<span style="background:${C("red")}" class="${i>=A?"gone":""}"></span>`;for(let i=0;i<Math.min(b0,60);i++)h+=`<span style="background:${C("blue-tint")}" class="${i>=Bn?"gone":""}"></span>`;$("#ur-balls").innerHTML=h;
+    $("#ur-log").innerHTML=log.map(x=>`<li>${x}</li>`).join("");
+    $("#ur-now").innerHTML=T?`Kvar: ${A} ${na} och ${Bn} ${nb} = ${T} st.<br>Nu: P(${na}) = <b class="r">${F(A,T)}</b>${simp({n:A,d:T}).d!==T&&A?` = ${F(simp({n:A,d:T}).n,simp({n:A,d:T}).d)}`:""} &nbsp; P(${nb}) = <b class="b">${F(Bn,T)}</b>${simp({n:Bn,d:T}).d!==T&&Bn?` = ${F(simp({n:Bn,d:T}).n,simp({n:Bn,d:T}).d)}`:""}`:"Påsen är tom."}
+  $("#ur-da").addEventListener("click",()=>take("a"));$("#ur-db").addEventListener("click",()=>take("b"));$("#ur-reset").addEventListener("click",reset);
+  on($$("#t-urn input"),"input",reset);reset();
+  TOOL.urn=(an,a,bn,b,first)=>{$("#ur-an").value=an;$("#ur-a").value=a;$("#ur-bn").value=bn;$("#ur-b").value=b;reset();if(first)take(first);return"#t-urn"}});
+
+/* kombinatorik */
+safe("komb",()=>{function perms(arr){if(arr.length<=1)return[arr];const out=[];arr.forEach((x,i)=>perms(arr.slice(0,i).concat(arr.slice(i+1))).forEach(p=>out.push([x].concat(p))));return out}
+  function tree(svg,ks){clear(svg);const prod=ks.reduce((a,b)=>a*b,1);if(ks.length>3||prod>36||ks.some(k=>k<1)){svg.setAttribute("viewBox","0 0 560 24");S("text",{x:0,y:16,"font-size":13,style:`fill:${C("muted")}`},svg,"Trädet ritas när det blir högst 36 kombinationer och högst tre steg.");return}
+    const H=Math.max(prod*16,60),W=560,lx=k=>40+k*(W-120)/ks.length;svg.setAttribute("viewBox",`0 0 ${W} ${H+10}`);
+    function rec(level,y0,y1,px,py){if(level===ks.length)return;const k=ks[level],h=(y1-y0)/k;for(let i=0;i<k;i++){const y=y0+h*(i+.5),x=lx(level+1);S("line",{x1:px,y1:py,x2:x,y2:y,style:`stroke:${C("line")};stroke-width:1.2`},svg);S("circle",{cx:x,cy:y,r:4,style:`fill:${pcol(level)}`},svg);rec(level+1,y0+h*i,y0+h*(i+1),x,y)}}
+    S("circle",{cx:lx(0),cy:H/2+5,r:5,style:`fill:${C("ink")}`},svg);rec(0,5,H+5,lx(0),H/2+5);S("text",{x:W-10,y:H/2+9,"text-anchor":"end","font-size":13,"font-weight":700},svg,`${prod} grenar`)}
+  function upd(){const m=seg("ko-m");["val","ko","sif"].forEach(x=>$("#ko-"+x).hidden=x!==m);const svg=$("#ko-svg");
+    if(m==="val"){const ks=$("#ko-list").value.split(/[,;\s]+/).map(x=>Math.round(num(x))).filter(x=>isFinite(x));if(!ks.length||ks.some(k=>k<0)){$("#ko-big").innerHTML='<span class="err">Skriv antal val, t.ex. 3, 2.</span>';$("#ko-why").textContent="";clear(svg);return}
+      const p=ks.reduce((a,b)=>a*b,1);$("#ko-big").innerHTML=`${ks.join(" · ")} = <span class="r">${nf(p,0)}</span> kombinationer`;$("#ko-why").innerHTML=`Multiplikationsprincipen: för vart och ett av de ${ks[0]} första valen finns ${ks.slice(1).join(" · ")||"inga fler"} sätt att fortsätta.`;tree(svg,ks)}
+    else if(m==="ko"){const n=Math.round(num($("#ko-n").value));if(!(n>=1&&n<=12)){$("#ko-big").innerHTML='<span class="err">Välj 1–12 personer.</span>';clear(svg);return}
+      const f=[];let p=1;for(let i=n;i>=1;i--){f.push(i);p*=i}$("#ko-big").innerHTML=`${f.join(" · ")} = <span class="r">${nf(p,0)}</span> sätt`;
+      const L="ABCDEFGHIJKL".slice(0,n).split("");$("#ko-why").innerHTML=`Första platsen kan väljas på ${n} sätt, nästa på ${n-1>0?n-1:1} … sista platsen är bestämd.`+(n<=4?`<div class="small">${perms(L).map(x=>x.join("")).join(", ")}</div>`:"");clear(svg);svg.setAttribute("viewBox","0 0 560 1")}
+    else{const d=Math.round(num($("#ko-d").value)),l=Math.round(num($("#ko-l").value)),rep=seg("ko-r")==="1";if(!(d>=1&&d<=10&&l>=1&&l<=8)){$("#ko-big").innerHTML='<span class="err">Välj 1–10 siffror och 1–8 platser.</span>';clear(svg);return}
+      const f=[];let p=1;for(let i=0;i<l;i++){const k=rep?d:d-i;f.push(Math.max(k,0));p*=Math.max(k,0)}
+      $("#ko-big").innerHTML=`${f.join(" · ")} = <span class="r">${nf(p,0)}</span> tal`;$("#ko-why").innerHTML=rep?`Varje plats kan vara vilken som helst av de ${d} siffrorna.`:(l>d?"Det finns inte tillräckligt många olika siffror.":`Första platsen ${d} val, nästa ${d-1} (en siffra är redan använd) …`);clear(svg);svg.setAttribute("viewBox","0 0 560 1")}}
+  $$('input[name="ko-m"],input[name="ko-r"]').forEach(r=>r.addEventListener("change",upd));on($$("#t-komb input.in"),"input",upd);upd();
+  TOOL.komb=(m,a,b,r)=>{setSeg("ko-m",m);if(m==="val")$("#ko-list").value=a;else if(m==="ko")$("#ko-n").value=a;else{$("#ko-d").value=a;$("#ko-l").value=b;setSeg("ko-r",r?"1":"0")}upd();return"#t-komb"}});
+/* ================= UPPGIFTSSTÖD ================= */
+const BY=new Map(TASKS.map((t,i)=>[t[0],i]));
+function label(k){if(/^\d+$/.test(k))return{num:k,title:`Uppgift ${k}`};const [g,n]=k.split("-");const G=GROUPS.find(x=>x[0]===g);return{num:n,title:`${G?G[1]:g} ${n}`}}
+let card=null,curIdx=-1;
+function openTask(i,opt={}){const t=TASKS[i];if(!t)return;curIdx=i;const [k,sec,page,q,h,a,tool]=t;const L=label(k);
+  if(card)card.remove();card=document.createElement("div");card.className="card";card.id="kort";card.setAttribute("role","region");card.setAttribute("aria-label",L.title);
+  card.innerHTML=`<div class="card-h"><span class="num">${L.num}</span><span class="meta"><b>${L.title}</b><span>${SECS[sec]} · sidan ${page}</span></span><button class="x" type="button" aria-label="Stäng stödkortet">×</button></div>
+   <div class="q">${tx(q)}</div>
+   <div><div class="lbl">Så kan du tänka</div><div class="hint">${tx(h)}</div></div>
+   <div class="answ" hidden><div class="lbl">Facit</div><div class="ans">${tx(a)}</div></div>
+   <div class="card-f">${tool?`<button class="btn" type="button" data-a="tool">Prova i verktyget ↓</button>`:""}<button class="btn ghost" type="button" data-a="ans">Visa facit</button><span class="sp"></span><button class="btn ghost" type="button" data-a="prev" ${i<=0?"disabled":""} aria-label="Föregående uppgift">‹ Föreg.</button><button class="btn ghost" type="button" data-a="next" ${i>=TASKS.length-1?"disabled":""} aria-label="Nästa uppgift">Nästa ›</button></div>`;
+  const slot=$(`#${sec} .slot`);slot.appendChild(card);
+  card.querySelector(".x").addEventListener("click",()=>{card.remove();card=null;history.replaceState(null,"",`#${sec}`)});
+  card.querySelector('[data-a="ans"]').addEventListener("click",e=>{const w=card.querySelector(".answ");w.hidden=!w.hidden;e.target.textContent=w.hidden?"Visa facit":"Dölj facit"});
+  card.querySelector('[data-a="prev"]').addEventListener("click",()=>openTask(i-1));card.querySelector('[data-a="next"]').addEventListener("click",()=>openTask(i+1));
+  if(tool)card.querySelector('[data-a="tool"]').addEventListener("click",()=>{const fn=TOOL[tool[0]];if(!fn)return;const id=fn(...tool.slice(1));const el=$(id);if(el){el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}});
+  if(tool&&TOOL[tool[0]])safe("prefill",()=>TOOL[tool[0]](...tool.slice(1)));
+  try{history.replaceState(null,"",`#u-${k}`)}catch(e){}
+  requestAnimationFrame(()=>{card.scrollIntoView({behavior:opt.instant?"auto":"smooth",block:"start"});if(opt.focus!==false)card.querySelector(".x").focus({preventScroll:true})});
+}
+
+/* sök */
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim();
+function parse(raw){let s=norm(raw).replace(/^(uppgift|uppg|upg|nr|tal)\.?\s*/,"");let m;
+  if(m=s.match(/^(\d{1,3})\s*[a-f]?\)?$/))return BY.has(m[1])?[m[1]]:[];
+  if(m=s.match(/^(?:minitest|mini|mt)\s*4?\s*([ab])?\s*[:.\-\s]?\s*(\d)?$/))return m[1]&&m[2]?[`4${m[1].toUpperCase()}-${m[2]}`]:TASKS.filter(t=>t[0].startsWith(m[1]?`4${m[1].toUpperCase()}-`:"4")).map(t=>t[0]);
+  if(m=s.match(/^4\s*([ab])\s*[:.\-\s]\s*(\d)$/))return[`4${m[1].toUpperCase()}-${m[2]}`];
+  if(m=s.match(/^(?:kapiteltest|kapitel test|kt|test)\s*(\d+)?$/))return m[1]?[`KT-${m[1]}`]:TASKS.filter(t=>t[0].startsWith("KT-")).map(t=>t[0]);
+  if(m=s.match(/^(?:sant eller falskt|sant|falskt|sf)\s*(\d+)?$/))return m[1]?[`SF-${m[1]}`]:TASKS.filter(t=>t[0].startsWith("SF-")).map(t=>t[0]);
+  if(m=s.match(/^(?:arbeta tillsammans|arbeta|at|satsa pa summan|satsa)\s*(\d)?$/))return m[1]?[`AT-${m[1]}`]:TASKS.filter(t=>t[0].startsWith("AT-")).map(t=>t[0]);
+  if(m=s.match(/^(?:uppslaget|uppslag|us)\s*([a-f])?$/))return m[1]?[`UP-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("UP-")).map(t=>t[0]);
+  if(m=s.match(/^(?:problemlosning|problem|pl)\s*([abc])?$/))return m[1]?[`PL-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("PL-")).map(t=>t[0]);
+  if(m=s.match(/^(?:bedomning\w*|forhandla om lon|forhandla|bu)\s*([ab])?$/))return m[1]?[`BU-${m[1].toUpperCase()}`]:TASKS.filter(t=>t[0].startsWith("BU-")).map(t=>t[0]);
+  if(s.length<2)return[];
+  const words=s.split(" ");return TASKS.filter(t=>{const hay=norm(`${label(t[0]).title} ${SECS[t[1]]} ${t[3]} ${t[4]}`.replace(/<[^>]+>/g,"").replace(/\[(\d+)\/(\d+)\]/g,"$1/$2"));return words.every(w=>hay.includes(w))}).slice(0,30).map(t=>t[0])}
+const plain=s=>s.replace(/<[^>]+>/g,"").replace(/\[(\d+|□)\/(\d+)\]/g,"$1/$2");
+safe("search",()=>{const q=$("#q"),box=$("#sugg");let res=[],act=0;
+  function render(){if(!q.value.trim()){box.hidden=true;q.setAttribute("aria-expanded","false");return}box.hidden=false;q.setAttribute("aria-expanded","true");
+    if(!res.length){box.innerHTML=`<div class="none">Ingen uppgift hittades. Prova ett nummer 1–53, ”minitest 4B 2”, ”kt 4”, ”sf 9” eller ett ord.</div>`;return}
+    box.innerHTML=res.map((k,i)=>{const t=TASKS[BY.get(k)],L=label(k);return `<button type="button" role="option" class="${i===act?"act":""}" data-k="${k}"><b>${L.title}</b><span>${SECS[t[1]]} · s. ${t[2]}</span><small>${plain(t[3]).slice(0,90)}${plain(t[3]).length>90?" …":""}</small></button>`}).join("");
+    $$("button",box).forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();go(b.dataset.k)}))}
+  function go(k){box.hidden=true;q.setAttribute("aria-expanded","false");q.blur();openTask(BY.get(k))}
+  q.addEventListener("input",()=>{res=parse(q.value);act=0;render()});
+  q.addEventListener("keydown",e=>{if(e.key==="ArrowDown"){act=Math.min(act+1,res.length-1);render();e.preventDefault()}else if(e.key==="ArrowUp"){act=Math.max(act-1,0);render();e.preventDefault()}
+    else if(e.key==="Enter"){if(res[act])go(res[act]);e.preventDefault()}else if(e.key==="Escape"){q.value="";res=[];render();q.blur()}});
+  q.addEventListener("blur",()=>setTimeout(()=>{box.hidden=true},150));q.addEventListener("focus",()=>{if(q.value.trim()){res=parse(q.value);render()}});
+  document.addEventListener("keydown",e=>{if(e.key==="/"&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();q.focus();q.select()}})});
+
+/* startsidan */
+safe("start",()=>{const g=$("#tgrid");TASKS.filter(t=>/^\d+$/.test(t[0])).forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t[0];b.className=+t[0]<=25?"f":"p";b.title=`${SECS[t[1]]}, s. ${t[2]}`;b.addEventListener("click",()=>openTask(BY.get(t[0])));g.appendChild(b)});
+  const ex=$("#extra");GROUPS.forEach(([p,name,pg])=>{const d=document.createElement("div");d.className="grp";d.innerHTML=`<b>${name} <span class="small">${pg}</span></b><div class="chips"></div>`;
+    TASKS.filter(t=>t[0].startsWith(p+"-")).forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t[0].split("-")[1];b.title=plain(t[3]);b.addEventListener("click",()=>openTask(BY.get(t[0])));d.querySelector(".chips").appendChild(b)});ex.appendChild(d)});
+  const qk=$("#quick");[["#t-tab","Tabell och diagram"],["#t-lm","Medelvärde och median"],["#t-vill","Vilseledande diagram"],["#t-dice","Tärningen"],["#t-card","Kortleken"],["#t-urn","Dra utan återläggning"],["#t-komb","Kombinatorik"],["#blandat","Minitester"]].forEach(([h,t])=>{const a=document.createElement("a");a.href=h;a.className="chip";a.style.textDecoration="none";a.textContent=t;qk.appendChild(a)})});
+
+/* hash: #u-47 öppnar uppgift */
+function fromHash(){const h=decodeURIComponent(location.hash.slice(1));if(h.startsWith("u-")&&BY.has(h.slice(2)))openTask(BY.get(h.slice(2)),{instant:true,focus:false})}
+window.addEventListener("hashchange",fromHash);fromHash();
+})();
+</script>
+</body>
+</html>
